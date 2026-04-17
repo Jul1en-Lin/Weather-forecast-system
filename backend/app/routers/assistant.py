@@ -138,7 +138,11 @@ async def chat_stream(
                     yield SSEStream.event({"chunk": chunk})
 
         except Exception as e:
-            error_msg = f"抱歉，服务暂时出现问题：{str(e)}"
+            err_str = str(e)
+            if req.model_id == "deepseek-r1:14b" and ("502" in err_str or "Connection" in err_str or "Connect" in err_str):
+                error_msg = "本地模型未就绪，请确认 Ollama 已启动（默认端口 11434）。"
+            else:
+                error_msg = f"抱歉，服务暂时出现问题：{err_str}"
             assistant_content += error_msg
             yield SSEStream.event({"chunk": error_msg})
 

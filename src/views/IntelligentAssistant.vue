@@ -72,8 +72,7 @@
             </div>
             <div class="toolbar">
               <select v-model="selectedModel">
-                <option value="deepseek-32b">DeepSeek R1 32B (高质量)</option>
-                <option value="qwen-32b">Qwen3 32B (快速响应)</option>
+                <option v-for="m in models" :key="m.id" :value="m.id">{{ m.name }}</option>
               </select>
               <select v-model="selectedKnowledgeBases" multiple size="1" style="height:32px">
                 <option value="kb_weather">气象术语库</option>
@@ -155,11 +154,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
-// 类型定义
+const API_BASE = 'http://localhost:8000'
+
 interface Message {
   role: 'user' | 'assistant'
   content: string
@@ -169,10 +169,15 @@ interface Message {
 interface Conversation {
   id: string
   title: string
-  messages: Message[]
 }
 
-// 认证相关
+interface ModelOption {
+  id: string
+  name: string
+  description: string
+}
+
+// 认证
 const router = useRouter()
 const authStore = useAuthStore()
 const username = computed(() => authStore.username)
@@ -181,60 +186,33 @@ const userInitial = computed(() => {
   return name ? name.charAt(0).toUpperCase() : 'U'
 })
 
-// 智能助手数据
+// 数据
 const conversations = ref<Conversation[]>([])
 const currentConvId = ref<string | null>(null)
 const inputMessage = ref('')
 const isTyping = ref(false)
 const messagesContainer = ref<HTMLElement | null>(null)
+const currentMessages = ref<Message[]>([])
 
-// 模型、知识库、工具选择
-const selectedModel = ref('deepseek-32b')
+// 选择
+const models = ref<ModelOption[]>([])
+const selectedModel = ref('')
 const selectedKnowledgeBases = ref<string[]>([])
 const selectedTools = ref<string[]>([])
 
-// 当前对话的消息
-const currentMessages = computed(() => {
-  const conv = conversations.value.find(c => c.id === currentConvId.value)
-  return conv ? conv.messages : []
-})
-
-// 辅助函数
-function generateId(): string {
-  return Date.now() + '-' + Math.random().toString(36).substr(2, 6)
-}
-
+// 辅助
 function formatTime(): string {
   const now = new Date()
-  const hours = String(now.getHours()).padStart(2, '0')
-  const minutes = String(now.getMinutes()).padStart(2, '0')
-  return `${hours}:${minutes}`
+  const h = String(now.getHours()).padStart(2, '0')
+  const m = String(now.getMinutes()).padStart(2, '0')
+  return `${h}:${m}`
 }
 
-function saveToLocal() {
-  localStorage.setItem('assistant_conversations', JSON.stringify(conversations.value))
-  localStorage.setItem('assistant_currentConvId', currentConvId.value as string)
-}
-
-function loadFromLocal() {
-  const saved = localStorage.getItem('assistant_conversations')
-  if (saved) {
-    conversations.value = JSON.parse(saved)
-  }
-  const savedId = localStorage.getItem('assistant_currentConvId')
-  if (savedId && conversations.value.some(c => c.id === savedId)) {
-    currentConvId.value = savedId
-  } else if (conversations.value.length > 0) {
-    currentConvId.value = conversations.value[0].id
-  } else {
-    const defaultId = generateId()
-    conversations.value = [{
-      id: defaultId,
-      title: '新对话',
-      messages: [{ role: 'assistant', content: '你好！我是智能气象助手 🌤️，有什么可以帮你的吗？', time: formatTime() }]
-    }]
-    currentConvId.value = defaultId
-  }
+function fmtTimeFromDate(dateStr: string): string {
+  const d = new Date(dateStr)
+  const h = String(d.getHours()).padStart(2, '0')
+  const m = String(d.getMinutes()).padStart(2, '0')
+  return `${h}:${m}`
 }
 
 function scrollToBottom() {
@@ -245,115 +223,167 @@ function scrollToBottom() {
   })
 }
 
-function updateConversationTitle(convId: string, userMsg: string) {
-  const conv = conversations.value.find(c => c.id === convId)
-  if (conv && (conv.title === '新对话' || !conv.title)) {
-    let newTitle = userMsg.slice(0, 20)
-    if (userMsg.length > 20) newTitle += '...'
-    conv.title = newTitle
-    saveToLocal()
+async function apiFetch(path: string, opts?: RequestInit) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...(opts?.headers || {}) },
+    ...opts,
+  })
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText)
+    throw new Error(`${res.status}: ${text}`)
   }
+  return res.json()
+}
+
+// 加载模型
+async function loadModels() {
+  const data = await apiFetch('/api/v1/assistant/models')
+  models.value = data.models
+  if (models.value.length > 0 && !selectedModel.value) {
+    selectedModel.value = models.value[0].id
+  }
+}
+
+// 加载对话
+async function loadConversations() {
+  const data = await apiFetch('/api/v1/assistant/conversations')
+  conversations.value = data.conversations
+  if (!currentConvId.value && conversations.value.length > 0) {
+    currentConvId.value = conversations.value[0].id
+    await loadMessages(currentConvId.value)
+  } else if (conversations.value.length === 0) {
+    await createNewChat()
+  }
+}
+
+// 加载消息
+async function loadMessages(convId: string) {
+  const data = await apiFetch(`/api/v1/assistant/conversations/${convId}`)
+  currentMessages.value = data.messages.map((m: { role: string; content: string; created_at?: string }) => ({
+    role: m.role as 'user' | 'assistant',
+    content: m.content,
+    time: m.created_at ? fmtTimeFromDate(m.created_at) : formatTime(),
+  }))
+  scrollToBottom()
 }
 
 // 对话操作
-function createNewChat() {
-  const newId = generateId()
-  conversations.value.unshift({
-    id: newId,
-    title: '新对话',
-    messages: [{ role: 'assistant', content: '你好！我是智能气象助手 🌤️，有什么可以帮你的吗？', time: formatTime() }]
+async function createNewChat() {
+  const data = await apiFetch('/api/v1/assistant/conversations', {
+    method: 'POST',
+    body: JSON.stringify({ title: '新对话', model_id: selectedModel.value }),
   })
-  currentConvId.value = newId
-  saveToLocal()
+  conversations.value.unshift(data)
+  currentConvId.value = data.id
+  currentMessages.value = []
   scrollToBottom()
 }
 
-function switchConversation(id: string) {
+async function switchConversation(id: string) {
   if (currentConvId.value === id) return
   currentConvId.value = id
-  saveToLocal()
-  scrollToBottom()
+  await loadMessages(id)
 }
 
-function deleteConversation(id: string) {
+async function deleteConversation(id: string) {
   if (conversations.value.length === 1) {
-    // 提示不能删除最后一个
+    alert('不能删除最后一个对话')
     return
   }
+  await apiFetch(`/api/v1/assistant/conversations/${id}`, { method: 'DELETE' })
   const idx = conversations.value.findIndex(c => c.id === id)
   if (idx !== -1) {
     conversations.value.splice(idx, 1)
     if (currentConvId.value === id) {
-      currentConvId.value = conversations.value[0].id
+      currentConvId.value = conversations.value[0]?.id || null
+      if (currentConvId.value) {
+        await loadMessages(currentConvId.value)
+      } else {
+        currentMessages.value = []
+      }
     }
-    saveToLocal()
-    scrollToBottom()
   }
 }
 
-// 模拟流式回复（等后端接口好后替换）
-async function mockStreamReply(userMessage: string, onChunk: (chunk: string) => void, onEnd: () => void) {
-  const mockFull = `这是对“${userMessage}”的模拟回复。\n\n我是智能气象助手，目前运行在前端演示模式。等后端同学根据API文档实现接口后，我就会调用真正的大模型，为你提供专业的气象分析、文档校正、材料生成等服务。\n\n你可以继续提问，我会尽力模拟回答。`
-  let index = 0
-  const interval = setInterval(() => {
-    if (index < mockFull.length) {
-      onChunk(mockFull[index])
-      index++
-    } else {
-      clearInterval(interval)
-      onEnd()
+// SSE 流式对话
+async function streamChat(userMessage: string, onChunk: (chunk: string) => void, onEnd: () => void) {
+  const res = await fetch(`${API_BASE}/api/v1/assistant/chat/stream`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      model_id: selectedModel.value,
+      message: userMessage,
+      conversation_id: currentConvId.value,
+      knowledge_base_ids: selectedKnowledgeBases.value,
+      tool_ids: selectedTools.value,
+    }),
+  })
+  if (!res.ok) throw new Error('请求失败')
+  const reader = res.body!.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    buffer += decoder.decode(value, { stream: true })
+    const chunks = buffer.split('\n\n')
+    buffer = chunks.pop() || ''
+    for (const chunk of chunks) {
+      const lines = chunk.trim().split('\n')
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6)
+          if (data === '[DONE]') {
+            onEnd()
+            return
+          }
+          try {
+            const parsed = JSON.parse(data)
+            if (parsed.chunk) onChunk(parsed.chunk)
+          } catch {
+            // ignore
+          }
+        }
+      }
     }
-  }, 30)
+  }
+  onEnd()
 }
 
 // 发送消息
 async function sendMessage() {
   if (!inputMessage.value.trim() || isTyping.value) return
-  
   const userText = inputMessage.value.trim()
   inputMessage.value = ''
 
-  let conv = conversations.value.find(c => c.id === currentConvId.value)
-  if (!conv) {
-    createNewChat()
-    conv = conversations.value.find(c => c.id === currentConvId.value)!
+  if (!currentConvId.value) {
+    await createNewChat()
   }
 
-  // 添加用户消息
-  const userMessage: Message = {
-    role: 'user',
-    content: userText,
-    time: formatTime()
-  }
-  conv.messages.push(userMessage)
-  saveToLocal()
+  currentMessages.value.push({ role: 'user', content: userText, time: formatTime() })
   scrollToBottom()
-  updateConversationTitle(currentConvId.value!, userText)
 
-  // 添加占位的助手消息
-  const assistantMsgIndex = conv.messages.length
-  conv.messages.push({ role: 'assistant', content: '', time: formatTime() })
-  saveToLocal()
+  const assistantIdx = currentMessages.value.length
+  currentMessages.value.push({ role: 'assistant', content: '', time: formatTime() })
   scrollToBottom()
 
   isTyping.value = true
-
   let accumulated = ''
-  await mockStreamReply(userText,
-    (chunk) => {
-      accumulated += chunk
-      conv.messages[assistantMsgIndex].content = accumulated
-      saveToLocal()
-      scrollToBottom()
-    },
-    () => {
-      isTyping.value = false
-      saveToLocal()
-    }
-  )
-  if (isTyping.value) {
+
+  try {
+    await streamChat(userText,
+      (chunk) => {
+        accumulated += chunk
+        currentMessages.value[assistantIdx].content = accumulated
+        scrollToBottom()
+      },
+      () => { isTyping.value = false }
+    )
+  } catch {
+    currentMessages.value[assistantIdx].content = '服务暂时不可用，请稍后重试。'
     isTyping.value = false
-    saveToLocal()
   }
 }
 
@@ -362,26 +392,26 @@ function sendSuggestion(text: string) {
   sendMessage()
 }
 
-// 语音输入（模拟）
 function startVoiceInput() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert('您的浏览器不支持麦克风，请使用 Chrome/Edge 等现代浏览器。')
     return
   }
-  // 模拟语音识别
   setTimeout(() => {
     inputMessage.value = '模拟语音输入：今天天气怎么样？'
   }, 1000)
 }
 
-// 退出登录
 const handleLogout = () => {
   authStore.logout()
   router.push('/login')
 }
 
 // 初始化
-loadFromLocal()
+onMounted(() => {
+  loadModels()
+  loadConversations()
+})
 </script>
 
 <style scoped>

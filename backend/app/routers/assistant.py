@@ -51,104 +51,8 @@ def get_tools():
         ToolInfo(id="alert_query", name="预警查询", description="查询气象预警信号"),
     ])
 
-# ---- 对话管理 ----
-@router.get("/conversations", response_model=ConversationsResponse)
-def list_conversations(
-    page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
-    db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
-):
-    items, total = ConversationService.list_by_user(db, current_user["user_id"], page, page_size)
-    return ConversationsResponse(
-        conversations=[
-            ConversationItem(
-                id=c.id,
-                title=c.title,
-                model_id=c.model_id,
-                created_at=c.created_at,
-                updated_at=c.updated_at,
-            ) for c in items
-        ],
-        total=total,
-    )
-
-@router.post("/conversations", response_model=ConversationItem)
-def create_conversation(
-    req: CreateConversationRequest,
-    db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
-):
-    conv = ConversationService.create(db, current_user["user_id"], req.title, req.model_id)
-    return ConversationItem(
-        id=conv.id,
-        title=conv.title,
-        model_id=conv.model_id,
-        created_at=conv.created_at,
-        updated_at=conv.updated_at,
-    )
-
-@router.get("/conversations/{conversation_id}", response_model=ConversationDetail)
-def get_conversation(
-    conversation_id: str,
-    db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
-):
-    conv = ConversationService.get(db, conversation_id, current_user["user_id"])
-    if not conv:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
-    messages = ConversationService.get_messages(db, conversation_id, current_user["user_id"])
-    return ConversationDetail(
-        id=conv.id,
-        title=conv.title,
-        model_id=conv.model_id,
-        messages=[
-            MessageItem(role=m.role, content=m.content, created_at=m.created_at)
-            for m in messages
-        ],
-        created_at=conv.created_at,
-        updated_at=conv.updated_at,
-    )
-
-@router.put("/conversations/{conversation_id}", response_model=ConversationItem)
-def rename_conversation(
-    conversation_id: str,
-    req: RenameConversationRequest,
-    db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
-):
-    conv = ConversationService.rename(db, conversation_id, current_user["user_id"], req.title)
-    if not conv:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
-    return ConversationItem(
-        id=conv.id,
-        title=conv.title,
-        model_id=conv.model_id,
-        created_at=conv.created_at,
-        updated_at=conv.updated_at,
-    )
-
-@router.delete("/conversations/{conversation_id}")
-def delete_conversation(
-    conversation_id: str,
-    db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
-):
-    ok = ConversationService.delete(db, conversation_id, current_user["user_id"])
-    if not ok:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
-    return {"detail": "Deleted"}
-
-@router.post("/conversations/batch-delete")
-def batch_delete_conversations(
-    req: BatchDeleteRequest,
-    db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
-):
-    count = ConversationService.batch_delete(db, req.conversation_ids, current_user["user_id"])
-    return {"detail": f"Deleted {count} conversations"}
-
 # ---- 流式对话（核心） ----
+# 注意：/chat/stream 必须放在 /conversations/{conversation_id} 之前，避免路径参数冲突
 @router.post("/chat/stream")
 async def chat_stream(
     req: ChatStreamRequest,
@@ -247,6 +151,103 @@ async def chat_stream(
             yield SSEStream.event("[DONE]")
 
     return sse_response(event_generator())
+
+# ---- 对话管理 ----
+@router.get("/conversations", response_model=ConversationsResponse)
+def list_conversations(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db_session),
+    current_user: dict = Depends(get_current_user),
+):
+    items, total = ConversationService.list_by_user(db, current_user["user_id"], page, page_size)
+    return ConversationsResponse(
+        conversations=[
+            ConversationItem(
+                id=c.id,
+                title=c.title,
+                model_id=c.model_id,
+                created_at=c.created_at,
+                updated_at=c.updated_at,
+            ) for c in items
+        ],
+        total=total,
+    )
+
+@router.post("/conversations", response_model=ConversationItem)
+def create_conversation(
+    req: CreateConversationRequest,
+    db: Session = Depends(get_db_session),
+    current_user: dict = Depends(get_current_user),
+):
+    conv = ConversationService.create(db, current_user["user_id"], req.title, req.model_id)
+    return ConversationItem(
+        id=conv.id,
+        title=conv.title,
+        model_id=conv.model_id,
+        created_at=conv.created_at,
+        updated_at=conv.updated_at,
+    )
+
+@router.get("/conversations/{conversation_id}", response_model=ConversationDetail)
+def get_conversation(
+    conversation_id: str,
+    db: Session = Depends(get_db_session),
+    current_user: dict = Depends(get_current_user),
+):
+    conv = ConversationService.get(db, conversation_id, current_user["user_id"])
+    if not conv:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
+    messages = ConversationService.get_messages(db, conversation_id, current_user["user_id"])
+    return ConversationDetail(
+        id=conv.id,
+        title=conv.title,
+        model_id=conv.model_id,
+        messages=[
+            MessageItem(role=m.role, content=m.content, created_at=m.created_at)
+            for m in messages
+        ],
+        created_at=conv.created_at,
+        updated_at=conv.updated_at,
+    )
+
+@router.put("/conversations/{conversation_id}", response_model=ConversationItem)
+def rename_conversation(
+    conversation_id: str,
+    req: RenameConversationRequest,
+    db: Session = Depends(get_db_session),
+    current_user: dict = Depends(get_current_user),
+):
+    conv = ConversationService.rename(db, conversation_id, current_user["user_id"], req.title)
+    if not conv:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
+    return ConversationItem(
+        id=conv.id,
+        title=conv.title,
+        model_id=conv.model_id,
+        created_at=conv.created_at,
+        updated_at=conv.updated_at,
+    )
+
+@router.delete("/conversations/{conversation_id}")
+def delete_conversation(
+    conversation_id: str,
+    db: Session = Depends(get_db_session),
+    current_user: dict = Depends(get_current_user),
+):
+    ok = ConversationService.delete(db, conversation_id, current_user["user_id"])
+    if not ok:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
+    return {"detail": "Deleted"}
+
+@router.post("/conversations/batch-delete")
+def batch_delete_conversations(
+    req: BatchDeleteRequest,
+    db: Session = Depends(get_db_session),
+    current_user: dict = Depends(get_current_user),
+):
+    count = ConversationService.batch_delete(db, req.conversation_ids, current_user["user_id"])
+    return {"detail": f"Deleted {count} conversations"}
 
 # ---- 语音转文字（预留） ----
 @router.post("/speech-to-text", response_model=SpeechToTextResponse)

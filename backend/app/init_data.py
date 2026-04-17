@@ -1,6 +1,9 @@
-from app.database import SessionLocal
+from app.database import SessionLocal, Base, engine
 from app.models.user import User
 from app.core.security import hash_password
+
+# 自动建表
+Base.metadata.create_all(bind=engine)
 
 def init_db():
     db = SessionLocal()

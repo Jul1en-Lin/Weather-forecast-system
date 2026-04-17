@@ -68,18 +68,19 @@ const errorMessage = ref('')
 const handleLogin = async () => {
   errorMessage.value = ''
   isLoading.value = true
-  
-  // 模拟登录验证
-  setTimeout(() => {
-    if (formData.value.username && formData.value.password) {
-      // 简单验证：用户名和密码都不为空即可登录
-      authStore.login(formData.value.username)
+
+  try {
+    const ok = await authStore.login(formData.value.username, formData.value.password)
+    if (ok) {
       router.push('/home')
     } else {
-      errorMessage.value = '请输入用户名和密码'
+      errorMessage.value = '用户名或密码错误'
     }
+  } catch {
+    errorMessage.value = '登录失败，请检查网络连接'
+  } finally {
     isLoading.value = false
-  }, 800)
+  }
 }
 </script>
 

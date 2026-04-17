@@ -1,0 +1,136 @@
+openapi: 3.0.0
+info:
+  title: 智能助手 API
+  version: 1.0.0
+servers:
+  - url: /api/v1/assistant
+paths:
+  /models:
+    get:
+      summary: 获取可用模型列表
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                models:
+                  - id: deepseek-32b
+                    name: DeepSeek R1 32B
+                    description: 高质量回答，速度中等
+  /knowledge-bases:
+    get:
+      summary: 获取知识库列表
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                knowledge_bases:
+                  - id: kb_001
+                    name: 气象术语库
+  /tools:
+    get:
+      summary: 获取可用工具列表
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                tools:
+                  - id: weather_query
+                    name: 天气查询
+  /chat/stream:
+    post:
+      summary: 发送对话（流式响应）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: string
+                model_id:
+                  type: string
+                knowledge_base_ids:
+                  type: array
+                  items:
+                    type: string
+                tool_ids:
+                  type: array
+                  items:
+                    type: string
+                message:
+                  type: string
+              required:
+                - model_id
+                - message
+            example:
+              model_id: deepseek-32b
+              message: 请生成一份茂名地区雷击风险空间分布描述
+      responses:
+        '200':
+          description: SSE 流式响应
+          content:
+            text/event-stream:
+              schema:
+                type: string
+  /conversations:
+    get:
+      summary: 获取对话列表
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+            type: integer
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: 创建新对话（可选）
+  /conversations/{conversation_id}:
+    get:
+      summary: 获取单个对话详情
+    put:
+      summary: 重命名对话
+      requestBody:
+        content:
+          application/json:
+            example:
+              title: 新标题
+    delete:
+      summary: 删除对话
+  /conversations/batch-delete:
+    post:
+      summary: 批量删除对话
+      requestBody:
+        content:
+          application/json:
+            example:
+              conversation_ids: ["conv_123", "conv_456"]
+  /speech-to-text:
+    post:
+      summary: 语音转文字
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                audio:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                text: 转换后的文字

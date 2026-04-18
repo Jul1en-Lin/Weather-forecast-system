@@ -87,10 +87,16 @@ async def chat_stream(
 
     tools = []
     tool_service = None
-    if req.tool_ids and "weather_query" in req.tool_ids:
-        tool_service = WeatherToolService.get_tool()
-        if tool_service:
-            tools.append(tool_service)
+    alert_tool = None
+    if req.tool_ids:
+        if "weather_query" in req.tool_ids:
+            tool_service = WeatherToolService.get_tool()
+            if tool_service:
+                tools.append(tool_service)
+        if "alert_query" in req.tool_ids:
+            alert_tool = WeatherToolService.get_alert_tool()
+            if alert_tool:
+                tools.append(alert_tool)
 
     async def event_generator():
         assistant_content = ""
@@ -114,14 +120,22 @@ async def chat_stream(
                                 tool_messages.append(result_text)
                             except Exception:
                                 tool_messages.append("天气服务暂不可用，请稍后重试。")
+                        elif alert_tool and tool_name == "alert_query":
+                            try:
+                                result = alert_tool.invoke(tool_args)
+                                tool_messages.append(result)
+                            except Exception:
+                                tool_messages.append("预警查询服务暂不可用，请稍后重试。")
 
                     final_prompt_parts = ["\n".join(system_parts)]
-                    final_prompt_parts.append("用户问题：" + req.message)
                     if tool_messages:
                         final_prompt_parts.append("工具查询结果：\n" + "\n".join(tool_messages))
                     final_prompt_parts.append("请根据以上信息回答用户。")
 
-                    final_messages = [SystemMessage(content="\n".join(final_prompt_parts))]
+                    final_messages = [
+                        SystemMessage(content="\n".join(final_prompt_parts)),
+                        HumanMessage(content=req.message),
+                    ]
                     async for chunk in llm.astream(final_messages):
                         text = chunk.content if hasattr(chunk, "content") else ""
                         if text:

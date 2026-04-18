@@ -7,6 +7,7 @@
 | 日期 | 版本 | 变更项 | 作者 | 关联 Issue |
 |-----|-----|-------|-----|-----------|
 | 2026-04-17 | — | feat: 完整后端实现（FastAPI + SQLAlchemy + LangChain + SSE 流式对话） | Claude | — |
+| 2026-04-18 | — | fix: 修复 MiniMax 天气工具调用报 400（chat content is empty）；feat: 实现预警查询工具并补充示例数据 | Claude | #2 |
 
 ---
 

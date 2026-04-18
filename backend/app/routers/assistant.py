@@ -4,7 +4,7 @@ from typing import List, Optional
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from app.dependencies import get_db_session, get_current_user
 from app.services.conversation import ConversationService
-from app.services.llm import get_llm, stream_llm_response
+from app.services.llm import get_llm, stream_llm_response, strip_thinking_tags, ThinkingFilter
 from app.services.knowledge_base import KnowledgeBaseService
 from app.services.weather_tool import WeatherToolService
 from app.core.sse import sse_response, SSEStream
@@ -136,13 +136,21 @@ async def chat_stream(
                         SystemMessage(content="\n".join(final_prompt_parts)),
                         HumanMessage(content=req.message),
                     ]
+                    filt = ThinkingFilter()
                     async for chunk in llm.astream(final_messages):
                         text = chunk.content if hasattr(chunk, "content") else ""
                         if text:
-                            assistant_content += text
-                            yield SSEStream.event({"chunk": text})
+                            out = filt.feed(text)
+                            if out:
+                                assistant_content += out
+                                yield SSEStream.event({"chunk": out})
+                    rem = filt.flush()
+                    if rem:
+                        assistant_content += rem
+                        yield SSEStream.event({"chunk": rem})
                 else:
                     content = first_response.content if hasattr(first_response, "content") else ""
+                    content = strip_thinking_tags(content)
                     if content:
                         assistant_content += content
                         yield SSEStream.event({"chunk": content})

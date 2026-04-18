@@ -8,6 +8,7 @@
 |-----|-----|-------|-----|-----------|
 | 2026-04-17 | — | feat: 完整后端实现（FastAPI + SQLAlchemy + LangChain + SSE 流式对话） | Claude | — |
 | 2026-04-18 | — | fix: 修复 MiniMax 天气工具调用报 400（chat content is empty）；feat: 实现预警查询工具并补充示例数据 | Claude | #2 |
+| 2026-04-19 | — | fix: 过滤 MiniMax SSE 流式回复中的 `<think>` 思维链标签；新增 `ThinkingFilter` 流式过滤器与 `strip_thinking_tags` 工具函数 | Claude | #1 |
 
 ---
 

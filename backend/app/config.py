@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     deepseek_api_key: str = ""
     minimax_api_key: str = ""
     tavily_api_key: str = ""
+    qweather_api_key: str = ""
+    qweather_api_host: str = "devapi.qweather.com"
     ollama_base_url: str = "http://localhost:11434/v1"
     app_secret_key: str = "change-me"
     allowed_origins: str = "http://localhost:5173"

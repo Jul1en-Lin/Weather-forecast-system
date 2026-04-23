@@ -42,11 +42,13 @@
 - 消费方式：**SQL 查询后将结果文本注入 prompt**，而非 RAG/向量检索。
 - 当用户勾选知识库后，后端在构造 prompt 时先查询对应 MySQL 表，将结果作为上下文一并传给 LLM。
 
-#### FR-005 工具调用（天气查询）
+#### FR-005 工具调用（天气查询 / 预警查询）
 - 端点：`GET /api/v1/assistant/tools`
-- 天气查询工具使用 `langchain_tavily.TavilySearch`。
-- 工具调用流程遵循 LangChain 标准：模型 `bind_tools` → 判断调用 → 执行工具 → 二次回传结果生成最终回答。
-- 若 Moonshot 在二次回传链路报 `400`，采用两阶段稳妥方案（参考 brainstorm 示例代码）。
+- **天气查询**：使用 `langchain_tavily.TavilySearch`。工具调用流程遵循 LangChain 标准：模型 `bind_tools` → 判断调用 → 执行工具 → 二次回传结果生成最终回答。若 Moonshot 在二次回传链路报 `400`，采用两阶段稳妥方案（参考 brainstorm 示例代码）。
+- **时间上下文注入**：构造 system prompt 时，必须动态注入当前日期（格式：`今天是 YYYY年M月D日，星期X。`），使模型明确知道查询基准日。
+- **查询词增强**：调用 TavilySearch 时，将 LLM 生成的原始查询词强制拼接当前日期与地点关键词（格式：`{原始查询} YYYY年M月D日 天气`），提高搜索精准度。
+- **预警查询**：`alert_query` 工具优先调用 QWeather 实时预警 API；若未配置 API Key 或调用失败，fallback 到数据库中的预警信号定义，并附注"（以上为预警信号标准定义，非实时预警）"。
+- **搜索结果后处理**：TavilySearch 原始返回内容需解析为结构化文本，标注每条结果的标题、来源 URL、发布时间（若可用）及内容摘要（≤500 字符），以【天气搜索结果】标题输出。
 
 #### FR-006 对话管理
 - 端点：
@@ -265,6 +267,7 @@ KIMI_API_KEY=sk-xxxxxxxx
 DEEPSEEK_API_KEY=sk-xxxxxxxx
 MINIMAX_API_KEY=xxxxxxxx
 TAVILY_API_KEY=tvly-xxxxxxxx
+QWEATHER_API_KEY=xxxxxxxx  # 和风天气实时预警 API（可选，未配置时 fallback 到 DB 定义）
 
 # Ollama（本地，一般无需 key）
 OLLAMA_BASE_URL=http://localhost:11434/v1

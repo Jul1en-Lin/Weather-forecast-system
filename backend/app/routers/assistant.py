@@ -1,7 +1,13 @@
+import logging
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+
+logger = logging.getLogger(__name__)
+
+_WEEKDAY_MAP = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
 from app.dependencies import get_db_session, get_current_user
 from app.services.conversation import ConversationService
 from app.services.llm import get_llm, stream_llm_response, strip_thinking_tags, ThinkingFilter
@@ -72,7 +78,14 @@ async def chat_stream(
     ConversationService.add_message(db, conversation_id, "user", req.message)
     history_msgs = ConversationService.get_messages(db, conversation_id, user_id)
 
-    system_parts = ["你是一个专业的气象智能助手，帮助用户解答气象相关问题。"]
+    now = datetime.now()
+    weekday = _WEEKDAY_MAP[now.weekday()]
+    date_str = f"今天是 {now.year} 年 {now.month} 月 {now.day} 日，{weekday}。"
+
+    system_parts = [
+        "你是一个专业的气象智能助手，帮助用户解答气象相关问题。",
+        date_str,
+    ]
     kb_context = KnowledgeBaseService.build_context(db, req.knowledge_base_ids)
     if kb_context:
         system_parts.append("以下是相关气象知识库内容，请结合这些内容回答：\n" + kb_context)
@@ -112,22 +125,35 @@ async def chat_stream(
                     for tc in tool_calls:
                         tool_name = tc.get("name", "")
                         tool_args = tc.get("args", {})
+                        logger.info("Tool call: %s, args: %s", tool_name, tool_args)
                         if tool_service and tool_name == "tavily_search":
                             try:
-                                query = tool_args.get("query", req.message)
-                                search_result = await tool_service.ainvoke({"query": query})
-                                result_text = WeatherToolService.format_tool_result(search_result)
+                                raw_query = tool_args.get("query", req.message)
+                                enhanced_query = f"{raw_query} {now.year}年{now.month}月{now.day}日 天气"
+                                logger.info("Enhanced tavily query: %s", enhanced_query)
+                                search_result = await tool_service.ainvoke({"query": enhanced_query})
+                                result_text = WeatherToolService.format_search_results(search_result)
+                                logger.info("Tool result: %s...", result_text[:200])
                                 tool_messages.append(result_text)
                             except Exception:
+                                logger.exception("Tavily search failed")
                                 tool_messages.append("天气服务暂不可用，请稍后重试。")
                         elif alert_tool and tool_name == "alert_query":
                             try:
                                 result = alert_tool.invoke(tool_args)
+                                logger.info("Tool result: %s...", str(result)[:200])
                                 tool_messages.append(result)
                             except Exception:
+                                logger.exception("Alert query failed")
                                 tool_messages.append("预警查询服务暂不可用，请稍后重试。")
 
-                    final_prompt_parts = ["\n".join(system_parts)]
+                    final_prompt_parts = [
+                        "你是一个专业的气象智能助手，帮助用户解答气象相关问题。",
+                        date_str,
+                    ]
+                    kb_ctx = KnowledgeBaseService.build_context(db, req.knowledge_base_ids)
+                    if kb_ctx:
+                        final_prompt_parts.append("以下是相关气象知识库内容，请结合这些内容回答：\n" + kb_ctx)
                     if tool_messages:
                         final_prompt_parts.append("工具查询结果：\n" + "\n".join(tool_messages))
                     final_prompt_parts.append("请根据以上信息回答用户。")

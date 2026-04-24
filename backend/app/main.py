@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import Base, engine
 from app.routers import auth, assistant
 from app.config import settings
+from app.init_data import init_db
 
 # 自动建表（开发阶段）
 Base.metadata.create_all(bind=engine)
+init_db()
 
 app = FastAPI(title="气象智能助手 API", version="1.0.0")
 

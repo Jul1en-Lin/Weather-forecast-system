@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Report</title>
+<style>
+body { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; font-size: 14px; line-height: 1.8; color: #333; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+h1 { font-size: 24px; border-bottom: 2px solid #2c3e50; padding-bottom: 8px; margin-top: 30px; }
+h2 { font-size: 20px; border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-top: 24px; }
+h3 { font-size: 16px; margin-top: 20px; }
+table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
+th { background: #f5f5f5; font-weight: 600; }
+code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; }
+pre { background: #f8f8f8; padding: 12px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+ul, ol { margin: 8px 0; padding-left: 24px; }
+li { margin: 4px 0; }
+hr { border: none; border-top: 1px solid #eee; margin: 24px 0; }
+</style>
+</head>
+<body>
+<h1>大语言模型气象业务应用平台 — 项目汇报文档</h1>
+<h2>一、项目概述</h2>
+<p>本项目是一款面向气象业务的大语言模型智能应用平台，采用前后端分离架构。前端为基于 Vue 3 的单页应用，提供智能气象问答对话界面；后端基于 FastAPI 构建，支持多模型流式对话、知识库检索、天气工具调用及用户认证。</p>
+<h3>核心功能</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>功能描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>智能对话</td>
+<td>支持多轮对话上下文，SSE 流式输出，4 个模型可选</td>
+</tr>
+<tr>
+<td>知识库</td>
+<td>气象术语库、预警信号库，以 SQL 查询注入 Prompt 的方式增强回答</td>
+</tr>
+<tr>
+<td>工具调用</td>
+<td>天气实时查询（Tavily 搜索）、气象预警查询（QWeather API）</td>
+</tr>
+<tr>
+<td>对话管理</td>
+<td>创建、切换、重命名、删除对话，历史消息持久化</td>
+</tr>
+<tr>
+<td>用户认证</td>
+<td>Session-Cookie 登录认证</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、技术栈</h2>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>技术选型</th>
+<th>版本/说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>前端</strong></td>
+<td>Vue 3 + Vite + TypeScript</td>
+<td>Composition API，严格模式</td>
+</tr>
+<tr>
+<td>状态管理</td>
+<td>Pinia</td>
+<td>持久化到 localStorage</td>
+</tr>
+<tr>
+<td>路由</td>
+<td>Vue Router</td>
+<td>history 模式</td>
+</tr>
+<tr>
+<td>样式</td>
+<td>原生 CSS</td>
+<td>Apple 风格设计令牌</td>
+</tr>
+<tr>
+<td><strong>后端</strong></td>
+<td>FastAPI + Uvicorn</td>
+<td>Python &gt;= 3.10</td>
+</tr>
+<tr>
+<td>ORM</td>
+<td>SQLAlchemy 2.0</td>
+<td>MySQL 驱动</td>
+</tr>
+<tr>
+<td>LLM 编排</td>
+<td>LangChain</td>
+<td>统一多厂商模型调用</td>
+</tr>
+<tr>
+<td>数据库</td>
+<td>MySQL</td>
+<td>5.7+</td>
+</tr>
+<tr>
+<td>模型接入</td>
+<td>Moonshot / DeepSeek / MiniMax / Ollama</td>
+<td>通过 langchain-openai 兼容</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>三、文件结构</h2>
+<pre><code>学校创新实践/
+├── index.html                     # 前端入口 HTML
+├── package.json                   # 前端 npm 配置
+├── vite.config.ts                 # Vite 构建配置
+├── tsconfig.app.json              # TypeScript 应用配置（strict + noUnusedLocals）
+├── openapi.yaml                   # 后端 API 规格（OpenAPI 3.0）
+├── README.md                      # 项目说明
+│
+├── src/                           # 前端源码
+│   ├── main.ts                    # 应用入口
+│   ├── App.vue                    # 根组件
+│   ├── style.css                  # 全局 Apple 风格 CSS 变量
+│   ├── router/
+│   │   └── index.ts               # 路由定义 + 导航守卫
+│   ├── stores/
+│   │   └── auth.ts                # Pinia 认证状态管理
+│   ├── views/
+│   │   ├── Login.vue              # 登录页
+│   │   ├── Home.vue               # 首页
+│   │   └── IntelligentAssistant.vue   # 智能助手核心页面（对话、模型选择、知识库、工具）
+│   └── assets/                    # 静态资源
+│
+├── backend/                       # 后端服务（FastAPI）
+│   ├── requirements.txt           # Python 依赖清单
+│   ├── .env                       # 环境变量配置（数据库、API Key）
+│   ├── init.sql                   # 数据库初始化 SQL
+│   └── app/
+│       ├── main.py                # FastAPI 应用入口
+│       ├── config.py              # 配置管理（Pydantic Settings）
+│       ├── database.py            # SQLAlchemy 数据库连接
+│       ├── dependencies.py        # 依赖注入
+│       ├── init_data.py           # 初始化数据脚本
+│       ├── models/                # ORM 模型（user/conversation/message/term/alert）
+│       ├── routers/               # API 路由（auth.py / assistant.py）
+│       ├── schemas/               # Pydantic 数据模型
+│       ├── services/              # 业务逻辑（llm / knowledge_base / weather_tool / conversation）
+│       └── core/                  # 安全加密、SSE 封装
+│
+├── docs/                          # 项目文档
+│   ├── project_spec.md            # 产品需求 + 工程设计规格
+│   ├── architecture.md            # 架构文档
+│   ├── project_status.md          # 项目状态与里程碑
+│   └── changelog.md               # 变更日志
+│
+├── public/                        # 静态公共资源
+├── dist/                          # 前端生产构建产物
+└── .gitignore                     # Git 忽略规则
+</code></pre>
+<hr />
+<h2>四、配置指南</h2>
+<h3>4.1 数据库配置（MySQL）</h3>
+<p>创建数据库并执行初始化脚本：</p>
+<pre><code class="language-sql">CREATE DATABASE meteo_assistant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+</code></pre>
+<p>后端 <code>backend/init.sql</code> 包含完整建表语句，包含以下 5 张表：</p>
+<table>
+<thead>
+<tr>
+<th>表名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>users</code></td>
+<td>用户表（用户名、bcrypt 密码哈希）</td>
+</tr>
+<tr>
+<td><code>conversations</code></td>
+<td>对话表（UUID 主键、用户外键、模型 ID、标题）</td>
+</tr>
+<tr>
+<td><code>messages</code></td>
+<td>消息表（角色、内容、工具调用 JSON）</td>
+</tr>
+<tr>
+<td><code>terms</code></td>
+<td>气象术语库（术语名、分类、释义、来源）</td>
+</tr>
+<tr>
+<td><code>alerts</code></td>
+<td>预警信号库（类型、级别、发布标准、防御指南）</td>
+</tr>
+</tbody>
+</table>
+<h3>4.2 后端环境变量（<code>backend/.env</code>）</h3>
+<pre><code class="language-bash"># 数据库（必配）
+DATABASE_URL=mysql+pymysql://用户名:密码@localhost:3306/meteo_assistant
+
+# LLM API Keys（至少配一个）
+KIMI_API_KEY=sk-xxxxxxxx
+DEEPSEEK_API_KEY=sk-xxxxxxxx
+MINIMAX_API_KEY=xxxxxxxx
+
+# 天气搜索工具（必配）
+TAVILY_API_KEY=tvly-xxxxxxxx
+
+# 实时预警（可选，未配置时 fallback 到数据库）
+QWEATHER_API_KEY=xxxxxxxx
+
+# 本地模型（可选）
+OLLAMA_BASE_URL=http://localhost:11434/v1
+
+# 应用配置
+APP_SECRET_KEY=your-secret-key-change-in-production
+ALLOWED_ORIGINS=http://localhost:5173
+</code></pre>
+<h3>4.3 前端环境</h3>
+<p>前端无额外环境变量配置，直接依赖 <code>vite.config.ts</code> 中的代理设置，开发时请求自动转发到 <code>http://localhost:8000</code>。</p>
+<hr />
+<h2>五、启动步骤</h2>
+<h3>5.1 启动后端</h3>
+<pre><code class="language-bash"># 1. 进入后端目录
+cd backend
+
+# 2. 创建虚拟环境（首次）
+python -m venv venv
+
+# 3. 激活虚拟环境
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+# 4. 安装依赖（首次）
+pip install -r requirements.txt
+
+# 5. 初始化数据库（首次）
+# 在 MySQL 中执行 init.sql 建表，然后运行：
+python -c &quot;from app.init_data import init_data; init_data()&quot;
+
+# 6. 启动服务
+uvicorn app.main:app --reload --port 8000
+</code></pre>
+<p>后端启动后，API 文档地址：<code>http://localhost:8000/docs</code></p>
+<h3>5.2 启动前端</h3>
+<pre><code class="language-bash"># 1. 在项目根目录安装依赖（首次）
+npm install
+
+# 2. 启动开发服务器
+npm run dev
+</code></pre>
+<p>前端默认地址：<code>http://localhost:5173</code></p>
+<h3>5.3 生产构建</h3>
+<pre><code class="language-bash"># 前端生产构建
+npm run build
+# 产物输出到 dist/ 目录
+</code></pre>
+<hr />
+<h2>六、API 接口概览</h2>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>路径</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/auth/login</code></td>
+<td>用户登录（Session-Cookie）</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/auth/logout</code></td>
+<td>用户登出</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v1/assistant/models</code></td>
+<td>获取可用模型列表</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v1/assistant/knowledge-bases</code></td>
+<td>获取知识库列表</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v1/assistant/tools</code></td>
+<td>获取工具列表</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/assistant/chat/stream</code></td>
+<td>流式对话（SSE）</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v1/assistant/conversations</code></td>
+<td>获取对话列表</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/assistant/conversations</code></td>
+<td>创建新对话</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v1/assistant/conversations/{id}</code></td>
+<td>获取对话详情</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/v1/assistant/conversations/{id}</code></td>
+<td>重命名对话</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/v1/assistant/conversations/{id}</code></td>
+<td>删除对话</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>七、已实现功能清单</h2>
+<ul>
+<li>[x] 用户登录 / 登出（Session-Cookie 认证）</li>
+<li>[x] 智能助手对话界面（流式输出、Markdown 渲染）</li>
+<li>[x] 多模型切换（Kimi K2.5 / DeepSeek Reasoner / MiniMax-M2.5 / Ollama 本地）</li>
+<li>[x] 对话历史管理（创建、切换、删除、重命名）</li>
+<li>[x] 气象术语知识库（SQL 查询注入 Prompt）</li>
+<li>[x] 预警信号知识库（QWeather 实时 API + 数据库 fallback）</li>
+<li>[x] 天气查询工具（Tavily 搜索 + 查询词增强）</li>
+<li>[x] 当前日期动态注入（System Prompt 自动追加）</li>
+<li>[x] 前端消息 Markdown 渲染 + 代码高亮</li>
+<li>[x] 响应式布局（Apple 风格设计）</li>
+</ul>
+</body>
+</html>

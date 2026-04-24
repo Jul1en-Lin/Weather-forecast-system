@@ -1,10 +1,24 @@
 from app.database import SessionLocal, Base, engine
 from app.models.user import User
 from app.models.alert import Alert
+from app.models.term import Term
 from app.core.security import hash_password
 
 # 自动建表
 Base.metadata.create_all(bind=engine)
+
+TERM_SEED_DATA = [
+    {"term": "副热带高压", "category": "天气系统", "definition": "位于副热带地区的暖性高压系统，是影响我国夏季天气的重要天气系统，其位置和强度变化直接影响雨带分布和台风路径。", "source": "中国气象局"},
+    {"term": "锋面", "category": "天气系统", "definition": "两种不同性质气团（如冷暖气团）之间的过渡地带，锋面附近常伴有云、雨、大风等天气现象。", "source": "中国气象局"},
+    {"term": "台风", "category": "灾害性天气", "definition": "发生在热带或副热带洋面上的强烈气旋性涡旋，中心附近最大风力达12级或以上，常伴有暴雨、风暴潮等灾害。", "source": "中国气象局"},
+    {"term": "暴雨", "category": "灾害性天气", "definition": "指24小时内降水量达50毫米以上的降雨天气过程，可能引发洪涝、山洪、泥石流等次生灾害。", "source": "中国气象局"},
+    {"term": "寒潮", "category": "灾害性天气", "definition": "指来自高纬度地区的强冷空气迅速入侵，造成大范围剧烈降温的天气过程，24小时内降温幅度达8℃以上。", "source": "中国气象局"},
+    {"term": "相对湿度", "category": "气象要素", "definition": "空气中实际水汽压与同温度下饱和水汽压的百分比，反映空气的潮湿程度，对人体舒适度和农业生产有重要影响。", "source": "中国气象局"},
+    {"term": "能见度", "category": "气象要素", "definition": "视力正常的人在当时天气条件下，能够从天空背景中看到和辨认出目标物的最大水平距离，单位通常为米或公里。", "source": "中国气象局"},
+    {"term": "强对流", "category": "灾害性天气", "definition": "指发生突然、移动迅速、天气剧烈、破坏力强的灾害性天气，包括雷暴、短时强降水、冰雹、雷雨大风、龙卷风等。", "source": "中国气象局"},
+    {"term": "厄尔尼诺", "category": "气候现象", "definition": "赤道太平洋中东段海水温度异常升高的现象，可引起全球大气环流异常，对全球气候产生显著影响。", "source": "中国气象局"},
+    {"term": "拉尼娜", "category": "气候现象", "definition": "赤道太平洋中东段海水温度异常降低的现象，与厄尔尼诺相反，同样会对全球气候产生重要影响。", "source": "中国气象局"},
+]
 
 ALERT_SEED_DATA = [
     {"alert_type": "台风", "level": "蓝", "criteria": "预计未来24小时内可能或者已经受热带气旋影响，沿海或者陆地平均风力达6级以上，或者阵风8级以上并可能持续。", "response_guide": "停止露天集体活动和高空等户外危险作业；加固门窗、围板、棚架、广告牌等易被风吹动的搭建物。"},
@@ -34,6 +48,16 @@ def init_db():
             print("Default user created: admin / admin123")
         else:
             print("Default user already exists")
+
+        term_count = db.query(Term).count()
+        if term_count == 0:
+            for data in TERM_SEED_DATA:
+                term = Term(**data)
+                db.add(term)
+            db.commit()
+            print(f"Inserted {len(TERM_SEED_DATA)} term records")
+        else:
+            print(f"Terms already exist ({term_count} records)")
 
         alert_count = db.query(Alert).count()
         if alert_count == 0:

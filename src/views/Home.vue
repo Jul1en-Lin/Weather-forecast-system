@@ -81,7 +81,7 @@ const handleLogout = async () => {
 .home-container {
   display: flex;
   min-height: 100vh;
-  background-image: url('/home.jpg');
+  background-image: url('/background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -242,7 +242,7 @@ const handleLogout = async () => {
   flex: 1;
   margin-left: 260px;
   min-height: 100vh;
-  background-image: url('/home.jpg');
+  background-image: url('/background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

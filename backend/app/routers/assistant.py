@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 _WEEKDAY_MAP = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
 from app.dependencies import get_db_session, get_current_user
 from app.services.conversation import ConversationService
-from app.services.llm import get_llm, stream_llm_response, strip_thinking_tags, ThinkingFilter
+from app.services.llm import get_llm, stream_llm_response, strip_thinking_tags, ThinkingFilter, MODEL_CONFIG
 from app.services.knowledge_base import KnowledgeBaseService
 from app.services.weather_tool import WeatherToolService
 from app.core.sse import sse_response, SSEStream
@@ -38,7 +38,7 @@ def get_models():
         ModelInfo(id="kimi-k2.5", name="Kimi K2.5", description="Moonshot 高性能模型"),
         ModelInfo(id="MiniMax-M2.5", name="MiniMax M2.5", description="MiniMax 通用模型"),
         ModelInfo(id="deepseek-reasoner", name="DeepSeek Reasoner", description="DeepSeek 推理模型"),
-        ModelInfo(id="deepseek-r1:14b", name="DeepSeek R1 14B (本地)", description="Ollama 本地模型"),
+        # ModelInfo(id="deepseek-r1:14b", name="DeepSeek R1 14B (本地)", description="Ollama 本地模型"),
     ])
 
 # ---- 知识库列表 ----
@@ -90,6 +90,17 @@ async def chat_stream(
     if kb_context:
         system_parts.append("以下是相关气象知识库内容，请结合这些内容回答：\n" + kb_context)
 
+    config = MODEL_CONFIG.get(req.model_id, {})
+    supports_tools = config.get("supports_tools", True)
+    if req.tool_ids and not supports_tools:
+        tool_descs = []
+        if "weather_query" in req.tool_ids:
+            tool_descs.append("- 天气查询工具：可查询指定地区的实时天气信息")
+        if "alert_query" in req.tool_ids:
+            tool_descs.append("- 预警查询工具：可查询指定地区的实时气象预警信号")
+        if tool_descs:
+            system_parts.append("你可以参考以下工具信息来回答，但请基于你的知识直接回复（当前模型不支持自动调用外部工具）：\n" + "\n".join(tool_descs))
+
     lc_messages = [SystemMessage(content="\n".join(system_parts))]
     for m in history_msgs[:-1]:
         if m.role == "user":
@@ -115,7 +126,7 @@ async def chat_stream(
         assistant_content = ""
         try:
             llm = get_llm(req.model_id, streaming=True)
-            if tools:
+            if tools and supports_tools:
                 bound_llm = llm.bind_tools(tools)
                 first_response = await bound_llm.ainvoke(lc_messages)
                 tool_calls = first_response.tool_calls if hasattr(first_response, "tool_calls") else []
@@ -187,8 +198,13 @@ async def chat_stream(
 
         except Exception as e:
             err_str = str(e)
-            if req.model_id == "deepseek-r1:14b" and ("502" in err_str or "Connection" in err_str or "Connect" in err_str):
-                error_msg = "本地模型未就绪，请确认 Ollama 已启动（默认端口 11434）。"
+            if req.model_id == "deepseek-r1:14b":
+                if "502" in err_str or "Connection" in err_str or "Connect" in err_str:
+                    error_msg = "本地模型未就绪，请确认 Ollama 已启动（默认端口 11434）。"
+                elif "does not support tools" in err_str:
+                    error_msg = "当前本地模型不支持工具调用，请切换为支持工具调用的模型（如 DeepSeek Reasoner），或取消勾选工具选项。"
+                else:
+                    error_msg = f"本地模型请求出错：{err_str}"
             else:
                 error_msg = f"抱歉，服务暂时出现问题：{err_str}"
             assistant_content += error_msg

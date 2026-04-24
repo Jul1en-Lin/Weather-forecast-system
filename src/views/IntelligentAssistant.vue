@@ -427,20 +427,40 @@ onMounted(() => {
 .assistant-container {
   display: flex;
   min-height: 100vh;
-  background: #f5f5f7;
+  background-image: url('/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
+}
+
+.assistant-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(2px);
+  z-index: 0;
 }
 
 /* 左侧导航栏样式（与Home.vue一致） */
 .sidebar {
   width: 260px;
-  background: white;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(15px);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
   position: fixed;
   height: 100vh;
   left: 0;
   top: 0;
+  z-index: 10;
 }
 
 .sidebar-header {
@@ -569,7 +589,7 @@ onMounted(() => {
   flex: 1;
   margin-left: 260px;
   padding: 20px;
-  background: #f5f5f7;
+  background: transparent;
   min-height: 100vh;
 }
 
@@ -582,7 +602,9 @@ onMounted(() => {
 /* 历史对话侧边栏 */
 .history-sidebar {
   width: 260px;
-  background: white;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -628,8 +650,8 @@ onMounted(() => {
   margin-bottom: 6px;
   border-radius: 10px;
   cursor: pointer;
-  background: white;
-  border: 1px solid #e5e5e5;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .conversation-item.active {
@@ -660,7 +682,9 @@ onMounted(() => {
 /* 聊天主区域 */
 .chat-wrapper {
   flex: 1;
-  background: white;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -670,8 +694,8 @@ onMounted(() => {
 
 .chat-header {
   padding: 20px 24px;
-  border-bottom: 1px solid #f0f0f0;
-  background: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
 }
 
 .header-content {
@@ -715,9 +739,9 @@ onMounted(() => {
 .toolbar select {
   padding: 6px 12px;
   border-radius: 20px;
-  border: 1px solid #d0d0d0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   font-size: 14px;
-  background: white;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .chat-messages {
@@ -727,7 +751,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  background: #fafafa;
+  background: transparent;
 }
 
 .empty-state {
@@ -773,8 +797,8 @@ onMounted(() => {
 
 .chip {
   padding: 12px 20px;
-  background: white;
-  border: 1px solid #d2d2d7;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
   color: #1d1d1f;
   font-size: 14px;
@@ -855,7 +879,7 @@ onMounted(() => {
 }
 
 .assistant-message .message-text {
-  background: white;
+  background: rgba(255, 255, 255, 0.7);
   color: #1d1d1f;
   border-bottom-left-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -946,8 +970,8 @@ onMounted(() => {
 
 .chat-input-container {
   padding: 20px 24px 24px;
-  background: white;
-  border-top: 1px solid #f0f0f0;
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .input-wrapper {
@@ -959,17 +983,17 @@ onMounted(() => {
 .chat-input {
   flex: 1;
   padding: 14px 20px;
-  border: 1px solid #d2d2d7;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 24px;
   font-size: 15px;
   outline: none;
   transition: all 0.3s ease;
-  background: #f5f5f7;
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .chat-input:focus {
   border-color: #007aff;
-  background: white;
+  background: rgba(255, 255, 255, 0.85);
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
@@ -999,15 +1023,15 @@ onMounted(() => {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #f5f5f7;
-  border: 1px solid #d2d2d7;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   font-size: 20px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .voice-button:hover {
-  background: #e8e8ed;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 @media (max-width: 768px) {

@@ -8,23 +8,27 @@ MODEL_CONFIG = {
         "model": "kimi-k2.5",
         "base_url": "https://api.moonshot.cn/v1",
         "api_key": settings.kimi_api_key,
-        "temperature": 1.0,  # Kimi K2.5 只接受 temperature=1
+        "temperature": 1.0,
+        "supports_tools": True,
     },
     "deepseek-reasoner": {
         "model": "deepseek-reasoner",
         "base_url": "https://api.deepseek.com/v1",
         "api_key": settings.deepseek_api_key,
+        "supports_tools": True,
     },
     "MiniMax-M2.5": {
         "model": "MiniMax-M2.5",
         "base_url": "https://api.minimax.chat/v1",
         "api_key": settings.minimax_api_key,
+        "supports_tools": True,
     },
     "deepseek-r1:14b": {
         "model": "deepseek-r1:14b",
         "base_url": settings.ollama_base_url,
         "api_key": "ollama",
         "is_local": True,
+        "supports_tools": False,
     },
 }
 

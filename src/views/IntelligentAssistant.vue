@@ -110,7 +110,7 @@
                 {{ msg.role === 'user' ? userInitial : '🤖' }}
               </div>
               <div class="message-content">
-                <div class="message-text">{{ msg.content }}</div>
+                <div class="message-text" v-html="msg.role === 'assistant' ? renderMarkdown(msg.content) : msg.content"></div>
                 <div class="message-time">{{ msg.time }}</div>
               </div>
             </div>
@@ -157,8 +157,16 @@
 import { ref, computed, nextTick, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 const API_BASE = 'http://localhost:8000'
+
+function renderMarkdown(content: string): string {
+  if (!content) return ''
+  const rawHtml = marked.parse(content, { async: false }) as string
+  return DOMPurify.sanitize(rawHtml)
+}
 
 interface Message {
   role: 'user' | 'assistant'
@@ -851,6 +859,60 @@ onMounted(() => {
   color: #1d1d1f;
   border-bottom-left-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.assistant-message .message-text :deep(strong) {
+  font-weight: 600;
+}
+
+.assistant-message .message-text :deep(ul),
+.assistant-message .message-text :deep(ol) {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.assistant-message .message-text :deep(li) {
+  margin: 4px 0;
+}
+
+.assistant-message .message-text :deep(code) {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 13px;
+}
+
+.assistant-message .message-text :deep(pre) {
+  background: #f5f5f7;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.assistant-message .message-text :deep(pre code) {
+  background: transparent;
+  padding: 0;
+}
+
+.assistant-message .message-text :deep(blockquote) {
+  border-left: 3px solid #d1d1d6;
+  margin: 8px 0;
+  padding-left: 12px;
+  color: #6e6e73;
+}
+
+.assistant-message .message-text :deep(p) {
+  margin: 6px 0;
+}
+
+.assistant-message .message-text :deep(p:first-child) {
+  margin-top: 0;
+}
+
+.assistant-message .message-text :deep(p:last-child) {
+  margin-bottom: 0;
 }
 
 .message-time {

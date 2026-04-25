@@ -147,7 +147,7 @@ hr { border: none; border-top: 1px solid #eee; margin: 24px 0; }
 ├── backend/                       # 后端服务（FastAPI）
 │   ├── requirements.txt           # Python 依赖清单
 │   ├── .env                       # 环境变量配置（数据库、API Key）
-│   ├── init.sql                   # 数据库初始化 SQL
+│   ├── init.sql                   # 数据库初始化 SQL（位于 backend/ 目录下）
 │   └── app/
 │       ├── main.py                # FastAPI 应用入口
 │       ├── config.py              # 配置管理（Pydantic Settings）
@@ -225,7 +225,7 @@ QWEATHER_API_KEY=xxxxxxxx
 # 本地模型（可选）
 OLLAMA_BASE_URL=http://localhost:11434/v1
 
-# 应用配置
+# 应用配置（APP_SECRET_KEY 当前未实际使用，可选）
 APP_SECRET_KEY=your-secret-key-change-in-production
 ALLOWED_ORIGINS=http://localhost:5173
 </code></pre>
@@ -240,7 +240,7 @@ cd backend
 # 2. 创建虚拟环境（首次）
 python -m venv venv
 
-# 3. 激活虚拟环境
+# 3. 激活虚拟环境（首次）
 # Windows:
 venv\Scripts\activate
 # macOS/Linux:
@@ -250,7 +250,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 5. 初始化数据库（首次）
-# 在 MySQL 中执行 init.sql 建表，然后运行：
+# 在 MySQL 中执行 init.sql 建表，然后运行（文件位于backend/init.sql）：
 python -c &quot;from app.init_data import init_data; init_data()&quot;
 
 # 6. 启动服务
@@ -341,16 +341,16 @@ npm run build
 <hr />
 <h2>七、已实现功能清单</h2>
 <ul>
-<li>[x] 用户登录 / 登出（Session-Cookie 认证）</li>
-<li>[x] 智能助手对话界面（流式输出、Markdown 渲染）</li>
-<li>[x] 多模型切换（Kimi K2.5 / DeepSeek Reasoner / MiniMax-M2.5 / Ollama 本地）</li>
-<li>[x] 对话历史管理（创建、切换、删除、重命名）</li>
-<li>[x] 气象术语知识库（SQL 查询注入 Prompt）</li>
-<li>[x] 预警信号知识库（QWeather 实时 API + 数据库 fallback）</li>
-<li>[x] 天气查询工具（Tavily 搜索 + 查询词增强）</li>
-<li>[x] 当前日期动态注入（System Prompt 自动追加）</li>
-<li>[x] 前端消息 Markdown 渲染 + 代码高亮</li>
-<li>[x] 响应式布局（Apple 风格设计）</li>
+<li>用户登录 / 登出（Session-Cookie 认证）</li>
+<li>智能助手对话界面（流式输出、Markdown 渲染）</li>
+<li>多模型切换（Kimi K2.5 / DeepSeek Reasoner / MiniMax-M2.5 / Ollama 本地模型）</li>
+<li>对话历史管理</li>
+<li>气象术语知识库（SQL 查询注入 Prompt）</li>
+<li>预警信号知识库（QWeather 实时 API + SQL 查询注入 Prompt）</li>
+<li>天气查询工具（Tavily 搜索 + 查询词增强）</li>
+<li>当前日期动态注入（System Prompt 自动追加）</li>
+<li>前端消息 Markdown 渲染 + 代码高亮</li>
+<li>响应式布局</li>
 </ul>
 </body>
 </html>

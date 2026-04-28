@@ -87,7 +87,9 @@
 首先创建 meteo_assistant 数据库：
 
 ```sql
-CREATE DATABASE meteo_assistant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS meteo_assistant
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
 ```
 
 用于初始化数据库的 sql 语句 `backend/init.sql` 包含完整建表语句，包含以下 5 张表，这 5 张表都存在 meteo_assistant 数据库中：

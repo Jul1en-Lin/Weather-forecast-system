@@ -105,9 +105,9 @@ CREATE DATABASE IF NOT EXISTS meteo_assistant
 
 ### 数据入库
 
-在执行启动步骤后会自动初始化数据创建默认的账号密码
-admin
-admin123
+在执行启动步骤后会自动初始化数据并创建默认账号：
+- 用户名：`admin`
+- 密码：`admin123`
 
 ### 所需的环境变量（`backend/.env`）
 
@@ -153,9 +153,10 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 5. 初始化数据库（首次）
-# 在 MySQL 中执行 init.sql 建表，然后运行（文件位于backend/init.sql）：
-# 确保仍在 backend 目录下
-python -c "from app.init_data import init_data; init_data()"
+# 先在 MySQL 中执行建表脚本：
+mysql -u 用户名 -p < init.sql
+# 然后导入初始数据（确保仍在 backend 目录下）：
+python -c "from app.init_data import init_db; init_db()"
 
 # 6. 启动服务
 uvicorn app.main:app --reload --port 8000
@@ -174,8 +175,7 @@ npm run dev
 <img width="2767" height="1770" alt="image" src="https://github.com/user-attachments/assets/5c61115d-65b5-4266-86ed-7b5e79de3f09" />
 
 访问前端地址即可自动路由到登录页 `http://localhost:5173`
-默认账号密码
-
-admin
-admin123
+默认账号密码：
+- 用户名：`admin`
+- 密码：`admin123`
 <img width="2825" height="1787" alt="login" src="https://github.com/user-attachments/assets/2b301bb9-b798-439a-9537-8f869aa3ac49" />

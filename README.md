@@ -18,7 +18,7 @@
 - 知识库：分别拥有气象术语库、预警信号库，以 SQL 查询注入 Prompt 的方式增强回答
 - 天气相关：天气实时查询（Tavily API）、气象预警查询（QWeather API）
 - 对话管理：支持创建、切换、删除对话、历史消息持久化
-- 状态保持：使用 Session-Cookie 存储用户状态
+- 状态保持：使用 localStorage 存储用户状态
 - Markdown：前端页面支持 Markdown 格式渲染
 
 ## 技术栈
@@ -103,14 +103,9 @@ CREATE DATABASE IF NOT EXISTS meteo_assistant
 | `terms` | 气象术语库（包含术语名、分类、释义、来源字段） |
 | `alerts` | 预警信号库（包含类型、级别、发布标准、防御指南字段） |
 
-- **手动执行**：手动执行 init.sql 语句进行初始化数据库与建表。
-- **自动执行**：后端启动时会通过 SQLAlchemy 自动创建表。
-
 ### 数据入库
 
-成功启动后端服务后会自动执行 init_db() 方法，初始化默认的账号密码并入库。具体操作在“启动步骤”章节可见
-
-默认账号密码
+在执行启动步骤后会自动初始化数据创建默认的账号密码
 admin
 admin123
 
@@ -159,6 +154,7 @@ pip install -r requirements.txt
 
 # 5. 初始化数据库（首次）
 # 在 MySQL 中执行 init.sql 建表，然后运行（文件位于backend/init.sql）：
+# 确保仍在 backend 目录下
 python -c "from app.init_data import init_data; init_data()"
 
 # 6. 启动服务
@@ -178,4 +174,8 @@ npm run dev
 <img width="2767" height="1770" alt="image" src="https://github.com/user-attachments/assets/5c61115d-65b5-4266-86ed-7b5e79de3f09" />
 
 访问前端地址即可自动路由到登录页 `http://localhost:5173`
+默认账号密码
+
+admin
+admin123
 <img width="2825" height="1787" alt="login" src="https://github.com/user-attachments/assets/2b301bb9-b798-439a-9537-8f869aa3ac49" />

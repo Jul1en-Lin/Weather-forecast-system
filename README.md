@@ -54,13 +54,13 @@
 │   └── app/
 │       ├── main.py                # FastAPI 应用入口
 │       ├── config.py              # 配置管理（Pydantic Settings）
-│       ├── database.py            # SQLAlchemy 数据库连接
-│       ├── dependencies.py        # 依赖注入
-│       ├── init_data.py           # 初始化数据脚本
-│       ├── models/                # ORM 模型（user/conversation/message/term/alert）
-│       ├── routers/               # API 路由（auth.py / assistant.py）
-│       ├── schemas/               # Pydantic 数据模型
-│       ├── services/              # 业务逻辑（llm / knowledge_base / weather_tool / conversation）
+│       ├── database.py            # 数据库连接
+│       ├── dependencies.py        # 保存相关依赖
+│       ├── init_data.py           # 初始化数据的脚本
+│       ├── models/                # 相关模型
+│       ├── routers/               # API 路由
+│       ├── schemas/               # Pydantic 数据，进行数据校验、类型转换、错误处理和数据序列化
+│       ├── services/              # 后端服务（LLM 调用/ 调用天气工具 / 对话管理）
 │       └── core/                  # 安全加密、SSE 封装
 │
 ├── docs/                          # 项目文档
@@ -78,15 +78,15 @@
 
 ## 配置指南
 
-### 数据库配置（MySQL）
+### 数据库 MySQL 配置
 
-创建数据库并执行初始化脚本：
+首先创建 meteo_assistant 数据库：
 
 ```sql
 CREATE DATABASE meteo_assistant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-后端 `backend/init.sql` 包含完整建表语句，包含以下 5 张表：
+用于初始化数据库的 sql 语句 `backend/init.sql` 包含完整建表语句，包含以下 5 张表，这 5 张表都存在 meteo_assistant 数据库中：
 
 | 表名 | 说明 |
 |------|------|
@@ -96,10 +96,13 @@ CREATE DATABASE meteo_assistant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 | `terms` | 气象术语库（术语名、分类、释义、来源） |
 | `alerts` | 预警信号库（类型、级别、发布标准、防御指南） |
 
-### 后端环境变量（`backend/.env`）
+**手动执行**：手动执行 init.sql 语句进行初始化数据库与建表
+**自动执行**：后端启动时会通过 SQLAlchemy 自动创建表
+
+### 所需的环境变量（`backend/.env`）
 
 ```bash
-# 数据库（必配）
+# 数据库（在 DATABASE_URL 中填上你的用户名与密码，端口默认为 3306）
 DATABASE_URL=mysql+pymysql://用户名:密码@localhost:3306/meteo_assistant
 
 # LLM API Keys（至少配一个）
@@ -107,18 +110,14 @@ KIMI_API_KEY=sk-xxxxxxxx
 DEEPSEEK_API_KEY=sk-xxxxxxxx
 MINIMAX_API_KEY=xxxxxxxx
 
-# 天气搜索工具（必配）
+# 天气搜索工具（TAVILY 官网申请）
 TAVILY_API_KEY=tvly-xxxxxxxx
 
-# 实时预警（可选，未配置时 fallback 到数据库）
+# 实时预警（和风天气的预警 API，可选）
 QWEATHER_API_KEY=xxxxxxxx
 
-# 本地模型（可选）
+# Ollama 本地模型（端口默认为11434，可选）
 OLLAMA_BASE_URL=http://localhost:11434/v1
-
-# 应用配置（APP_SECRET_KEY 当前未实际使用，可选）
-APP_SECRET_KEY=your-secret-key-change-in-production
-ALLOWED_ORIGINS=http://localhost:5173
 ```
 
 ### 前端环境
@@ -155,7 +154,9 @@ python -c "from app.init_data import init_data; init_data()"
 uvicorn app.main:app --reload --port 8000
 ```
 
-后端启动后，API 文档地址：`http://localhost:8000/docs`
+启动成功后，可访问 API 文档地址：`http://localhost:8000/docs` 查看接口
+<img width="2767" height="1770" alt="image" src="https://github.com/user-attachments/assets/5c61115d-65b5-4266-86ed-7b5e79de3f09" />
+
 
 ### 启动前端
 

@@ -1,0 +1,134 @@
+Traceback (most recent call last):
+  File "<string>", line 8, in <module>
+    print(shape.text[:200])
+    ~~~~~^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'gbk' codec can't encode character '\u2713' in position 0: illegal multibyte sequence
+--- Slide 1 ---
+Meteo LLM Platform
+大语言模型气象
+业务应用平台
+基于 Vue 3 + FastAPI 的智能气象问答系统
+项目汇报  |  2026年4月
+
+--- Slide 2 ---
+01
+项目概述
+项目定位
+将通用大语言模型转化为具备气象专业知识的智能业务助手，支持多模型切换、知识库增强与实时天气工具调用，为气象业务人员提供高效、准确的智能问答服务。
+前后端分离
+Vue 3 SPA + FastAPI 后端
+多模型支持
+Kimi / DeepSeek / MiniMax / Ollama
+流式对话
+SSE 实时输出 + Markdown 渲染
+Apple 风格 UI
+原生 CSS 设计令牌 + 玻璃态背景
+
+--- Slide 3 ---
+02
+核心功能
+智能对话
+多轮对话上下文记忆，SSE 流式输出，前端支持 Markdown 渲染与代码高亮
+多模型切换
+支持 Kimi K2.5、DeepSeek Reasoner、MiniMax-M2.5、Ollama 本地模型一键切换
+气象知识库
+术语库与预警信号库通过 SQL 查询注入 Prompt，增强模型回答专业性
+工具调用
+天气实时查询（Tavily 搜索增强）、气象预警查询（QWeather API 实时数据）
+
+--- Slide 4 ---
+03
+技术架构
+前端
+Vue 3 Composition API
+Vite + TypeScript
+Pinia 状态管理
+Vue Router
+原生 CSS Apple 风格
+后端
+FastAPI + Uvicorn
+LangChain LLM 编排
+SQLAlchemy 2.0 ORM
+Pydantic 数据校验
+SSE 流式封装
+数据/模型
+MySQL 5.7+
+Tavily 天气搜索
+QWeather 实时预警
+Session-Cookie 认证
+OpenAPI 3.0 规范
+
+--- Slide 5 ---
+04
+数据库设计
+表名
+说明
+users
+用户表：用户名 + bcrypt 密码哈希
+conversations
+对话表：UUID 主键、用户外键、模型 ID、标题
+messages
+消息表：角色、内容、工具调用 JSON
+terms
+气象术语库：术语名、分类、释义、来源
+alerts
+预警信号库：类型、级别、发布标准、防御指南
+
+--- Slide 6 ---
+05
+API 接口设计
+方法
+路径
+说明
+POST
+/api/v1/auth/login
+用户登录（Session-Cookie）
+POST
+/api/v1/auth/logout
+用户登出
+GET
+/api/v1/assistant/models
+获取可用模型列表
+GET
+/api/v1/assistant/knowledge-bases
+获取知识库列表
+GET
+/api/v1/assistant/tools
+获取工具列表
+POST
+/api/v1/assistant/chat/stream
+流式对话（SSE）
+GET
+/api/v1/assistant/conversations
+获取对话列表
+POST
+/api/v1/assistant/conversations
+创建新对话
+GET
+/api/v1/assistant/conversations/{id}
+获取对话详情
+PUT
+/api/v1/assistant/conversations/{id}
+重命名对话
+DELETE
+/api/v1/assistant/conversations/{id}
+删除对话
+
+--- Slide 7 ---
+关键数字
+4
+大语言模型
+Kimi / DeepSeek / MiniMax / Ollama
+5
+数据库表
+用户 / 对话 / 消息 / 术语 / 预警
+11
+API 接口
+RESTful + SSE 流式对话
+2
+知识库
+气象术语库 + 预警信号库
+
+--- Slide 8 ---
+06
+已实现功能

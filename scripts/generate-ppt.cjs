@@ -249,7 +249,7 @@ s3.addText("后端", {
 
 const backendItems = [
   "FastAPI + Uvicorn (Python >= 3.10)",
-  "SQLAlchemy 2.0 + MySQL",
+  "SQLAlchemy 2.0 + SQLite",
   "LangChain 多模型编排",
   "Moonshot / DeepSeek / MiniMax / Ollama",
   "Tavily + QWeather API",
@@ -404,7 +404,7 @@ s5.addText("后端 (FastAPI)", {
   margin: 0,
 });
 s5.addText(
-  ["LangChain 模型编排", "知识库检索", "天气/预警工具", "MySQL 持久化"].map((t, i, arr) => ({
+  ["LangChain 模型编排", "知识库检索", "天气/预警工具", "SQLite 持久化"].map((t, i, arr) => ({
     text: t,
     options: { bullet: true, breakLine: i < arr.length - 1 },
   })),

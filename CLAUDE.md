@@ -33,23 +33,30 @@ npm run preview
 
 ### 路由与认证
 
-- `src/router/index.ts`：定义了 `/login`、`/home`、`/intelligent-assistant` 三条主路由，根路径重定向到 `/login`。
-- 导航守卫 `beforeEach` 检查 `meta.requiresAuth`，未认证用户重定向到登录页，已认证用户访问登录页则重定向到首页。
-- 认证状态通过 Pinia `auth` store 管理，并持久化到 `localStorage`。
+- `src/router/index.ts`：定义了 `/login`、`/register`、`/home`、`/settings`、`/admin/users`、`/intelligent-assistant` 等路由。
+- 导航守卫 `beforeEach` 检查 `meta.requiresAuth` 和 `meta.requiresAdmin`，未认证用户重定向到登录页，已认证用户访问登录页则重定向到首页。
+- 认证状态通过 Pinia `auth` store 管理，包含 `isAdmin` 属性判断管理员权限。
 
 ### 状态管理
 
-- `src/stores/auth.ts`：使用 Pinia Setup Store 管理登录状态。`login()` 写入 `localStorage`，`checkAuth()` 从 `localStorage` 恢复状态。当前为模拟登录（用户名密码非空即可）。
+- `src/stores/auth.ts`：使用 Pinia Setup Store 管理登录状态。
+  - `login()` / `logout()` / `checkAuth()` / `register()` 方法
+  - `isAdmin` 计算属性判断是否为管理员
+  - Session-Cookie 认证方式
 
 ### 智能助手对话
 
 - `src/views/IntelligentAssistant.vue` 是核心功能页面，包含：
   - 历史对话侧边栏（创建、切换、删除对话）
-  - 模型选择（deepseek-32b / qwen-32b）
+  - 模型选择（DeepSeek / Kimi / MiniMax / Ollama）
   - 知识库与工具多选
-  - 流式消息展示（当前为 `mockStreamReply` 模拟，待后端接入）
-- 对话数据全部持久化到 `localStorage`（`assistant_conversations`、`assistant_currentConvId`）。
-- 后端 API 契约定义在 `openapi.yaml` 中，路径前缀 `/api/v1/assistant`，包含模型列表、知识库、工具、流式对话 `/chat/stream`（SSE）等端点。
+  - SSE 流式消息展示
+- 对话数据持久化到后端数据库。
+
+### 用户管理
+
+- 管理员可访问 `/admin/users` 查看用户列表、修改用户权限、删除用户
+- 所有用户可访问 `/settings` 修改 LLM API Keys 和天气服务配置
 
 ### 样式体系
 
@@ -69,7 +76,7 @@ npm run preview
 
 ## 注意事项
 
-- 当前无真实后端对接，LLM 回复由 `mockStreamReply` 模拟生成。接入后端后需替换为调用 `openapi.yaml` 中定义的 `/chat/stream` SSE 接口。
+- 后端 API 契约定义在 `openapi.yaml` 中，路径前缀 `/api/v1`，包含认证、用户管理、配置、智能助手等端点。
 - `tsconfig.app.json` 启用 `strict` 与 `noUnusedLocals`/`noUnusedParameters`，未使用的变量会导致构建失败。
 - 项目未配置 ESLint / Prettier / 测试框架。
 

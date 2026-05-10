@@ -1,52 +1,68 @@
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <div class="login-header">
+  <div class="register-container">
+    <div class="register-card">
+      <div class="register-header">
         <div class="logo">
           <span class="logo-icon">🌤️</span>
         </div>
-        <h1 class="title">大语言模型气象业务应用平台</h1>
-        <p class="subtitle">请登录您的账户</p>
+        <h1 class="title">用户注册</h1>
+        <p class="subtitle">创建您的账户</p>
       </div>
-      
-      <form @submit.prevent="handleLogin" class="login-form">
+
+      <form @submit.prevent="handleRegister" class="register-form">
         <div class="form-group">
           <label for="username">用户名</label>
           <input
             id="username"
             v-model="formData.username"
             type="text"
-            placeholder="请输入用户名"
+            placeholder="请输入用户名（3-64个字符）"
             required
+            minlength="3"
+            maxlength="64"
             class="input-field"
           />
         </div>
-        
+
         <div class="form-group">
           <label for="password">密码</label>
           <input
             id="password"
             v-model="formData.password"
             type="password"
-            placeholder="请输入密码"
+            placeholder="请输入密码（6-128个字符）"
+            required
+            minlength="6"
+            maxlength="128"
+            class="input-field"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">确认密码</label>
+          <input
+            id="confirmPassword"
+            v-model="formData.confirmPassword"
+            type="password"
+            placeholder="请再次输入密码"
             required
             class="input-field"
           />
         </div>
-        
-        <button type="submit" class="login-button" :disabled="isLoading">
+
+        <button type="submit" class="register-button" :disabled="isLoading">
           <span v-if="isLoading" class="loading-spinner"></span>
-          <span v-else>登 录</span>
+          <span v-else>注 册</span>
         </button>
-        
+
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
       </form>
 
-      <div class="login-footer">
+      <div class="register-footer">
         <p class="footer-text">
-          没有账号？<router-link to="/register" class="register-link">立即注册</router-link>
+          已有账号？<router-link to="/login" class="login-link">立即登录</router-link>
         </p>
-        <p class="footer-copyright">© 2026 气象业务应用平台</p>
       </div>
     </div>
   </div>
@@ -62,25 +78,37 @@ const authStore = useAuthStore()
 
 const formData = ref({
   username: '',
-  password: ''
+  password: '',
+  confirmPassword: ''
 })
 
 const isLoading = ref(false)
 const errorMessage = ref('')
+const successMessage = ref('')
 
-const handleLogin = async () => {
+const handleRegister = async () => {
   errorMessage.value = ''
+  successMessage.value = ''
+
+  if (formData.value.password !== formData.value.confirmPassword) {
+    errorMessage.value = '两次输入的密码不一致'
+    return
+  }
+
   isLoading.value = true
 
   try {
-    const ok = await authStore.login(formData.value.username, formData.value.password)
-    if (ok) {
-      router.push('/home')
+    const result = await authStore.register(formData.value.username, formData.value.password)
+    if (result.success) {
+      successMessage.value = '注册成功！即将跳转到登录页面...'
+      setTimeout(() => {
+        router.push('/login')
+      }, 1500)
     } else {
-      errorMessage.value = '用户名或密码错误'
+      errorMessage.value = result.error || '注册失败'
     }
   } catch {
-    errorMessage.value = '登录失败，请检查网络连接'
+    errorMessage.value = '注册失败，请检查网络连接'
   } finally {
     isLoading.value = false
   }
@@ -88,7 +116,7 @@ const handleLogin = async () => {
 </script>
 
 <style scoped>
-.login-container {
+.register-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -101,7 +129,7 @@ const handleLogin = async () => {
   position: relative;
 }
 
-.login-container::before {
+.register-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -112,7 +140,7 @@ const handleLogin = async () => {
   backdrop-filter: blur(5px);
 }
 
-.login-card {
+.register-card {
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(20px);
   border-radius: 20px;
@@ -137,7 +165,7 @@ const handleLogin = async () => {
   }
 }
 
-.login-header {
+.register-header {
   text-align: center;
   margin-bottom: 40px;
 }
@@ -171,11 +199,12 @@ const handleLogin = async () => {
 
 .subtitle {
   font-size: 14px;
-  color: #86868b;
+  color: #1d1d1f;
   margin: 0;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
-.login-form {
+.register-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -215,7 +244,7 @@ const handleLogin = async () => {
   color: #86868b;
 }
 
-.login-button {
+.register-button {
   margin-top: 10px;
   padding: 14px;
   background: linear-gradient(135deg, #007aff 0%, #0056cc 100%);
@@ -232,16 +261,16 @@ const handleLogin = async () => {
   gap: 8px;
 }
 
-.login-button:hover:not(:disabled) {
+.register-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 122, 255, 0.4);
 }
 
-.login-button:active:not(:disabled) {
+.register-button:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.login-button:disabled {
+.register-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
@@ -274,6 +303,18 @@ const handleLogin = async () => {
   animation: shake 0.5s ease-in-out;
 }
 
+.success-message {
+  color: #34c759;
+  font-size: 14px;
+  text-align: center;
+  margin: 0;
+  padding: 10px;
+  background: rgba(52, 199, 89, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
 @keyframes shake {
   0%, 100% {
     transform: translateX(0);
@@ -286,7 +327,7 @@ const handleLogin = async () => {
   }
 }
 
-.login-footer {
+.register-footer {
   margin-top: 30px;
   text-align: center;
 }
@@ -298,28 +339,21 @@ const handleLogin = async () => {
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
-.footer-copyright {
-  font-size: 12px;
-  color: #1d1d1f;
-  margin: 8px 0 0 0;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-}
-
-.register-link {
+.login-link {
   color: #007aff;
   text-decoration: none;
   font-weight: 500;
 }
 
-.register-link:hover {
+.login-link:hover {
   text-decoration: underline;
 }
 
 @media (max-width: 480px) {
-  .login-card {
+  .register-card {
     padding: 32px 24px;
   }
-  
+
   .title {
     font-size: 20px;
   }

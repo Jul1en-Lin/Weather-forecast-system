@@ -32,3 +32,8 @@ __pycache__/
 venv/
 .env
 cookies.txt
+
+# SQLite 数据库文件
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm

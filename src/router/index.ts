@@ -14,6 +14,12 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/Register.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/home',
     name: 'Home',
     component: () => import('../views/Home.vue'),
@@ -23,6 +29,18 @@ const routes: RouteRecordRaw[] = [
     path: '/intelligent-assistant',
     name: 'IntelligentAssistant',
     component: () => import('../views/IntelligentAssistant.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin/users',
+    name: 'AdminUsers',
+    component: () => import('../views/AdminUsers.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: () => import('../views/Settings.vue'),
     meta: { requiresAuth: true }
   }
 ]
@@ -41,11 +59,15 @@ router.beforeEach(async (to, _from, next) => {
   if (to.meta.requiresAuth) {
     if (!isAuthenticated) {
       next('/login')
+    } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
+      next('/home')
     } else {
       next()
     }
   } else {
     if (to.path === '/login' && isAuthenticated) {
+      next('/home')
+    } else if (to.path === '/register' && isAuthenticated) {
       next('/home')
     } else {
       next()

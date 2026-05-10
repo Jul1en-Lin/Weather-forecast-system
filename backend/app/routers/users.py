@@ -9,7 +9,7 @@ router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
 def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
     if not current_user.get("is_admin"):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="管理员权限required")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="需要管理员权限")
     return current_user
 
 @router.get("/", response_model=List[UserResponse])

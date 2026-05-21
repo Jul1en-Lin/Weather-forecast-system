@@ -14,10 +14,20 @@
           <span class="nav-icon">🏠</span>
           <span class="nav-text">首页</span>
         </router-link>
-        
+
         <router-link to="/intelligent-assistant" class="nav-item" active-class="active">
           <span class="nav-icon">🤖</span>
           <span class="nav-text">智能助手</span>
+        </router-link>
+
+        <router-link to="/settings" class="nav-item" active-class="active">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">系统设置</span>
+        </router-link>
+
+        <router-link v-if="isAdmin" to="/admin/users" class="nav-item" active-class="active">
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">用户管理</span>
         </router-link>
       </nav>
       
@@ -28,7 +38,7 @@
           </div>
           <div class="user-details">
             <p class="username">{{ username }}</p>
-            <p class="user-role">管理员</p>
+            <p class="user-role">{{ isAdmin ? '管理员' : '普通用户' }}</p>
           </div>
         </div>
         <button @click="handleLogout" class="logout-button">
@@ -160,7 +170,7 @@ import { useAuthStore } from '../stores/auth'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
-const API_BASE = 'http://localhost:8000'
+const API_BASE = ''  // 使用相对路径，通过 Vite 代理转发到后端
 
 function renderMarkdown(content: string): string {
   if (!content) return ''
@@ -189,6 +199,7 @@ interface ModelOption {
 const router = useRouter()
 const authStore = useAuthStore()
 const username = computed(() => authStore.username)
+const isAdmin = computed(() => authStore.isAdmin)
 const userInitial = computed(() => {
   const name = username.value
   return name ? name.charAt(0).toUpperCase() : 'U'
@@ -431,7 +442,6 @@ onMounted(() => {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
   position: relative;
 }
 

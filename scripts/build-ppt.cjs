@@ -235,7 +235,7 @@ function addSectionHeader(slide, num, title) {
     {
       label: "数据/模型",
       color: "0D9488",
-      items: ["MySQL 5.7+", "Tavily 天气搜索", "QWeather 实时预警", "Session-Cookie 认证", "OpenAPI 3.0 规范"],
+      items: ["SQLite", "Tavily 天气搜索", "QWeather 实时预警", "Session-Cookie 认证", "OpenAPI 3.0 规范"],
     },
   ];
 

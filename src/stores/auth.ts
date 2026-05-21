@@ -1,14 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-const API_BASE = 'http://localhost:8000'
+const API_BASE = ''  // 使用相对路径，通过 Vite 代理转发到后端
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
-  const user = ref<{ username: string } | null>(null)
+  const user = ref<{ username: string; is_admin: boolean } | null>(null)
 
   const isLoggedIn = computed(() => isAuthenticated.value)
   const username = computed(() => user.value?.username || '')
+  const isAdmin = computed(() => user.value?.is_admin || false)
 
   const login = async (uname: string, password: string): Promise<boolean> => {
     const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
@@ -20,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!res.ok) return false
     const data = await res.json()
     isAuthenticated.value = true
-    user.value = { username: data.username }
+    user.value = { username: data.username, is_admin: data.is_admin }
     return true
   }
 
@@ -42,7 +43,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (res.ok) {
         const data = await res.json()
         isAuthenticated.value = true
-        user.value = { username: data.username }
+        user.value = { username: data.username, is_admin: data.is_admin }
         return true
       }
     } catch {
@@ -53,13 +54,29 @@ export const useAuthStore = defineStore('auth', () => {
     return false
   }
 
+  const register = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    const res = await fetch(`${API_BASE}/api/v1/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, password }),
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      return { success: false, error: data.detail || '注册失败' }
+    }
+    return { success: true }
+  }
+
   return {
     isAuthenticated,
     user,
     isLoggedIn,
     username,
+    isAdmin,
     login,
     logout,
     checkAuth,
+    register,
   }
 })

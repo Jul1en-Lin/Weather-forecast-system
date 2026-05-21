@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.conversation import Conversation
@@ -38,6 +39,7 @@ class ConversationService:
         conv = ConversationService.get(db, conversation_id, user_id)
         if conv:
             conv.title = title
+            conv.updated_at = datetime.now()  # SQLite 不支持 onupdate，手动更新
             db.commit()
             db.refresh(conv)
         return conv
@@ -78,6 +80,10 @@ class ConversationService:
             tool_calls=tool_calls,
         )
         db.add(msg)
+        # 更新所属对话的 updated_at（SQLite 不支持 onupdate）
+        conv = db.query(Conversation).filter(Conversation.id == conversation_id).first()
+        if conv:
+            conv.updated_at = datetime.now()
         db.commit()
         db.refresh(msg)
         return msg

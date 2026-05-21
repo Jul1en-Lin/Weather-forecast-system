@@ -2,7 +2,7 @@ import secrets
 import bcrypt
 from fastapi import Request, HTTPException, status
 
-# 内存 session 存储: {session_id: {"user_id": int, "username": str}}
+# 内存 session 存储: {session_id: {"user_id": int, "username": str, "is_admin": bool}}
 _session_store: dict[str, dict] = {}
 
 def hash_password(password: str) -> str:
@@ -11,9 +11,9 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed: str) -> bool:
     return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
 
-def create_session(user_id: int, username: str) -> str:
+def create_session(user_id: int, username: str, is_admin: bool = False) -> str:
     session_id = secrets.token_urlsafe(32)
-    _session_store[session_id] = {"user_id": user_id, "username": username}
+    _session_store[session_id] = {"user_id": user_id, "username": username, "is_admin": is_admin}
     return session_id
 
 def delete_session(session_id: str) -> None:

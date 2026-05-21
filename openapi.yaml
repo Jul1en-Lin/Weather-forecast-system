@@ -3,9 +3,183 @@ info:
   title: 智能助手 API
   version: 1.0.0
 servers:
-  - url: /api/v1/assistant
+  - url: /api/v1
 paths:
-  /models:
+  # ============ 认证相关 ============
+  /auth/register:
+    post:
+      summary: 用户注册
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 64
+                password:
+                  type: string
+                  minLength: 6
+                  maxLength: 128
+              required:
+                - username
+                - password
+            example:
+              username: newuser
+              password: password123
+      responses:
+        '200':
+          description: 注册成功
+          content:
+            application/json:
+              example:
+                id: 2
+                username: newuser
+                is_admin: false
+        '400':
+          description: 用户名已存在
+
+  /auth/login:
+    post:
+      summary: 用户登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+            example:
+              username: admin
+              password: admin123
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              example:
+                username: admin
+                is_admin: true
+        '401':
+          description: 用户名或密码错误
+
+  /auth/logout:
+    post:
+      summary: 用户登出
+      responses:
+        '200':
+          description: 登出成功
+
+  /auth/me:
+    get:
+      summary: 获取当前用户信息
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                username: admin
+                is_admin: true
+
+  # ============ 用户管理（仅管理员） ============
+  /users/:
+    get:
+      summary: 获取所有用户列表
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                - id: 1
+                  username: admin
+                  is_admin: true
+                  created_at: "2026-04-17T00:00:00"
+        '403':
+          description: 需要管理员权限
+
+  /users/me:
+    get:
+      summary: 获取当前用户详情
+      responses:
+        '200':
+          description: OK
+
+  /users/{id}:
+    put:
+      summary: 更新用户信息（仅管理员可修改 is_admin）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            example:
+              is_admin: false
+      responses:
+        '200':
+          description: 更新成功
+        '403':
+          description: 需要管理员权限
+    delete:
+      summary: 删除用户（仅管理员，不可删除 admin）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 删除成功
+        '400':
+          description: 不能删除 admin 用户
+
+  # ============ 配置管理 ============
+  /config/:
+    get:
+      summary: 获取当前配置（敏感信息已掩码）
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                kimi_api_key: sk-L...xxxx
+                deepseek_api_key: sk-e...xxxx
+                minimax_api_key: sk-c...xxxx
+                tavily_api_key: tvly-...xxxx
+                qweather_api_key: 1a91...xxxx
+                qweather_api_host: devapi.qweather.com
+                ollama_base_url: http://localhost:11434/v1
+    put:
+      summary: 更新配置（所有已登录用户）
+      requestBody:
+        content:
+          application/json:
+            example:
+              kimi_api_key: sk-new-key-here
+              deepseek_api_key: sk-new-key-here
+      responses:
+        '200':
+          description: 更新成功
+
+  # ============ 智能助手 ============
+  /assistant/models:
     get:
       summary: 获取可用模型列表
       responses:
@@ -18,7 +192,7 @@ paths:
                   - id: deepseek-32b
                     name: DeepSeek R1 32B
                     description: 高质量回答，速度中等
-  /knowledge-bases:
+  /assistant/knowledge-bases:
     get:
       summary: 获取知识库列表
       responses:
@@ -30,7 +204,7 @@ paths:
                 knowledge_bases:
                   - id: kb_001
                     name: 气象术语库
-  /tools:
+  /assistant/tools:
     get:
       summary: 获取可用工具列表
       responses:
@@ -42,7 +216,7 @@ paths:
                 tools:
                   - id: weather_query
                     name: 天气查询
-  /chat/stream:
+  /assistant/chat/stream:
     post:
       summary: 发送对话（流式响应）
       requestBody:
@@ -79,7 +253,7 @@ paths:
             text/event-stream:
               schema:
                 type: string
-  /conversations:
+  /assistant/conversations:
     get:
       summary: 获取对话列表
       parameters:
@@ -89,13 +263,14 @@ paths:
             type: integer
         - name: page_size
           in: query
+          schema:
             type: integer
       responses:
         '200':
           description: OK
     post:
       summary: 创建新对话（可选）
-  /conversations/{conversation_id}:
+  /assistant/conversations/{conversation_id}:
     get:
       summary: 获取单个对话详情
     put:
@@ -107,7 +282,7 @@ paths:
               title: 新标题
     delete:
       summary: 删除对话
-  /conversations/batch-delete:
+  /assistant/conversations/batch-delete:
     post:
       summary: 批量删除对话
       requestBody:
@@ -115,7 +290,7 @@ paths:
           application/json:
             example:
               conversation_ids: ["conv_123", "conv_456"]
-  /speech-to-text:
+  /assistant/speech-to-text:
     post:
       summary: 语音转文字
       requestBody:

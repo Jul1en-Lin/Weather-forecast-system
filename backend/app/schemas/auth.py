@@ -6,6 +6,8 @@ class LoginRequest(BaseModel):
 
 class LoginResponse(BaseModel):
     username: str
+    is_admin: bool
 
 class MeResponse(BaseModel):
     username: str
+    is_admin: bool

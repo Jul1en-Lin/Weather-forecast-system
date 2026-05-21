@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"from app.database import engine, Base; from app.models import User, Conversation, Message, Term, Alert; Base.metadata.create_all\\(bind=engine\\); print\\(''Tables created successfully''\\)\")"
+    ]
+  }
+}

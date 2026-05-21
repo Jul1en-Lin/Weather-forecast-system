@@ -42,6 +42,7 @@ def init_db():
             user = User(
                 username="admin",
                 password_hash=hash_password("admin123"),
+                is_admin=True,
             )
             db.add(user)
             db.commit()

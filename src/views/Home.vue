@@ -14,10 +14,20 @@
           <span class="nav-icon">🏠</span>
           <span class="nav-text">首页</span>
         </router-link>
-        
+
         <router-link to="/intelligent-assistant" class="nav-item" active-class="active">
           <span class="nav-icon">🤖</span>
           <span class="nav-text">智能助手</span>
+        </router-link>
+
+        <router-link to="/settings" class="nav-item" active-class="active">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">系统设置</span>
+        </router-link>
+
+        <router-link v-if="isAdmin" to="/admin/users" class="nav-item" active-class="active">
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">用户管理</span>
         </router-link>
       </nav>
       
@@ -28,7 +38,7 @@
           </div>
           <div class="user-details">
             <p class="username">{{ username }}</p>
-            <p class="user-role">管理员</p>
+            <p class="user-role">{{ isAdmin ? '管理员' : '普通用户' }}</p>
           </div>
         </div>
         <button @click="handleLogout" class="logout-button">
@@ -65,6 +75,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const username = computed(() => authStore.username)
+const isAdmin = computed(() => authStore.isAdmin)
 
 const userInitial = computed(() => {
   const name = username.value
@@ -304,18 +315,18 @@ const handleLogout = async () => {
   margin: 0 0 16px 0;
   letter-spacing: -1px;
   line-height: 1.2;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
 }
 
 .main-subtitle {
   font-size: 18px;
-  color: #FFFFFF;
+  color: #1d1d1f;
   margin: 0 0 40px 0;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
   line-height: 1.6;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .feature-cards {
@@ -326,16 +337,20 @@ const handleLogout = async () => {
 }
 
 .feature-card {
-  background: #f5f5f7;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(15px);
   border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 30px 24px;
   text-align: center;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .feature-card:hover {
+  background: rgba(255, 255, 255, 0.5);
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .card-icon {

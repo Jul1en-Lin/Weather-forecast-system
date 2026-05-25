@@ -20,12 +20,6 @@
 ### 用户管理页
 ![admin-users](./docs/images/readme-admin-users.png)
 
-## 设计风格
-
-- **UI 设计**：Apple 风格 + 玻璃模糊（Glassmorphism）
-- **配色方案**：淡雅柔和，所有页面使用统一的背景图片 + 半透明白色模糊层
-- **卡片效果**：使用 `backdrop-filter: blur()` 实现毛玻璃质感，白色透明度 20%
-- **响应式**：适配桌面端和移动端
 
 ## 核心功能
 
@@ -43,7 +37,7 @@
 - 前端：Vue 3 + Vite + TypeScript
 - 后端：Python + LangChain + FastAPI
 - 数据库：SQLite（自动初始化，无需安装数据库服务）
-- 模型 API 接入：目前支持 Kimi / DeepSeek / MiniMax / Ollama 本地模型
+- 模型 API 接入：目前支持 Kimi / DeepSeek / MiniMax
 
 ## 文件结构
 
@@ -136,7 +130,6 @@
 | Kimi API Key | Kimi 模型 API 密钥 |
 | DeepSeek API Key | DeepSeek 模型 API 密钥 |
 | MiniMax API Key | MiniMax 模型 API 密钥 |
-| Ollama 本地地址 | Ollama 本地模型地址 |
 | Tavily API Key | 天气搜索服务密钥 |
 | 和风天气 API Key | 实时预警查询密钥 |
 | 和风天气 API Host | 和风天气 API 服务器地址 |
@@ -161,8 +154,6 @@ TAVILY_API_KEY=tvly-xxxxxxxx
 QWEATHER_API_KEY=xxxxxxxx
 QWEATHER_API_HOST=kt4up5963t.re.qweatherapi.com
 
-# Ollama 本地模型（可选）
-OLLAMA_BASE_URL=http://localhost:11434/v1
 ```
 
 前端无需额外配置，Vite 代理自动将 `/api/*` 请求转发到后端 `http://localhost:8000`。

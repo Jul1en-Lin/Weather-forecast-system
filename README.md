@@ -5,20 +5,20 @@
 前端基于 Vue 3 提供智能气象问答对话界面，采用玻璃模糊（Glassmorphism）设计风格；后端采用 Python + LangChain 技术，实现简单的天气检索功能，模型支持流式输出、知识库检索、调用天气工具等。
 
 ### 登录页
-<img width="2825" height="1787" alt="login" src="https://github.com/user-attachments/assets/4aa8d82a-f5d3-4e6b-9adb-164792380541" />
+![login](./docs/images/home.png)
 
 ### 首页
-<img width="2824" height="1784" alt="home" src="https://github.com/user-attachments/assets/8ac0bf56-dae1-495a-b7c4-6bf24c9aa372" />
-![AI-page](./docs/images/readme-ai-page.png)
+![home](./docs/images/home2.png)
+![AI-page](./docs/images/picture1.png)
 
 ### 系统设置页（LLM 模型）
-![settings-llm](./docs/images/readme-settings-llm.png)
+![settings-llm](./docs/images/setting1.png)
 
 ### 系统设置页（天气服务）
-![settings-weather](./docs/images/readme-settings-weather.png)
+![settings-weather](./docs/images/setting2.png)
 
 ### 用户管理页
-![admin-users](./docs/images/readme-admin-users.png)
+![admin-users](./docs/images/setting3.png)
 
 
 ## 核心功能

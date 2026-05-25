@@ -11,7 +11,13 @@ node_modules
 dist/
 docs/*
 !docs/images/
-!docs/images/readme-*.png
+docs/images/*
+!docs/images/home.png
+!docs/images/home2.png
+!docs/images/picture1.png
+!docs/images/setting1.png
+!docs/images/setting2.png
+!docs/images/setting3.png
 dist-ssr
 *.local
 

@@ -191,4 +191,3 @@ npm run dev:backend
 - 用户名：`admin`
 - 密码：`admin123`
 
-<img width="2825" height="1787" alt="login" src="https://github.com/user-attachments/assets/2b301bb9-b798-439a-9537-8f869aa3ac49" />

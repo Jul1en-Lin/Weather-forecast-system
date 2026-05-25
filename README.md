@@ -9,7 +9,7 @@
 
 ### 首页
 <img width="2824" height="1784" alt="home" src="https://github.com/user-attachments/assets/8ac0bf56-dae1-495a-b7c4-6bf24c9aa372" />
-<img width="2824" height="1787" alt="AI-page" src="https://github.com/user-attachments/assets/f72ced63-9076-4cd9-8c93-6b45efe3e294" />
+![AI-page](./docs/images/readme-ai-page.png)
 
 ### 系统设置页（LLM 模型）
 ![settings-llm](./docs/images/readme-settings-llm.png)

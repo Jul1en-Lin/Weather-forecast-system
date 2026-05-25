@@ -24,7 +24,7 @@
 - 请求体字段：`model_id`、`message`、`conversation_id`（可选）、`knowledge_base_ids`（可选）、`tool_ids`（可选）
 - 返回：`text/event-stream`（SSE），逐字/逐段推送大模型生成内容。
 - 后端需维护多轮对话上下文：若提供 `conversation_id`，从 MySQL 查询历史消息并注入 LangChain 消息链；否则创建新对话。
-- 前端模型映射以后端为准：前端 `deepseek-32b` 等选项为 mock，实际可用模型由 `/api/v1/assistant/models` 返回。
+- 前端模型映射以后端为准：实际可用模型由 `/api/v1/assistant/models` 返回。
 
 #### FR-003 模型管理
 - 端点：`GET /api/v1/assistant/models`
@@ -32,7 +32,7 @@
 - 支持的模型：
   - `kimi-k2.5`（Moonshot）
   - `MiniMax-M2.5`
-  - `deepseek-reasoner`（DeepSeek）
+  - `deepseek-v4-flash`（DeepSeek）
   - `deepseek-r1:14b`（本地 Ollama）
 - 各模型通过 `langchain-openai` SDK 配置，使用官方提供的 `base_url` 与 `api_key`。
 
@@ -192,7 +192,7 @@ CREATE TABLE alerts (
 | 模型 ID | 提供商 | model 参数 | base_url | 备注 |
 |---------|--------|-----------|----------|------|
 | `kimi-k2.5` | Moonshot | `kimi-k2.5` | `https://api.moonshot.cn/v1` | 用户已确认 |
-| `deepseek-reasoner` | DeepSeek | `deepseek-reasoner` | `https://api.deepseek.com/v1` | 官网文档 |
+| `deepseek-v4-flash` | DeepSeek | `deepseek-v4-flash` | `https://api.deepseek.com/v1` | 官网文档 |
 | `MiniMax-M2.5` | MiniMax | `MiniMax-M2.5` | `https://api.minimax.chat/v1` | 官网文档 |
 | `deepseek-r1:14b` | Ollama（本地） | `deepseek-r1:14b` | `http://localhost:11434/v1` | 默认端口 |
 

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 _WEEKDAY_MAP = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
 from app.dependencies import get_db_session, get_current_user
 from app.services.conversation import ConversationService
-from app.services.llm import get_llm, stream_llm_response, strip_thinking_tags, ThinkingFilter, MODEL_CONFIG
+from app.services.llm import get_llm, stream_llm_response, strip_thinking_tags, ThinkingFilter, get_model_config
 from app.services.knowledge_base import KnowledgeBaseService
 from app.services.weather_tool import WeatherToolService
 from app.core.sse import sse_response, SSEStream
@@ -37,7 +37,7 @@ def get_models():
     return ModelsResponse(models=[
         ModelInfo(id="kimi-k2.5", name="Kimi K2.5", description="Moonshot 高性能模型"),
         ModelInfo(id="MiniMax-M2.5", name="MiniMax M2.5", description="MiniMax 通用模型"),
-        ModelInfo(id="deepseek-reasoner", name="DeepSeek Reasoner", description="DeepSeek 推理模型"),
+        ModelInfo(id="deepseek-v4-flash", name="DeepSeek-V4-Flash", description="DeepSeek Flash 模型"),
         # ModelInfo(id="deepseek-r1:14b", name="DeepSeek R1 14B (本地)", description="Ollama 本地模型"),
     ])
 
@@ -90,7 +90,7 @@ async def chat_stream(
     if kb_context:
         system_parts.append("以下是相关气象知识库内容，请结合这些内容回答：\n" + kb_context)
 
-    config = MODEL_CONFIG.get(req.model_id, {})
+    config = get_model_config(req.model_id)
     supports_tools = config.get("supports_tools", True)
     if req.tool_ids and not supports_tools:
         tool_descs = []
@@ -202,7 +202,7 @@ async def chat_stream(
                 if "502" in err_str or "Connection" in err_str or "Connect" in err_str:
                     error_msg = "本地模型未就绪，请确认 Ollama 已启动（默认端口 11434）。"
                 elif "does not support tools" in err_str:
-                    error_msg = "当前本地模型不支持工具调用，请切换为支持工具调用的模型（如 DeepSeek Reasoner），或取消勾选工具选项。"
+                    error_msg = "当前本地模型不支持工具调用，请切换为支持工具调用的模型（如 DeepSeek-V4-Flash），或取消勾选工具选项。"
                 else:
                     error_msg = f"本地模型请求出错：{err_str}"
             else:

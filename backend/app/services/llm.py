@@ -3,39 +3,53 @@ from typing import AsyncIterator
 from langchain_openai import ChatOpenAI
 from app.config import settings
 
-MODEL_CONFIG = {
+MODEL_DEFINITIONS = {
     "kimi-k2.5": {
         "model": "kimi-k2.5",
         "base_url": "https://api.moonshot.cn/v1",
-        "api_key": settings.kimi_api_key,
         "temperature": 1.0,
         "supports_tools": True,
     },
-    "deepseek-reasoner": {
-        "model": "deepseek-reasoner",
+    "deepseek-v4-flash": {
+        "model": "deepseek-v4-flash",
         "base_url": "https://api.deepseek.com/v1",
-        "api_key": settings.deepseek_api_key,
         "supports_tools": True,
     },
     "MiniMax-M2.5": {
         "model": "MiniMax-M2.5",
         "base_url": "https://api.minimax.chat/v1",
-        "api_key": settings.minimax_api_key,
         "supports_tools": True,
     },
     "deepseek-r1:14b": {
         "model": "deepseek-r1:14b",
-        "base_url": settings.ollama_base_url,
-        "api_key": "ollama",
         "is_local": True,
         "supports_tools": False,
     },
 }
 
-def get_llm(model_id: str, temperature: float = 0.7, streaming: bool = True) -> ChatOpenAI:
-    config = MODEL_CONFIG.get(model_id)
+
+def get_model_config(model_id: str) -> dict:
+    """Build a fresh model config from the current runtime settings."""
+    config = MODEL_DEFINITIONS.get(model_id)
     if not config:
         raise ValueError(f"Unknown model_id: {model_id}")
+
+    runtime_config = dict(config)
+    if model_id == "kimi-k2.5":
+        runtime_config["api_key"] = settings.kimi_api_key
+    elif model_id == "deepseek-v4-flash":
+        runtime_config["api_key"] = settings.deepseek_api_key
+    elif model_id == "MiniMax-M2.5":
+        runtime_config["api_key"] = settings.minimax_api_key
+    elif model_id == "deepseek-r1:14b":
+        runtime_config["base_url"] = settings.ollama_base_url
+        runtime_config["api_key"] = "ollama"
+
+    return runtime_config
+
+
+def get_llm(model_id: str, temperature: float = 0.7, streaming: bool = True) -> ChatOpenAI:
+    config = get_model_config(model_id)
     kwargs = dict(
         model=config["model"],
         base_url=config["base_url"],

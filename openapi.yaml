@@ -189,9 +189,9 @@ paths:
             application/json:
               example:
                 models:
-                  - id: deepseek-32b
-                    name: DeepSeek R1 32B
-                    description: 高质量回答，速度中等
+                  - id: deepseek-v4-flash
+                    name: DeepSeek-V4-Flash
+                    description: DeepSeek Flash 模型
   /assistant/knowledge-bases:
     get:
       summary: 获取知识库列表
@@ -244,7 +244,7 @@ paths:
                 - model_id
                 - message
             example:
-              model_id: deepseek-32b
+              model_id: deepseek-v4-flash
               message: 请生成一份茂名地区雷击风险空间分布描述
       responses:
         '200':

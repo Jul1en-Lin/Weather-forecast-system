@@ -11,6 +11,15 @@
 <img width="2824" height="1784" alt="home" src="https://github.com/user-attachments/assets/8ac0bf56-dae1-495a-b7c4-6bf24c9aa372" />
 <img width="2824" height="1787" alt="AI-page" src="https://github.com/user-attachments/assets/f72ced63-9076-4cd9-8c93-6b45efe3e294" />
 
+### 系统设置页（LLM 模型）
+<img width="1600" height="908" alt="settings-llm" src="docs/images/readme-settings-llm.png" />
+
+### 系统设置页（天气服务）
+<img width="1600" height="908" alt="settings-weather" src="docs/images/readme-settings-weather.png" />
+
+### 用户管理页
+<img width="1600" height="908" alt="admin-users" src="docs/images/readme-admin-users.png" />
+
 ## 设计风格
 
 - **UI 设计**：Apple 风格 + 玻璃模糊（Glassmorphism）

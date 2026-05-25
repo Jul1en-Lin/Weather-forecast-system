@@ -1,0 +1,55 @@
+import unittest
+from unittest.mock import patch
+
+from app.config import settings
+from app.services.llm import get_llm, get_model_config
+
+
+class LLMConfigTests(unittest.TestCase):
+    def setUp(self):
+        self.original_config = settings.get_config_dict(mask_secrets=False)
+
+    def tearDown(self):
+        settings.update_config(**self.original_config)
+
+    def test_model_config_uses_latest_runtime_settings(self):
+        settings.update_config(
+            kimi_api_key="sk-old-kimi",
+            deepseek_api_key="sk-old-deepseek",
+            minimax_api_key="sk-old-minimax",
+            ollama_base_url="http://localhost:11434/v1",
+        )
+
+        settings.update_config(
+            kimi_api_key="sk-new-kimi",
+            deepseek_api_key="sk-new-deepseek",
+            minimax_api_key="sk-new-minimax",
+            ollama_base_url="http://127.0.0.1:11435/v1",
+        )
+
+        self.assertEqual(get_model_config("kimi-k2.5")["api_key"], "sk-new-kimi")
+        self.assertEqual(get_model_config("deepseek-v4-flash")["api_key"], "sk-new-deepseek")
+        self.assertEqual(get_model_config("MiniMax-M2.5")["api_key"], "sk-new-minimax")
+        self.assertEqual(
+            get_model_config("deepseek-r1:14b")["base_url"],
+            "http://127.0.0.1:11435/v1",
+        )
+
+    def test_get_llm_constructs_client_with_latest_runtime_config(self):
+        settings.update_config(deepseek_api_key="sk-runtime-deepseek")
+
+        with patch("app.services.llm.ChatOpenAI") as chat_openai:
+            llm = get_llm("deepseek-v4-flash", temperature=0.2, streaming=False)
+
+        self.assertIs(llm, chat_openai.return_value)
+        chat_openai.assert_called_once_with(
+            model="deepseek-v4-flash",
+            base_url="https://api.deepseek.com/v1",
+            api_key="sk-runtime-deepseek",
+            streaming=False,
+            temperature=0.2,
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -16,6 +16,7 @@
 | 2026-05-10 | — | feat: 新增用户注册功能（`POST /api/v1/auth/register`）；新增用户管理页面（管理员可查看、修改权限、删除用户）；新增 is_admin 字段到用户表 | Claude | — |
 | 2026-05-10 | — | feat: 新增系统设置页面，支持在前端配置 LLM API Keys（Kimi/DeepSeek/MiniMax/Ollama）和天气服务配置（Tavily/和风天气）；所有已登录用户均可修改配置 | Claude | — |
 | 2026-05-10 | — | style: 统一所有页面背景样式，使用 `/background.jpg` 图片 + 玻璃模糊效果（`backdrop-filter: blur`）；登录/注册页使用玻璃质感卡片设计；Settings.vue 和 AdminUsers.vue 采用与首页一致的框架布局；卡片透明度调整为 20% 白色 + 模糊效果 | Claude | — |
+| 2026-05-25 | — | docs: 更新 README 页面截图，新增系统设置与用户管理界面，并将本地截图改为 GitHub 兼容的 Markdown 图片语法 | Codex | — |
 
 ---
 

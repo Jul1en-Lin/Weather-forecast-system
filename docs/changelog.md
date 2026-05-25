@@ -17,6 +17,7 @@
 | 2026-05-10 | — | feat: 新增系统设置页面，支持在前端配置 LLM API Keys（Kimi/DeepSeek/MiniMax/Ollama）和天气服务配置（Tavily/和风天气）；所有已登录用户均可修改配置 | Claude | — |
 | 2026-05-10 | — | style: 统一所有页面背景样式，使用 `/background.jpg` 图片 + 玻璃模糊效果（`backdrop-filter: blur`）；登录/注册页使用玻璃质感卡片设计；Settings.vue 和 AdminUsers.vue 采用与首页一致的框架布局；卡片透明度调整为 20% 白色 + 模糊效果 | Claude | — |
 | 2026-05-25 | — | docs: 更新 README 页面截图，新增系统设置与用户管理界面，并将本地截图改为 GitHub 兼容的 Markdown 图片语法 | Codex | — |
+| 2026-05-25 | — | fix: 补充 README 引用的截图资源入库，修复 GitHub 图片无法展示问题 | Codex | — |
 
 ---
 

@@ -8,6 +8,12 @@ from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 logger = logging.getLogger(__name__)
 
 _WEEKDAY_MAP = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
+DEFAULT_KNOWLEDGE_BASE_IDS = ["kb_weather", "kb_alert"]
+WEATHER_TOOL_KEYWORDS = [
+    "天气", "气温", "温度", "下雨", "降雨", "降水", "预报", "湿度", "风力", "风向",
+    "空气质量", "pm2.5", "出行", "穿衣", "冷不冷", "热不热",
+]
+ALERT_TOOL_KEYWORDS = ["预警", "警报", "告警", "气象灾害", "台风", "暴雨", "高温", "寒潮", "雷雨大风", "冰雹"]
 from app.dependencies import get_db_session, get_current_user
 from app.services.conversation import ConversationService
 from app.services.llm import get_llm, stream_llm_response, strip_thinking_tags, ThinkingFilter, get_model_config
@@ -20,7 +26,6 @@ from app.schemas.assistant import (
     KnowledgeBasesResponse, KnowledgeBaseInfo,
     ToolsResponse, ToolInfo,
     ChatStreamRequest,
-    SpeechToTextResponse,
 )
 from app.schemas.conversation import (
     ConversationsResponse, ConversationItem,
@@ -30,6 +35,27 @@ from app.schemas.conversation import (
 )
 
 router = APIRouter(prefix="/api/v1/assistant", tags=["assistant"])
+
+def resolve_knowledge_base_ids(knowledge_base_ids: Optional[List[str]]) -> List[str]:
+    return knowledge_base_ids or DEFAULT_KNOWLEDGE_BASE_IDS.copy()
+
+def resolve_tool_ids(
+    message: str,
+    supports_tools: bool,
+    requested_tool_ids: Optional[List[str]] = None,
+) -> List[str]:
+    if not supports_tools:
+        return []
+    if requested_tool_ids:
+        return requested_tool_ids
+
+    normalized = message.lower()
+    tool_ids: List[str] = []
+    if any(keyword in normalized for keyword in WEATHER_TOOL_KEYWORDS):
+        tool_ids.append("weather_query")
+    if any(keyword in normalized for keyword in ALERT_TOOL_KEYWORDS):
+        tool_ids.append("alert_query")
+    return tool_ids
 
 # ---- 模型列表 ----
 @router.get("/models", response_model=ModelsResponse)
@@ -93,12 +119,15 @@ async def chat_stream(
         "你是一个专业的气象智能助手，帮助用户解答气象相关问题。",
         date_str,
     ]
-    kb_context = KnowledgeBaseService.build_context(db, req.knowledge_base_ids)
+    effective_knowledge_base_ids = resolve_knowledge_base_ids(req.knowledge_base_ids)
+    config = get_model_config(req.model_id, db)
+    supports_tools = config.get("supports_tools", True)
+    effective_tool_ids = resolve_tool_ids(req.message, supports_tools, req.tool_ids)
+
+    kb_context = KnowledgeBaseService.build_context(db, effective_knowledge_base_ids)
     if kb_context:
         system_parts.append("以下是相关气象知识库内容，请结合这些内容回答：\n" + kb_context)
 
-    config = get_model_config(req.model_id, db)
-    supports_tools = config.get("supports_tools", True)
     if req.tool_ids and not supports_tools:
         tool_descs = []
         if "weather_query" in req.tool_ids:
@@ -119,12 +148,12 @@ async def chat_stream(
     tools = []
     tool_service = None
     alert_tool = None
-    if req.tool_ids:
-        if "weather_query" in req.tool_ids:
+    if effective_tool_ids:
+        if "weather_query" in effective_tool_ids:
             tool_service = WeatherToolService.get_tool()
             if tool_service:
                 tools.append(tool_service)
-        if "alert_query" in req.tool_ids:
+        if "alert_query" in effective_tool_ids:
             alert_tool = WeatherToolService.get_alert_tool()
             if alert_tool:
                 tools.append(alert_tool)
@@ -169,7 +198,7 @@ async def chat_stream(
                         "你是一个专业的气象智能助手，帮助用户解答气象相关问题。",
                         date_str,
                     ]
-                    kb_ctx = KnowledgeBaseService.build_context(db, req.knowledge_base_ids)
+                    kb_ctx = KnowledgeBaseService.build_context(db, effective_knowledge_base_ids)
                     if kb_ctx:
                         final_prompt_parts.append("以下是相关气象知识库内容，请结合这些内容回答：\n" + kb_ctx)
                     if tool_messages:
@@ -378,8 +407,3 @@ def batch_delete_conversations(
 ):
     count = ConversationService.batch_delete(db, req.conversation_ids, current_user["user_id"])
     return {"detail": f"Deleted {count} conversations"}
-
-# ---- 语音转文字（预留） ----
-@router.post("/speech-to-text", response_model=SpeechToTextResponse)
-def speech_to_text():
-    return SpeechToTextResponse(text="")

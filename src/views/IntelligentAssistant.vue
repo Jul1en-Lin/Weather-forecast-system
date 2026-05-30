@@ -20,7 +20,7 @@
           <span class="nav-text">智能助手</span>
         </router-link>
 
-        <router-link to="/settings" class="nav-item" active-class="active">
+        <router-link v-if="isAdmin" to="/settings" class="nav-item" active-class="active">
           <span class="nav-icon">⚙️</span>
           <span class="nav-text">系统设置</span>
         </router-link>
@@ -87,14 +87,6 @@
               <select v-model="selectedModel">
                 <option v-for="m in models" :key="m.id" :value="m.id">{{ m.name }}</option>
               </select>
-              <select v-model="selectedKnowledgeBases" multiple size="1" style="height:32px">
-                <option value="kb_weather">气象术语库</option>
-                <option value="kb_alert">预警信号库</option>
-              </select>
-              <select v-model="selectedTools" multiple size="1" style="height:32px">
-                <option value="weather_query">天气查询工具</option>
-                <option value="alert_query">预警查询工具</option>
-              </select>
             </div>
           </div>
           
@@ -157,7 +149,6 @@
                       :disabled="!inputMessage.trim() || isTyping">
                 发送
               </button>
-              <button @click="startVoiceInput" class="voice-button">🎤</button>
             </div>
           </div>
         </div>
@@ -220,8 +211,6 @@ const currentMessages = ref<Message[]>([])
 // 选择
 const models = ref<ModelOption[]>([])
 const selectedModel = ref('')
-const selectedKnowledgeBases = ref<string[]>([])
-const selectedTools = ref<string[]>([])
 
 watch(selectedModel, (newVal) => {
   if (currentConvId.value && newVal) {
@@ -274,6 +263,19 @@ async function loadModels() {
   }
 }
 
+async function ensureSelectedModel(): Promise<boolean> {
+  if (selectedModel.value) return true
+  if (models.value.length === 0) {
+    await loadModels()
+  }
+  if (models.value.length === 0) {
+    alert('暂无可用模型，请先联系管理员配置模型')
+    return false
+  }
+  selectedModel.value = models.value[0].id
+  return true
+}
+
 // 加载对话
 async function loadConversations() {
   const data = await apiFetch('/api/v1/assistant/conversations')
@@ -304,7 +306,8 @@ async function loadMessages(convId: string) {
 }
 
 // 对话操作
-async function createNewChat() {
+async function createNewChat(): Promise<boolean> {
+  if (!(await ensureSelectedModel())) return false
   const data = await apiFetch('/api/v1/assistant/conversations', {
     method: 'POST',
     body: JSON.stringify({ title: '新对话', model_id: selectedModel.value }),
@@ -313,6 +316,7 @@ async function createNewChat() {
   currentConvId.value = data.id
   currentMessages.value = []
   scrollToBottom()
+  return true
 }
 
 async function switchConversation(id: string) {
@@ -360,8 +364,6 @@ async function streamChat(userMessage: string, onChunk: (chunk: string) => void,
       model_id: selectedModel.value,
       message: userMessage,
       conversation_id: currentConvId.value,
-      knowledge_base_ids: selectedKnowledgeBases.value,
-      tool_ids: selectedTools.value,
     }),
   })
   if (!res.ok) throw new Error('请求失败')
@@ -443,7 +445,8 @@ async function sendMessage() {
   inputMessage.value = ''
 
   if (!currentConvId.value) {
-    await createNewChat()
+    const created = await createNewChat()
+    if (!created) return
   }
 
   currentMessages.value.push({ role: 'user', content: userText, time: formatTime() })
@@ -483,25 +486,15 @@ function sendSuggestion(text: string) {
   sendMessage()
 }
 
-function startVoiceInput() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    alert('您的浏览器不支持麦克风，请使用 Chrome/Edge 等现代浏览器。')
-    return
-  }
-  setTimeout(() => {
-    inputMessage.value = '模拟语音输入：今天天气怎么样？'
-  }, 1000)
-}
-
 const handleLogout = () => {
   authStore.logout()
   router.push('/login')
 }
 
 // 初始化
-onMounted(() => {
-  loadModels()
-  loadConversations()
+onMounted(async () => {
+  await loadModels()
+  await loadConversations()
 })
 </script>
 
@@ -1110,21 +1103,6 @@ onMounted(() => {
 .send-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.voice-button {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.voice-button:hover {
-  background: rgba(255, 255, 255, 0.8);
 }
 
 @media (max-width: 768px) {

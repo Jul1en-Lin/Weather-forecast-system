@@ -290,21 +290,6 @@ paths:
           application/json:
             example:
               conversation_ids: ["conv_123", "conv_456"]
-  /assistant/speech-to-text:
-    post:
-      summary: 语音转文字
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                audio:
-                  type: string
-                  format: binary
-      responses:
-        '200':
-          description: OK
           content:
             application/json:
               example:

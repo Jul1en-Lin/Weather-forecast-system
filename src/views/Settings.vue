@@ -20,7 +20,7 @@
           <span class="nav-text">智能助手</span>
         </router-link>
 
-        <router-link to="/settings" class="nav-item active" active-class="active">
+        <router-link v-if="isAdmin" to="/settings" class="nav-item active" active-class="active">
           <span class="nav-icon">⚙️</span>
           <span class="nav-text">系统设置</span>
         </router-link>

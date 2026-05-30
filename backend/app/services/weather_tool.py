@@ -148,9 +148,11 @@ class WeatherToolService:
     def format_search_results(result) -> str:
         """Parse TavilySearch result into structured text with time annotations."""
         raw = WeatherToolService.format_tool_result(result)
-        # Try to parse as list of dicts (TavilySearch may return a list or an object)
+        # Try to parse as list of dicts (TavilySearch may return a dict, list, or object)
         items = []
-        if isinstance(result, list):
+        if isinstance(result, dict):
+            items = result.get("results", [])
+        elif isinstance(result, list):
             items = result
         elif hasattr(result, "results"):
             items = result.results

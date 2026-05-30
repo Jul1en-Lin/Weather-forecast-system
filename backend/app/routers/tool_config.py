@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.dependencies import get_current_user, get_db_session
+from app.dependencies import get_db_session, require_admin
 from app.models.tool_config import ToolConfig
 from app.schemas.tool_config import (
     ToolConfigSchema,
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/v1/config/tools", tags=["tool_config"])
 @router.get("/", response_model=ToolConfigListResponse)
 def list_tools(
     db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin),
 ):
     """List all weather tool API configurations."""
     from app.config import settings, mask_api_key
@@ -41,7 +41,7 @@ def update_tool(
     tool_id: str,
     req: ToolConfigUpdate,
     db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin),
 ):
     """Update a weather tool API configuration."""
     from app.config import settings, mask_api_key

@@ -64,10 +64,6 @@
   - `POST /api/v1/assistant/conversations/batch-delete` — 批量删除
 - 对话及消息持久化到 MySQL。
 
-#### FR-007 语音转文字
-- 端点：`POST /api/v1/assistant/speech-to-text`
-- **暂不实现**，接口预留，逻辑以前端为准。
-
 ---
 
 ## 第二部分：EDD（工程设计文档）

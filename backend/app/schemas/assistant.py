@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class ModelInfo(BaseModel):
@@ -26,11 +26,8 @@ class ToolsResponse(BaseModel):
     tools: List[ToolInfo]
 
 class ChatStreamRequest(BaseModel):
-    model_id: str
-    message: str
+    model_id: str = Field(..., min_length=1)
+    message: str = Field(..., min_length=1)
     conversation_id: Optional[str] = None
     knowledge_base_ids: Optional[List[str]] = None
     tool_ids: Optional[List[str]] = None
-
-class SpeechToTextResponse(BaseModel):
-    text: str

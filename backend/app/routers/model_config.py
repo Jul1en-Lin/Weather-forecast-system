@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from app.dependencies import get_current_user, get_db_session
+from app.dependencies import get_db_session, require_admin
 from app.database import SessionLocal
 from app.models.model_config import ModelConfig
 from app.schemas.model_config import (
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/v1/config/models", tags=["model_config"])
 @router.get("/", response_model=ModelConfigListResponse)
 def list_models(
     db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin),
 ):
     """List all LLM model configurations."""
     from app.services.llm import get_model_config
@@ -39,7 +39,7 @@ def list_models(
 def create_model(
     req: ModelConfigCreate,
     db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin),
 ):
     """Create a new model configuration."""
     from app.services.llm import get_model_config
@@ -66,7 +66,7 @@ def update_model(
     model_id: str,
     req: ModelConfigUpdate,
     db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin),
 ):
     """Update an existing model configuration."""
     from app.services.llm import get_model_config
@@ -95,7 +95,7 @@ def update_model(
 def delete_model(
     model_id: str,
     db: Session = Depends(get_db_session),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin),
 ):
     """Delete a model configuration."""
     model_cfg = db.query(ModelConfig).filter(ModelConfig.id == model_id).first()

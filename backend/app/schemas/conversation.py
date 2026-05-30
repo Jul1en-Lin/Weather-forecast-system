@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
 
@@ -28,7 +28,7 @@ class ConversationsResponse(BaseModel):
 
 class CreateConversationRequest(BaseModel):
     title: Optional[str] = "新对话"
-    model_id: str
+    model_id: str = Field(..., min_length=1)
 
 class RenameConversationRequest(BaseModel):
     title: str

@@ -63,7 +63,12 @@
   - `PUT /api/v1/assistant/conversations/{id}` — 重命名对话
   - `DELETE /api/v1/assistant/conversations/{id}` — 删除对话
   - `POST /api/v1/assistant/conversations/batch-delete` — 批量删除
-- 对话及消息持久化到 MySQL。
+- 批量删除前端交互：
+  - 智能助手左侧的历史对话侧边栏提供“批量操作”切换按钮。
+  - 切换至批量操作模式后，对话列表每一项左侧渲染自定义圆形勾选框，点击任一对话项均可切换选中状态，单条对话的重命名与单删动作隐藏。
+  - 提供“全选/取消全选”和“删除选中(N)”等批量动作栏，选中并确认后通过 `/conversations/batch-delete` API 进行后端批量删除。
+  - 删除后本地状态实时更新，如当前处于激活状态的对话被删除，自动切换到剩余的第一条对话；若对话列表完全被清空，则自动调用创建接口新建空对话，保证界面可用性。
+- 对话及消息持久化到 MySQL/SQLite。
 
 ---
 

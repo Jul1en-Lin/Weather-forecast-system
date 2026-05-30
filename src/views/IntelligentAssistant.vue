@@ -50,20 +50,48 @@
     <!-- 右侧主内容区（智能助手完整功能） -->
     <main class="main-content">
       <div class="chat-layout">
-        <!-- 历史对话侧边栏（新增） -->
+        <!-- 历史对话侧边栏 -->
         <aside class="history-sidebar">
-          <div class="new-chat-btn" @click="createNewChat">✨ 新建对话</div>
-          <div class="history-title">📋 历史对话</div>
+          <div v-if="isBatchMode" class="batch-actions-container">
+            <button class="batch-action-btn select-all-btn" @click="selectAllConversations">
+              {{ isAllSelected ? '取消全选' : '全选' }}
+            </button>
+            <button
+              class="batch-action-btn batch-delete-btn"
+              :disabled="selectedConvIds.length === 0"
+              @click="batchDeleteConversations"
+            >
+              🗑️ 删除 ({{ selectedConvIds.length }})
+            </button>
+          </div>
+          <div v-else class="new-chat-btn" @click="createNewChat">✨ 新建对话</div>
+          
+          <div class="history-sidebar-header">
+            <span class="history-title">📋 历史对话</span>
+            <button class="batch-toggle-btn" @click="toggleBatchMode">
+              {{ isBatchMode ? '取消' : '批量操作' }}
+            </button>
+          </div>
+          
           <div class="conversation-list">
             <div
               v-for="conv in conversations"
               :key="conv.id"
               class="conversation-item"
-              :class="{ active: conv.id === currentConvId }"
-              @click="switchConversation(conv.id)"
+              :class="{
+                active: !isBatchMode && conv.id === currentConvId,
+                selected: isBatchMode && selectedConvIds.includes(conv.id)
+              }"
+              @click="handleConvItemClick(conv.id)"
             >
+              <div
+                v-if="isBatchMode"
+                class="custom-checkbox"
+                :class="{ checked: selectedConvIds.includes(conv.id) }"
+                @click.stop="toggleSelectConv(conv.id)"
+              ></div>
               <span class="conv-title">{{ conv.title || '未命名' }}</span>
-              <div class="conv-actions">
+              <div v-if="!isBatchMode" class="conv-actions">
                 <button class="action-btn rename-btn" @click.stop="renameConversationPrompt(conv.id, conv.title)">✏️</button>
                 <button class="action-btn delete-btn" @click.stop="deleteConversation(conv.id)">🗑️</button>
               </div>
@@ -207,6 +235,80 @@ const inputMessage = ref('')
 const isTyping = ref(false)
 const messagesContainer = ref<HTMLElement | null>(null)
 const currentMessages = ref<Message[]>([])
+
+// 批量操作
+const isBatchMode = ref(false)
+const selectedConvIds = ref<string[]>([])
+
+const isAllSelected = computed(() => {
+  return conversations.value.length > 0 && selectedConvIds.value.length === conversations.value.length
+})
+
+function toggleBatchMode() {
+  isBatchMode.value = !isBatchMode.value
+  selectedConvIds.value = []
+}
+
+function selectAllConversations() {
+  if (isAllSelected.value) {
+    selectedConvIds.value = []
+  } else {
+    selectedConvIds.value = conversations.value.map(c => c.id)
+  }
+}
+
+function toggleSelectConv(id: string) {
+  const index = selectedConvIds.value.indexOf(id)
+  if (index > -1) {
+    selectedConvIds.value.splice(index, 1)
+  } else {
+    selectedConvIds.value.push(id)
+  }
+}
+
+function handleConvItemClick(id: string) {
+  if (isBatchMode.value) {
+    toggleSelectConv(id)
+  } else {
+    switchConversation(id)
+  }
+}
+
+async function batchDeleteConversations() {
+  if (selectedConvIds.value.length === 0) return
+  
+  const count = selectedConvIds.value.length
+  if (!confirm(`确定要删除选中的 ${count} 个对话吗？`)) {
+    return
+  }
+  
+  try {
+    await apiFetch('/api/v1/assistant/conversations/batch-delete', {
+      method: 'POST',
+      body: JSON.stringify({ conversation_ids: selectedConvIds.value }),
+    })
+    
+    // 从本地状态移除已删除的对话
+    conversations.value = conversations.value.filter(c => !selectedConvIds.value.includes(c.id))
+    
+    // 如果当前选中的对话被删除了，切换到剩余的第一个
+    if (selectedConvIds.value.includes(currentConvId.value || '')) {
+      if (conversations.value.length > 0) {
+        currentConvId.value = conversations.value[0].id
+        await loadMessages(currentConvId.value)
+      } else {
+        currentConvId.value = null
+        currentMessages.value = []
+        await createNewChat()
+      }
+    }
+    
+    selectedConvIds.value = []
+    isBatchMode.value = false
+  } catch (error) {
+    alert('批量删除失败，请重试')
+  }
+}
 
 // 选择
 const models = ref<ModelOption[]>([])
@@ -728,11 +830,108 @@ onMounted(async () => {
   background: #0e8e6e;
 }
 
+.history-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
 .history-title {
   font-size: 14px;
   color: #6e6e6e;
-  margin-bottom: 12px;
+  margin: 0;
   font-weight: 500;
+}
+
+.batch-toggle-btn {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #007aff;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.batch-toggle-btn:hover {
+  background-color: rgba(0, 122, 255, 0.1);
+}
+
+.batch-actions-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.batch-action-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.select-all-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1d1d1f;
+}
+
+.select-all-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.batch-delete-btn {
+  background: #ff3b30;
+  color: white;
+}
+
+.batch-delete-btn:hover:not(:disabled) {
+  background: #d63027;
+}
+
+.batch-delete-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.conversation-item.selected {
+  background: rgba(16, 163, 127, 0.1);
+  border-color: rgba(16, 163, 127, 0.4);
+}
+
+.custom-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.custom-checkbox.checked {
+  background: #10a37f;
+  border-color: #10a37f;
+}
+
+.custom-checkbox.checked::after {
+  content: '✓';
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
 }
 
 .conversation-list {

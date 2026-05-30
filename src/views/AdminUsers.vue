@@ -32,13 +32,13 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="user-info">
-          <div class="user-avatar">
+        <div class="user-info-sidebar">
+          <div class="user-avatar-sidebar">
             {{ userInitial }}
           </div>
-          <div class="user-details">
-            <p class="username">{{ username }}</p>
-            <p class="user-role">{{ isAdmin ? '管理员' : '普通用户' }}</p>
+          <div class="user-details-sidebar">
+            <p class="username-sidebar">{{ username }}</p>
+            <p class="user-role-sidebar">{{ isAdmin ? '管理员' : '普通用户' }}</p>
           </div>
         </div>
         <button @click="handleLogout" class="logout-button">

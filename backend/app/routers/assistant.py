@@ -74,6 +74,10 @@ async def chat_stream(
         conv = ConversationService.get(db, req.conversation_id, user_id)
         if not conv:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
+        # 自动同步更新会话的 model_id，确保模型变更被持久化保存
+        if conv.model_id != req.model_id:
+            conv.model_id = req.model_id
+            db.commit()
     else:
         conv = ConversationService.create(db, user_id, req.message[:30], req.model_id)
 

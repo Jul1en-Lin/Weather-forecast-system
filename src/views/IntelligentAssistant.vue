@@ -167,7 +167,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { marked } from 'marked'
@@ -222,6 +222,12 @@ const models = ref<ModelOption[]>([])
 const selectedModel = ref('')
 const selectedKnowledgeBases = ref<string[]>([])
 const selectedTools = ref<string[]>([])
+
+watch(selectedModel, (newVal) => {
+  if (currentConvId.value && newVal) {
+    localStorage.setItem(`conv_model_${currentConvId.value}`, newVal)
+  }
+})
 
 // 辅助
 function formatTime(): string {
@@ -283,7 +289,10 @@ async function loadConversations() {
 // 加载消息
 async function loadMessages(convId: string) {
   const data = await apiFetch(`/api/v1/assistant/conversations/${convId}`)
-  if (data.model_id) {
+  const localModel = localStorage.getItem(`conv_model_${convId}`)
+  if (localModel) {
+    selectedModel.value = localModel
+  } else if (data.model_id) {
     selectedModel.value = data.model_id
   }
   currentMessages.value = data.messages.map((m: { role: string; content: string; created_at?: string }) => ({
@@ -309,9 +318,14 @@ async function createNewChat() {
 async function switchConversation(id: string) {
   if (currentConvId.value === id) return
   currentConvId.value = id
-  const conv = conversations.value.find(c => c.id === id)
-  if (conv && conv.model_id) {
-    selectedModel.value = conv.model_id
+  const localModel = localStorage.getItem(`conv_model_${id}`)
+  if (localModel) {
+    selectedModel.value = localModel
+  } else {
+    const conv = conversations.value.find(c => c.id === id)
+    if (conv && conv.model_id) {
+      selectedModel.value = conv.model_id
+    }
   }
   await loadMessages(id)
 }

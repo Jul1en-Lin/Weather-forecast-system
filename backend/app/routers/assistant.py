@@ -117,6 +117,7 @@ async def chat_stream(
 
     system_parts = [
         "你是一个专业的气象智能助手，帮助用户解答气象相关问题。",
+        "【重要指令】无论用户是否主动提及出行，你必须始终在回答的末尾或合适位置，基于当前的天气状况（如温度、降水、风力、空气质量、预警等）提供具体、实用的出行建议（例如穿衣、是否需要携带雨具、防晒防寒、户外运动适宜度等）。",
         date_str,
     ]
     effective_knowledge_base_ids = resolve_knowledge_base_ids(req.knowledge_base_ids)
@@ -209,6 +210,7 @@ async def chat_stream(
 
                     final_prompt_parts = [
                         "你是一个专业的气象智能助手，帮助用户解答气象相关问题。",
+                        "【重要指令】无论用户是否主动提及出行，你必须始终在回答的末尾或合适位置，基于当前的天气状况（如温度、降水、风力、空气质量、预警等）提供具体、实用的出行建议（例如穿衣、是否需要携带雨具、防晒防寒、户外运动适宜度等）。",
                         date_str,
                     ]
                     kb_ctx = KnowledgeBaseService.build_context(db, effective_knowledge_base_ids)
@@ -217,8 +219,9 @@ async def chat_stream(
                     if tool_messages:
                         final_prompt_parts.append("工具查询结果：\n" + "\n".join(tool_messages))
                     final_prompt_parts.append(
-                        "请严格根据工具查询结果回答用户。若工具结果包含多天数据，必须逐日列出；"
+                        "请基于工具查询结果回答用户关于天气的具体情况。若工具结果包含多天数据，必须逐日列出；"
                         "若工具结果不足以回答完整天数，请说明数据不足，不要自行补全。"
+                        "此外，你应当根据获得的天气信息自主生成对应的出行建议，这不受上述关于不能自行补全天气数据的限制。"
                     )
 
                     final_messages = [

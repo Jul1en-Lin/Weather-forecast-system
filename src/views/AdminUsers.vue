@@ -247,7 +247,7 @@ onMounted(fetchUsers)
 
 .sidebar-header {
   padding: 30px 20px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .logo {
@@ -291,7 +291,7 @@ onMounted(fetchUsers)
 }
 
 .nav-item:hover {
-  background: #f5f5f7;
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .nav-item.active {
@@ -309,7 +309,7 @@ onMounted(fetchUsers)
 
 .sidebar-footer {
   padding: 20px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .user-info-sidebar {

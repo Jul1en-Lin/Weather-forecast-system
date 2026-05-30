@@ -771,8 +771,8 @@ onMounted(fetchConfig)
 .logout-button {
   width: 100%;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: #f5f5f7;
+  border: none;
   border-radius: 10px;
   color: #1d1d1f;
   font-size: 14px;
@@ -782,14 +782,30 @@ onMounted(fetchConfig)
 }
 
 .logout-button:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: #e8e8ed;
 }
 
 .main-content {
   flex: 1;
   margin-left: 260px;
   min-height: 100vh;
+  background-image: url('/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   position: relative;
+}
+
+.main-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(2px);
+  z-index: 0;
 }
 
 .content-wrapper {
@@ -864,12 +880,12 @@ onMounted(fetchConfig)
 
 /* Configurations Form Card */
 .settings-form {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
   padding: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .config-section {

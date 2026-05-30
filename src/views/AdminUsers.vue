@@ -247,7 +247,7 @@ onMounted(fetchUsers)
 
 .sidebar-header {
   padding: 30px 20px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .logo {
@@ -291,7 +291,7 @@ onMounted(fetchUsers)
 }
 
 .nav-item:hover {
-  background: #f5f5f7;
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .nav-item.active {
@@ -309,17 +309,17 @@ onMounted(fetchUsers)
 
 .sidebar-footer {
   padding: 20px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.user-info-sidebar {
+.user-info {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
 }
 
-.user-avatar-sidebar {
+.user-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -332,18 +332,18 @@ onMounted(fetchUsers)
   font-weight: 600;
 }
 
-.user-details-sidebar {
+.user-details {
   flex: 1;
 }
 
-.username-sidebar {
+.username {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
   color: #1d1d1f;
 }
 
-.user-role-sidebar {
+.user-role {
   margin: 0;
   font-size: 12px;
   color: #86868b;
@@ -489,13 +489,13 @@ onMounted(fetchUsers)
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
-.user-info {
+.user-card .user-info {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.user-avatar {
+.user-card .user-avatar {
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -508,14 +508,14 @@ onMounted(fetchUsers)
   font-weight: 600;
 }
 
-.user-details .username {
+.user-card .user-details .username {
   font-size: 17px;
   font-weight: 600;
   color: #1d1d1f;
   margin: 0 0 6px 0;
 }
 
-.user-meta {
+.user-card .user-meta {
   font-size: 13px;
   color: #86868b;
   margin: 0;

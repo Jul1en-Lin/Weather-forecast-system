@@ -88,8 +88,7 @@
 │   ├── project_spec.md            # 产品需求与设计规格
 │   ├── architecture.md            # 架构文档
 │   ├── project_status.md          # 项目状态与里程碑
-│   ├── changelog.md               # 变更日志
-│   └── docs4Dev/                  # 开发指南
+│   └── changelog.md               # 变更日志
 │
 ├── scripts/                        # 工具脚本
 │   ├── generate-ppt.cjs           # PPT 生成脚本
@@ -190,4 +189,3 @@ npm run dev:backend
 
 - 用户名：`admin`
 - 密码：`admin123`
-

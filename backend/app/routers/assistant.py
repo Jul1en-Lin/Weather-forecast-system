@@ -127,6 +127,10 @@ async def chat_stream(
     kb_context = KnowledgeBaseService.build_context(db, effective_knowledge_base_ids)
     if kb_context:
         system_parts.append("以下是相关气象知识库内容，请结合这些内容回答：\n" + kb_context)
+    if "weather_query" in effective_tool_ids:
+        system_parts.append("用户正在询问实时天气或天气预报，请调用 weather_query 工具获取结果后再回答。")
+    if "alert_query" in effective_tool_ids:
+        system_parts.append("用户正在询问实时气象预警，请调用 alert_query 工具获取结果后再回答。")
 
     if req.tool_ids and not supports_tools:
         tool_descs = []
@@ -173,7 +177,16 @@ async def chat_stream(
                         tool_name = tc.get("name", "")
                         tool_args = tc.get("args", {})
                         logger.info("Tool call: %s, args: %s", tool_name, tool_args)
-                        if tool_service and tool_name == "tavily_search":
+                        if tool_service and tool_name == "weather_query":
+                            try:
+                                tool_args.setdefault("query", req.message)
+                                result_text = await tool_service.ainvoke(tool_args)
+                                logger.info("Tool result: %s...", result_text[:200])
+                                tool_messages.append(result_text)
+                            except Exception:
+                                logger.exception("Weather query failed")
+                                tool_messages.append("天气查询服务暂不可用，请稍后重试。")
+                        elif tool_service and tool_name == "tavily_search":
                             try:
                                 raw_query = tool_args.get("query", req.message)
                                 enhanced_query = f"{raw_query} {now.year}年{now.month}月{now.day}日 天气"
@@ -203,7 +216,10 @@ async def chat_stream(
                         final_prompt_parts.append("以下是相关气象知识库内容，请结合这些内容回答：\n" + kb_ctx)
                     if tool_messages:
                         final_prompt_parts.append("工具查询结果：\n" + "\n".join(tool_messages))
-                    final_prompt_parts.append("请根据以上信息回答用户。")
+                    final_prompt_parts.append(
+                        "请严格根据工具查询结果回答用户。若工具结果包含多天数据，必须逐日列出；"
+                        "若工具结果不足以回答完整天数，请说明数据不足，不要自行补全。"
+                    )
 
                     final_messages = [
                         SystemMessage(content="\n".join(final_prompt_parts)),

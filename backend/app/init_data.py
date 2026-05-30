@@ -59,8 +59,8 @@ MODEL_SEED_DATA = [
 TOOL_SEED_DATA = [
     {
         "id": "weather_query",
-        "name": "天气查询 (Tavily)",
-        "description": "用于获取指定地区的实时天气，需配合 Tavily Search API 使用。",
+        "name": "天气查询",
+        "description": "用于获取指定地区的实时/多日天气预报，优先使用和风天气结构化接口，未配置时 fallback 到 Tavily Search。",
         "api_key": "",
         "api_host": ""
     },

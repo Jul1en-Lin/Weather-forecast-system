@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Optional
 import httpx
 from langchain_tavily import TavilySearch
@@ -32,25 +33,76 @@ def _query_alerts(alert_type: str = "", level: str = "") -> str:
 
 from app.models.tool_config import ToolConfig
 
-def _fetch_realtime_alerts(location: str = "") -> str:
-    """Fetch real-time weather alerts via QWeather API, fallback to DB definitions."""
+
+def _get_tool_config(tool_id: str) -> tuple[str, str]:
     db = SessionLocal()
-    qweather_key = ""
-    qweather_host = "devapi.qweather.com"
     try:
-        qweather_cfg = db.query(ToolConfig).filter(ToolConfig.id == "alert_query").first()
-        if qweather_cfg:
-            qweather_key = qweather_cfg.api_key or ""
-            qweather_host = qweather_cfg.api_host or "devapi.qweather.com"
+        tool_cfg = db.query(ToolConfig).filter(ToolConfig.id == tool_id).first()
+        if tool_cfg:
+            return tool_cfg.api_key or "", tool_cfg.api_host or ""
     except Exception:
-        pass
+        logger.exception("Failed to load tool config: %s", tool_id)
     finally:
         db.close()
+    return "", ""
 
-    # Fallback to settings
-    if not qweather_key:
-        qweather_key = settings.qweather_api_key
-        qweather_host = settings.qweather_api_host or "devapi.qweather.com"
+
+def _normalize_forecast_days(days: int) -> int:
+    try:
+        parsed = int(days)
+    except (TypeError, ValueError):
+        parsed = 1
+    return max(1, min(parsed, 7))
+
+
+def _infer_forecast_days(text: str) -> int:
+    if not text:
+        return 1
+    if "七天" in text or "7天" in text or "一周" in text:
+        return 7
+    if "三天" in text or "3天" in text:
+        return 3
+    match = re.search(r"未来\s*(\d+)\s*天", text)
+    if match:
+        return _normalize_forecast_days(int(match.group(1)))
+    return 1
+
+
+def _infer_location_from_query(query: str) -> str:
+    if not query:
+        return ""
+    match = re.search(r"(?:未来(?:\d+|[一二三四五六七])天的?|今天|明天)?([\u4e00-\u9fa5]{2,8})(?:天气|预报)", query)
+    if match:
+        location = match.group(1)
+        for prefix in ("的", "查询", "看看"):
+            location = location.removeprefix(prefix)
+        return location
+    return ""
+
+
+def _get_qweather_config() -> tuple[str, str]:
+    api_key, api_host = _get_tool_config("alert_query")
+    if api_key:
+        return api_key, api_host or settings.qweather_api_host or "devapi.qweather.com"
+    return settings.qweather_api_key, settings.qweather_api_host or api_host or "devapi.qweather.com"
+
+
+def _qweather_geo_hosts(api_host: str) -> list[str]:
+    hosts = []
+    if api_host:
+        hosts.append(api_host)
+    if "geoapi.qweather.com" not in hosts:
+        hosts.append("geoapi.qweather.com")
+    return hosts
+
+
+def _get_tavily_key() -> str:
+    api_key, _ = _get_tool_config("weather_query")
+    return api_key or settings.tavily_api_key
+
+def _fetch_realtime_alerts(location: str = "") -> str:
+    """Fetch real-time weather alerts via QWeather API, fallback to DB definitions."""
+    qweather_key, qweather_host = _get_qweather_config()
 
     if not qweather_key:
         logger.info("QWeather API key not configured, falling back to DB alert definitions")
@@ -104,29 +156,93 @@ def _fetch_realtime_alerts(location: str = "") -> str:
     return f"【预警信号标准定义】\n{db_result}\n\n（以上为预警信号标准定义，非实时预警）"
 
 
+def _fetch_qweather_forecast(location: str, days: int) -> Optional[str]:
+    qweather_key, qweather_host = _get_qweather_config()
+    if not qweather_key or not location:
+        return None
+
+    try:
+        with httpx.Client(timeout=10.0) as client:
+            geo_data = {}
+            for geo_host in _qweather_geo_hosts(qweather_host):
+                geo_resp = client.get(
+                    f"https://{geo_host}/geo/v2/city/lookup",
+                    params={"location": location, "key": qweather_key, "number": 1},
+                )
+                geo_data = geo_resp.json()
+                if geo_data.get("code") == "200" and geo_data.get("location"):
+                    break
+            else:
+                logger.warning(
+                    "QWeather geo lookup returned no location for %s, code=%s",
+                    location,
+                    geo_data.get("code"),
+                )
+                return None
+
+            location_id = geo_data["location"][0].get("id", "")
+            location_name = geo_data["location"][0].get("name", location)
+            if not location_id:
+                return None
+
+            forecast_days = 7 if days > 3 else 3
+            weather_resp = client.get(
+                f"https://{qweather_host}/v7/weather/{forecast_days}d",
+                params={"location": location_id, "key": qweather_key},
+            )
+            weather_data = weather_resp.json()
+            if weather_data.get("code") != "200":
+                logger.warning("QWeather forecast returned code %s", weather_data.get("code"))
+                return None
+
+            weather_data["daily"] = weather_data.get("daily", [])[:days]
+            return WeatherToolService.format_qweather_forecast(location_name, weather_data)
+    except Exception as e:
+        logger.exception("QWeather forecast call failed: %s", e)
+        return None
+
+
+def _fetch_tavily_weather(location: str, days: int, query: str = "") -> str:
+    tavily_key = _get_tavily_key()
+    if not tavily_key:
+        return "天气查询服务未配置 API Key，暂时无法获取实时预报。"
+
+    search = TavilySearch(
+        tavily_api_key=tavily_key,
+        max_results=5,
+        search_depth="basic",
+    )
+    query_text = query or f"{location} 未来{days}天天气预报"
+    try:
+        result = search.invoke({"query": query_text})
+        return WeatherToolService.format_search_results(result)
+    except Exception as e:
+        logger.exception("Tavily weather search failed: %s", e)
+        return "天气搜索服务暂不可用，请稍后重试。"
+
+
+def _query_weather(location: str = "", days: int = 1, query: str = "") -> str:
+    """Query structured weather forecast. Args: location city name, days 1-7, query original user question."""
+    normalized_days = _normalize_forecast_days(days)
+    if normalized_days == 1:
+        normalized_days = _infer_forecast_days(query)
+    location = location or _infer_location_from_query(query)
+    forecast = _fetch_qweather_forecast(location, normalized_days)
+    if forecast:
+        return forecast
+    return _fetch_tavily_weather(location, normalized_days, query)
+
+
 class WeatherToolService:
     @staticmethod
     def get_tool():
-        db = SessionLocal()
-        tavily_key = ""
-        try:
-            tavily_cfg = db.query(ToolConfig).filter(ToolConfig.id == "weather_query").first()
-            if tavily_cfg:
-                tavily_key = tavily_cfg.api_key or ""
-        except Exception:
-            pass
-        finally:
-            db.close()
-
-        if not tavily_key:
-            tavily_key = settings.tavily_api_key
-
-        if not tavily_key:
-            return None
-        return TavilySearch(
-            tavily_api_key=tavily_key,
-            max_results=3,
-            search_depth="basic",
+        return StructuredTool.from_function(
+            name="weather_query",
+            description=(
+                "查询指定城市的结构化天气预报。参数：location（城市/地区名称，如北京、江门）、"
+                "days（预报天数，1-7；用户问未来七天时传 7）、query（用户原始问题，可选）。"
+            ),
+            func=_query_weather,
         )
 
     @staticmethod
@@ -185,3 +301,30 @@ class WeatherToolService:
             )
 
         return "\n\n".join(parts)
+
+    @staticmethod
+    def format_qweather_forecast(location: str, data: dict) -> str:
+        """Format QWeather daily forecast into compact rows for LLM prompt."""
+        daily = data.get("daily", [])
+        if not daily:
+            return f"未查询到{location}天气预报数据。"
+
+        parts = [f"【结构化天气预报 - {location}】"]
+        for item in daily:
+            date = item.get("fxDate", "日期未知")
+            day_text = item.get("textDay", "")
+            night_text = item.get("textNight", "")
+            if day_text and night_text and day_text != night_text:
+                weather_text = f"{day_text}转{night_text}"
+            else:
+                weather_text = day_text or night_text or "天气未知"
+            temp_min = item.get("tempMin", "?")
+            temp_max = item.get("tempMax", "?")
+            wind_dir = item.get("windDirDay") or item.get("windDirNight") or "风向未知"
+            wind_scale = item.get("windScaleDay") or item.get("windScaleNight") or "?"
+            humidity = item.get("humidity", "?")
+            parts.append(
+                f"{date} | {weather_text} | {temp_min}℃~{temp_max}℃ | "
+                f"{wind_dir}{wind_scale}级 | 湿度{humidity}%"
+            )
+        return "\n".join(parts)

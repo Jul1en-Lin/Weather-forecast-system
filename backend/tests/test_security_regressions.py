@@ -10,6 +10,7 @@ os.environ["DATABASE_URL"] = f"sqlite:///{db_file.name}"
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.core.security import _session_store, create_session, get_session
 
 
 class SecurityRegressionTests(unittest.TestCase):
@@ -51,6 +52,16 @@ class SecurityRegressionTests(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 422)
+
+    def test_session_survives_in_memory_store_clear(self):
+        session_id = create_session(1, "admin", True)
+        _session_store.clear()
+
+        session = get_session(session_id)
+
+        self.assertIsNotNone(session)
+        self.assertEqual(session["username"], "admin")
+        self.assertTrue(session["is_admin"])
 
 
 if __name__ == "__main__":

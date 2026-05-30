@@ -16,7 +16,7 @@
 #### FR-001 用户认证
 - 提供基于 **Session-Cookie** 的登录与登出接口。
 - 登录时验证用户名与密码，对接 MySQL 用户表。
-- Session 数据存储于**内存**中。
+- Session 数据持久化到数据库 `sessions` 表，后端可使用内存缓存加速读取。
 - 未认证用户访问受保护接口时返回 `401 Unauthorized`。
 
 #### FR-002 智能助手流式对话
@@ -48,9 +48,10 @@
 
 #### FR-005 工具调用（天气查询 / 预警查询）
 - 端点：`GET /api/v1/assistant/tools`
-- **天气查询**：使用 `langchain_tavily.TavilySearch`。工具调用流程遵循 LangChain 标准：模型 `bind_tools` → 判断调用 → 执行工具 → 二次回传结果生成最终回答。若 Moonshot 在二次回传链路报 `400`，采用两阶段稳妥方案（参考 brainstorm 示例代码）。
+- **天气查询**：后端提供 `weather_query` 结构化工具。优先调用 QWeather 城市查询与多日天气预报接口，支持 1-7 天预报；若未配置 QWeather API Key 或调用失败，fallback 到 `langchain_tavily.TavilySearch` 搜索结果。工具调用流程遵循 LangChain 标准：模型 `bind_tools` → 判断调用 → 执行工具 → 二次回传结果生成最终回答。
 - **时间上下文注入**：构造 system prompt 时，必须动态注入当前日期（格式：`今天是 YYYY年M月D日，星期X。`），使模型明确知道查询基准日。
-- **查询词增强**：调用 TavilySearch 时，将 LLM 生成的原始查询词强制拼接当前日期与地点关键词（格式：`{原始查询} YYYY年M月D日 天气`），提高搜索精准度。
+- **结构化预报约束**：用户询问多日预报（如“未来七天”）时，工具应返回逐日预报文本；最终回答必须按工具结果逐日列出，不能在数据不足时自行补全。
+- **查询词增强**：fallback 到 TavilySearch 时，将 LLM 生成的原始查询词强制拼接当前日期与地点关键词（格式：`{原始查询} YYYY年M月D日 天气`），提高搜索精准度。
 - **预警查询**：`alert_query` 工具优先调用 QWeather 实时预警 API；若未配置 API Key 或调用失败，fallback 到数据库中的预警信号定义，并附注"（以上为预警信号标准定义，非实时预警）"。
 - **搜索结果后处理**：TavilySearch 原始返回内容需解析为结构化文本，标注每条结果的标题、来源 URL、发布时间（若可用）及内容摘要（≤500 字符），以【天气搜索结果】标题输出。
 
@@ -77,11 +78,11 @@
 | ASGI 服务器 | Uvicorn | >= 0.27 | 运行 FastAPI 应用 |
 | LLM 编排 | LangChain | >= 0.1 | 模型调用、工具绑定、消息链管理 |
 | LLM SDK | langchain-openai | >= 0.1 | 统一兼容 OpenAI 风格 API 的多厂商模型 |
-| 天气搜索 | langchain-tavily | >= 0.1 | TavilySearch 工具 |
+| 天气查询 | QWeather / langchain-tavily | — / >= 0.1 | 结构化天气预报优先，TavilySearch fallback |
 | 数据库 ORM | SQLAlchemy | >= 2.0 | MySQL 数据访问 |
 | 数据库驱动 | PyMySQL 或 mysqlclient | — | MySQL 连接 |
 | 密码哈希 | bcrypt | — | 用户密码存储 |
-| Session 管理 | starlette-session 或自研内存中间件 | — | Session-Cookie 认证 |
+| Session 管理 | 自研数据库持久化 Session | — | Session-Cookie 认证，避免开发热重载后登录态丢失 |
 
 ### 2.2 目录结构
 
@@ -97,6 +98,7 @@ backend/
 │   │   ├── user.py
 │   │   ├── conversation.py
 │   │   ├── message.py
+│   │   ├── session.py         # 登录 Session 持久化
 │   │   ├── term.py             # 气象术语库
 │   │   └── alert.py            # 预警信号库
 │   ├── schemas/                # Pydantic 序列化 / 校验模型
@@ -112,7 +114,7 @@ backend/
 │   │   ├── __init__.py
 │   │   ├── llm.py              # LLM 初始化、模型映射、流式调用
 │   │   ├── knowledge_base.py   # 知识库 SQL 查询与 prompt 注入
-│   │   ├── weather_tool.py     # TavilySearch 工具封装
+│   │   ├── weather_tool.py     # QWeather 结构化天气工具与 TavilySearch fallback
 │   │   └── conversation.py     # 对话 CRUD、上下文组装
 │   ├── core/                   # 核心工具
 │   │   ├── __init__.py
@@ -215,6 +217,17 @@ CREATE TABLE tool_configs (
 );
 ```
 
+#### 2.3.8 sessions（登录 Session 表）
+```sql
+CREATE TABLE sessions (
+    id VARCHAR(128) PRIMARY KEY,           -- session_id
+    user_id INT NOT NULL,
+    username VARCHAR(64) NOT NULL,
+    is_admin BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ### 2.4 模型配置（langchain-openai）
 
 | 模型 ID | 提供商 | model 参数 | base_url | 备注 |
@@ -312,7 +325,7 @@ ALLOWED_ORIGINS=http://localhost:5173
 | Moonshot 工具二次回传报 400 | 工具调用失败 | 采用两阶段稳妥方案：首轮获取 tool_calls → 本地执行工具 → 构造最终 prompt 二次调用模型 |
 | Ollama 未启动或端口不通 | 本地模型不可用 | 返回 503，前端提示"本地模型未就绪" |
 | Tavily API 限流/失败 | 天气查询无结果 | 直接回复用户"天气服务暂不可用"，不影响对话流 |
-| Session 内存存储重启丢失 | 登录态失效 | 当前阶段可接受；后续如需持久化可迁移至 Redis/MySQL |
+| Session 表不可用 | 登录态校验失败 | 返回 401，前端跳转登录页重新认证 |
 
 ---
 

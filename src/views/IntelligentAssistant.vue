@@ -241,6 +241,12 @@ function scrollToBottom() {
   })
 }
 
+function handleUnauthorized() {
+  authStore.isAuthenticated = false
+  authStore.user = null
+  router.push('/login')
+}
+
 async function apiFetch(path: string, opts?: RequestInit) {
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
@@ -248,6 +254,10 @@ async function apiFetch(path: string, opts?: RequestInit) {
     ...opts,
   })
   if (!res.ok) {
+    if (res.status === 401) {
+      handleUnauthorized()
+      throw new Error('登录已过期')
+    }
     const text = await res.text().catch(() => res.statusText)
     throw new Error(`${res.status}: ${text}`)
   }
@@ -366,7 +376,13 @@ async function streamChat(userMessage: string, onChunk: (chunk: string) => void,
       conversation_id: currentConvId.value,
     }),
   })
-  if (!res.ok) throw new Error('请求失败')
+  if (!res.ok) {
+    if (res.status === 401) {
+      handleUnauthorized()
+      throw new Error('登录已过期')
+    }
+    throw new Error('请求失败')
+  }
   const reader = res.body!.getReader()
   const decoder = new TextDecoder()
   let buffer = ''
@@ -475,8 +491,11 @@ async function sendMessage() {
         }
       }
     )
-  } catch {
-    currentMessages.value[assistantIdx].content = '服务暂时不可用，请稍后重试。'
+  } catch (e) {
+    currentMessages.value[assistantIdx].content =
+      e instanceof Error && e.message === '登录已过期'
+        ? '登录已过期，请重新登录。'
+        : '服务暂时不可用，请稍后重试。'
     isTyping.value = false
   }
 }
@@ -493,8 +512,12 @@ const handleLogout = () => {
 
 // 初始化
 onMounted(async () => {
-  await loadModels()
-  await loadConversations()
+  try {
+    await loadModels()
+    await loadConversations()
+  } catch {
+    // 401 已在 apiFetch 中处理，其它初始化错误保持静默
+  }
 })
 </script>
 

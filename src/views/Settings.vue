@@ -771,8 +771,8 @@ onMounted(fetchConfig)
 .logout-button {
   width: 100%;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: #f5f5f7;
+  border: none;
   border-radius: 10px;
   color: #1d1d1f;
   font-size: 14px;
@@ -782,7 +782,7 @@ onMounted(fetchConfig)
 }
 
 .logout-button:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: #e8e8ed;
 }
 
 .main-content {

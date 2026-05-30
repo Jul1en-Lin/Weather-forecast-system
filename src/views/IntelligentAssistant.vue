@@ -784,19 +784,36 @@ onMounted(async () => {
   background: #e8e8ed;
 }
 
-/* 右侧主内容区 */
 .main-content {
   flex: 1;
   margin-left: 260px;
   padding: 20px;
-  background: transparent;
   min-height: 100vh;
+  background-image: url('/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.main-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(2px);
+  z-index: 0;
 }
 
 .chat-layout {
   display: flex;
   gap: 20px;
   height: calc(100vh - 40px);
+  position: relative;
+  z-index: 1;
 }
 
 /* 历史对话侧边栏 */

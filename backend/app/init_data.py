@@ -2,13 +2,79 @@ from app.database import SessionLocal, Base, engine
 from app.models.user import User
 from app.models.alert import Alert
 from app.models.term import Term
+from app.models.model_config import ModelConfig
+from app.models.tool_config import ToolConfig
 from app.core.security import hash_password
 
 # 自动建表
 Base.metadata.create_all(bind=engine)
 
+MODEL_SEED_DATA = [
+    {
+        "id": "kimi-k2.5",
+        "name": "Kimi K2.5",
+        "description": "Moonshot 高性能模型",
+        "model": "kimi-k2.5",
+        "base_url": "https://api.moonshot.cn/v1",
+        "api_key": "",
+        "temperature": 1.0,
+        "supports_tools": True,
+        "is_local": False
+    },
+    {
+        "id": "MiniMax-M2.5",
+        "name": "MiniMax M2.5",
+        "description": "MiniMax 通用模型",
+        "model": "MiniMax-M2.5",
+        "base_url": "https://api.minimax.chat/v1",
+        "api_key": "",
+        "temperature": 0.7,
+        "supports_tools": True,
+        "is_local": False
+    },
+    {
+        "id": "deepseek-v4-flash",
+        "name": "DeepSeek-V4-Flash",
+        "description": "DeepSeek Flash 模型",
+        "model": "deepseek-v4-flash",
+        "base_url": "https://api.deepseek.com/v1",
+        "api_key": "",
+        "temperature": 0.7,
+        "supports_tools": True,
+        "is_local": False
+    },
+    {
+        "id": "deepseek-r1:14b",
+        "name": "DeepSeek R1 14B (本地)",
+        "description": "Ollama 本地模型",
+        "model": "deepseek-r1:14b",
+        "base_url": "http://localhost:11434/v1",
+        "api_key": "ollama",
+        "temperature": 0.7,
+        "supports_tools": False,
+        "is_local": True
+    }
+]
+
+TOOL_SEED_DATA = [
+    {
+        "id": "weather_query",
+        "name": "天气查询 (Tavily)",
+        "description": "用于获取指定地区的实时天气，需配合 Tavily Search API 使用。",
+        "api_key": "",
+        "api_host": ""
+    },
+    {
+        "id": "alert_query",
+        "name": "预警查询 (和风天气)",
+        "description": "用于查询气象预警信号，需配合和风天气 API 使用（未配置则使用本地静态防御指南）。",
+        "api_key": "",
+        "api_host": "devapi.qweather.com"
+    }
+]
+
 TERM_SEED_DATA = [
-    {"term": "副热带高压", "category": "天气系统", "definition": "位于副热带地区的暖性高压系统，是影响我国夏季天气的重要天气系统，其位置和强度变化直接影响雨带分布和台风路径。", "source": "中国气象局"},
+    {"term": "副热带高压", "category": "天气系统", "definition": "位于副热带地区的暖性高压系统，是影响我国夏季天气的重要天气系统，其位置 and 强度变化直接影响雨带分布和台风路径。", "source": "中国气象局"},
     {"term": "锋面", "category": "天气系统", "definition": "两种不同性质气团（如冷暖气团）之间的过渡地带，锋面附近常伴有云、雨、大风等天气现象。", "source": "中国气象局"},
     {"term": "台风", "category": "灾害性天气", "definition": "发生在热带或副热带洋面上的强烈气旋性涡旋，中心附近最大风力达12级或以上，常伴有暴雨、风暴潮等灾害。", "source": "中国气象局"},
     {"term": "暴雨", "category": "灾害性天气", "definition": "指24小时内降水量达50毫米以上的降雨天气过程，可能引发洪涝、山洪、泥石流等次生灾害。", "source": "中国气象局"},
@@ -29,9 +95,9 @@ ALERT_SEED_DATA = [
     {"alert_type": "暴雨", "level": "黄", "criteria": "预计未来6小时内降雨量将达50毫米以上，或者已达50毫米以上且降雨可能持续。", "response_guide": "交通管理部门应当根据路况在强降雨路段采取交通管制措施，在积水路段实行交通引导；切断低洼地带有危险的室外电源，暂停在空旷地方的户外作业，转移危险地带人员和危房居民到安全场所避雨。"},
     {"alert_type": "暴雨", "level": "橙", "criteria": "预计未来3小时内降雨量将达50毫米以上，或者已达50毫米以上且降雨可能持续。", "response_guide": "切断有危险的室外电源，暂停户外作业；处于危险地带的单位应当停课、停业，采取专门措施保护已到校学生、幼儿和其他上班人员的安全；做好城市、农田的排涝，注意防范可能引发的山洪、滑坡、泥石流等灾害。"},
     {"alert_type": "暴雨", "level": "红", "criteria": "预计未来3小时内降雨量将达100毫米以上，或者已达100毫米以上且降雨可能持续。", "response_guide": "停止集会、停课、停业（除特殊行业外）；做好山洪、滑坡、泥石流等灾害的防御和抢险工作。"},
-    {"alert_type": "高温", "level": "黄", "criteria": "连续三天日最高气温将在35℃以上。", "response_guide": "有关部门和单位按照职责做好防暑降温准备工作；午后尽量减少户外活动；对老、弱、病、幼人群提供防暑降温指导。"},
-    {"alert_type": "高温", "level": "橙", "criteria": "24小时内最高气温将升至37℃以上。", "response_guide": "有关部门和单位按照职责落实防暑降温保障措施；尽量避免在高温时段进行户外活动，高温条件下作业的人员应当缩短连续工作时间。"},
-    {"alert_type": "高温", "level": "红", "criteria": "24小时内最高气温将升至40℃以上。", "response_guide": "有关部门和单位按照职责采取防暑降温应急措施；停止户外露天作业（除特殊行业外）；对老、弱、病、幼人群采取保护措施。"},
+    {"alert_type": "高温", "level": "黄", "criteria": "连续三天日最高气温将在35℃以上。", "response_guide": "有关部门 and 单位按照职责做好防暑降温准备工作；午后尽量减少户外活动；对老、弱、病、幼人群提供防暑降温指导。"},
+    {"alert_type": "高温", "level": "橙", "criteria": "24小时内最高气温将升至37℃以上。", "response_guide": "有关部门 and 单位按照职责落实防暑降温保障措施；尽量避免在高温时段进行户外活动，高温条件下作业的人员应当缩短连续工作时间。"},
+    {"alert_type": "高温", "level": "红", "criteria": "24小时内最高气温将升至40℃以上。", "response_guide": "有关部门 and 单位按照职责采取防暑降温应急措施；停止户外露天作业（除特殊行业外）；对老、弱、病、幼人群采取保护措施。"},
 ]
 
 def init_db():
@@ -49,6 +115,17 @@ def init_db():
             print("Default user created: admin / admin123")
         else:
             print("Default user already exists")
+
+        # Seed models
+        model_count = db.query(ModelConfig).count()
+        if model_count == 0:
+            for data in MODEL_SEED_DATA:
+                model = ModelConfig(**data)
+                db.add(model)
+            db.commit()
+            print(f"Inserted {len(MODEL_SEED_DATA)} model config records")
+        else:
+            print(f"Model configs already exist ({model_count} records)")
 
         term_count = db.query(Term).count()
         if term_count == 0:
@@ -69,6 +146,17 @@ def init_db():
             print(f"Inserted {len(ALERT_SEED_DATA)} alert records")
         else:
             print(f"Alerts already exist ({alert_count} records)")
+
+        # Seed tools
+        tool_count = db.query(ToolConfig).count()
+        if tool_count == 0:
+            for data in TOOL_SEED_DATA:
+                tool = ToolConfig(**data)
+                db.add(tool)
+            db.commit()
+            print(f"Inserted {len(TOOL_SEED_DATA)} tool config records")
+        else:
+            print(f"Tool configs already exist ({tool_count} records)")
     finally:
         db.close()
 

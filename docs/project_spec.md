@@ -28,13 +28,17 @@
 
 #### FR-003 模型管理
 - 端点：`GET /api/v1/assistant/models`
-- 返回当前后端支持的模型列表，包含 `id`、`name`、`description`。
-- 支持的模型：
-  - `kimi-k2.5`（Moonshot）
-  - `MiniMax-M2.5`
-  - `deepseek-v4-flash`（DeepSeek）
+- 返回当前数据库中已配置并启用的模型列表，包含 `id`、`name`、`description`。
+- 系统初始内置并自动 Seeding 以下模型：
+  - `kimi-k2.5`（Moonshot，默认 API）
+  - `MiniMax-M2.5`（MiniMax 通用 API）
+  - `deepseek-v4-flash`（DeepSeek API）
   - `deepseek-r1:14b`（本地 Ollama）
-- 各模型通过 `langchain-openai` SDK 配置，使用官方提供的 `base_url` 与 `api_key`。
+- 模型扩展与 CRUD 管理：
+  - 核心配置及属性均存储于 `model_configs` 数据库表中。
+  - 支持的增删改查（CRUD）接口端点前缀：`/api/v1/config/models`，提供 `GET /`、`POST /`、`PUT /{id}`、`DELETE /{id}` 接口。
+  - 支持自定义 API 接口地址、API Key、实际模型参数、是否是本地模型、温度参数及是否支持天气/预警工具。
+- 各模型通过 `langchain-openai` SDK 进行动态运行时配置与实例化。
 
 #### FR-004 知识库（气象术语库 / 预警信号库）
 - 端点：`GET /api/v1/assistant/knowledge-bases`
@@ -183,6 +187,34 @@ CREATE TABLE alerts (
     level ENUM('蓝','黄','橙','红') NOT NULL,
     criteria TEXT NOT NULL,                -- 发布标准
     response_guide TEXT,                   -- 防御指南
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### 2.3.6 model_configs（模型配置表）
+```sql
+CREATE TABLE model_configs (
+    id VARCHAR(64) PRIMARY KEY,            -- 模型唯一ID
+    name VARCHAR(100) NOT NULL,            -- 显示名称
+    description VARCHAR(255) DEFAULT NULL, -- 描述
+    model VARCHAR(100) NOT NULL,           -- 模型参数名
+    base_url VARCHAR(255) DEFAULT NULL,    -- API 接口地址
+    api_key VARCHAR(255) DEFAULT NULL,     -- 覆盖 API 密钥
+    temperature FLOAT DEFAULT NULL,        -- 温度参数
+    supports_tools BOOLEAN DEFAULT TRUE,   -- 是否支持工具
+    is_local BOOLEAN DEFAULT FALSE,        -- 是否是本地模型 (Ollama)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### 2.3.7 tool_configs（工具配置表）
+```sql
+CREATE TABLE tool_configs (
+    id VARCHAR(64) PRIMARY KEY,            -- 工具唯一ID (如 weather_query, alert_query)
+    name VARCHAR(100) NOT NULL,            -- 显示名称
+    description VARCHAR(255) DEFAULT NULL, -- 描述
+    api_key VARCHAR(255) DEFAULT NULL,     -- API 密钥
+    api_host VARCHAR(255) DEFAULT NULL,    -- API 接口域名 (和风天气特有)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ```

@@ -8,8 +8,12 @@ from app.services.llm import get_llm, get_model_config
 class LLMConfigTests(unittest.TestCase):
     def setUp(self):
         self.original_config = settings.get_config_dict(mask_secrets=False)
+        self.db_patcher = patch("app.services.llm.SessionLocal")
+        self.mock_session_local = self.db_patcher.start()
+        self.mock_session_local.return_value.query.return_value.filter.return_value.first.return_value = None
 
     def tearDown(self):
+        self.db_patcher.stop()
         settings.update_config(**self.original_config)
 
     def test_model_config_uses_latest_runtime_settings(self):

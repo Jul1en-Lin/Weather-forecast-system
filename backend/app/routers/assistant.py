@@ -33,12 +33,15 @@ router = APIRouter(prefix="/api/v1/assistant", tags=["assistant"])
 
 # ---- 模型列表 ----
 @router.get("/models", response_model=ModelsResponse)
-def get_models():
+def get_models(db: Session = Depends(get_db_session)):
+    from app.models.model_config import ModelConfig
+    models_db = db.query(ModelConfig).order_by(ModelConfig.created_at.asc()).all()
     return ModelsResponse(models=[
-        ModelInfo(id="kimi-k2.5", name="Kimi K2.5", description="Moonshot 高性能模型"),
-        ModelInfo(id="MiniMax-M2.5", name="MiniMax M2.5", description="MiniMax 通用模型"),
-        ModelInfo(id="deepseek-v4-flash", name="DeepSeek-V4-Flash", description="DeepSeek Flash 模型"),
-        # ModelInfo(id="deepseek-r1:14b", name="DeepSeek R1 14B (本地)", description="Ollama 本地模型"),
+        ModelInfo(
+            id=m.id,
+            name=m.name,
+            description=m.description or ""
+        ) for m in models_db
     ])
 
 # ---- 知识库列表 ----
@@ -90,7 +93,7 @@ async def chat_stream(
     if kb_context:
         system_parts.append("以下是相关气象知识库内容，请结合这些内容回答：\n" + kb_context)
 
-    config = get_model_config(req.model_id)
+    config = get_model_config(req.model_id, db)
     supports_tools = config.get("supports_tools", True)
     if req.tool_ids and not supports_tools:
         tool_descs = []
@@ -125,7 +128,7 @@ async def chat_stream(
     async def event_generator():
         assistant_content = ""
         try:
-            llm = get_llm(req.model_id, streaming=True)
+            llm = get_llm(req.model_id, streaming=True, db=db)
             if tools and supports_tools:
                 bound_llm = llm.bind_tools(tools)
                 first_response = await bound_llm.ainvoke(lc_messages)
@@ -198,11 +201,11 @@ async def chat_stream(
 
         except Exception as e:
             err_str = str(e)
-            if req.model_id == "deepseek-r1:14b":
+            if config.get("is_local", False):
                 if "502" in err_str or "Connection" in err_str or "Connect" in err_str:
                     error_msg = "本地模型未就绪，请确认 Ollama 已启动（默认端口 11434）。"
                 elif "does not support tools" in err_str:
-                    error_msg = "当前本地模型不支持工具调用，请切换为支持工具调用的模型（如 DeepSeek-V4-Flash），或取消勾选工具选项。"
+                    error_msg = "当前本地模型不支持工具调用，请切换为支持工具调用的模型，或取消勾选工具选项。"
                 else:
                     error_msg = f"本地模型请求出错：{err_str}"
             else:
@@ -296,6 +299,61 @@ def rename_conversation(
         created_at=conv.created_at,
         updated_at=conv.updated_at,
     )
+
+@router.post("/conversations/{conversation_id}/summarize")
+def summarize_conversation(
+    conversation_id: str,
+    db: Session = Depends(get_db_session),
+    current_user: dict = Depends(get_current_user),
+):
+    """使用 AI 自动总结并更新对话标题"""
+    from app.services.conversation import ConversationService
+    from app.services.llm import get_llm, strip_thinking_tags
+    
+    conv = ConversationService.get(db, conversation_id, current_user["user_id"])
+    if not conv:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Conversation not found"
+        )
+        
+    first_msg = None
+    for msg in conv.messages:
+        if msg.role == "user":
+            first_msg = msg.content
+            break
+            
+    if not first_msg:
+        return {"title": conv.title}
+        
+    try:
+        # 使用会话的模型，参数偏向确定性（较小 temperature）
+        llm = get_llm(conv.model_id, temperature=0.3, streaming=False, db=db)
+        
+        prompt = (
+            "请根据以下用户的提问，总结生成一个非常简短、精准的中文对话标题（绝对不能超过6个字，直接输出标题文本，不要包含任何标点符号、引号、破折号、前缀、空格或解释说明）：\n"
+            f"用户提问：{first_msg}"
+        )
+        
+        resp = llm.invoke(prompt)
+        ai_title = strip_thinking_tags(resp.content)
+        
+        # 去除非文字字符
+        ai_title = ai_title.replace('"', '').replace('“', '').replace('”', '').replace('《', '').replace('》', '').strip()
+        if len(ai_title) > 10:
+            ai_title = ai_title[:10]
+            
+        if ai_title:
+            ConversationService.rename(db, conversation_id, current_user["user_id"], ai_title)
+            return {"title": ai_title}
+    except Exception as e:
+        # fallback: 截取前 10 个字符，同时防止包含 thinking tag
+        clean_msg = strip_thinking_tags(first_msg)
+        fallback_title = clean_msg[:10] + "..." if len(clean_msg) > 10 else clean_msg
+        ConversationService.rename(db, conversation_id, current_user["user_id"], fallback_title)
+        return {"title": fallback_title}
+        
+    return {"title": conv.title}
 
 @router.delete("/conversations/{conversation_id}")
 def delete_conversation(

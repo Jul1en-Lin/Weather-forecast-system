@@ -30,9 +30,29 @@ def _query_alerts(alert_type: str = "", level: str = "") -> str:
         db.close()
 
 
+from app.models.tool_config import ToolConfig
+
 def _fetch_realtime_alerts(location: str = "") -> str:
     """Fetch real-time weather alerts via QWeather API, fallback to DB definitions."""
-    if not settings.qweather_api_key:
+    db = SessionLocal()
+    qweather_key = ""
+    qweather_host = "devapi.qweather.com"
+    try:
+        qweather_cfg = db.query(ToolConfig).filter(ToolConfig.id == "alert_query").first()
+        if qweather_cfg:
+            qweather_key = qweather_cfg.api_key or ""
+            qweather_host = qweather_cfg.api_host or "devapi.qweather.com"
+    except Exception:
+        pass
+    finally:
+        db.close()
+
+    # Fallback to settings
+    if not qweather_key:
+        qweather_key = settings.qweather_api_key
+        qweather_host = settings.qweather_api_host or "devapi.qweather.com"
+
+    if not qweather_key:
         logger.info("QWeather API key not configured, falling back to DB alert definitions")
         db_result = _query_alerts(alert_type=location)
         if "未查询到" in db_result:
@@ -42,9 +62,9 @@ def _fetch_realtime_alerts(location: str = "") -> str:
     try:
         # QWeather uses location ID or lat/lon; here we try a geo lookup first
         # For simplicity, use the city-warning endpoint with location keyword
-        host = settings.qweather_api_host
+        host = qweather_host
         geo_url = f"https://{host}/geo/v2/city/lookup"
-        geo_params = {"location": location or "", "key": settings.qweather_api_key, "number": 1}
+        geo_params = {"location": location or "", "key": qweather_key, "number": 1}
         with httpx.Client(timeout=10.0) as client:
             geo_resp = client.get(geo_url, params=geo_params)
             geo_data = geo_resp.json()
@@ -54,7 +74,7 @@ def _fetch_realtime_alerts(location: str = "") -> str:
 
             if location_id:
                 warn_url = f"https://{host}/v7/warning/now"
-                warn_params = {"location": location_id, "key": settings.qweather_api_key}
+                warn_params = {"location": location_id, "key": qweather_key}
                 warn_resp = client.get(warn_url, params=warn_params)
                 warn_data = warn_resp.json()
 
@@ -87,10 +107,24 @@ def _fetch_realtime_alerts(location: str = "") -> str:
 class WeatherToolService:
     @staticmethod
     def get_tool():
-        if not settings.tavily_api_key:
+        db = SessionLocal()
+        tavily_key = ""
+        try:
+            tavily_cfg = db.query(ToolConfig).filter(ToolConfig.id == "weather_query").first()
+            if tavily_cfg:
+                tavily_key = tavily_cfg.api_key or ""
+        except Exception:
+            pass
+        finally:
+            db.close()
+
+        if not tavily_key:
+            tavily_key = settings.tavily_api_key
+
+        if not tavily_key:
             return None
         return TavilySearch(
-            tavily_api_key=settings.tavily_api_key,
+            tavily_api_key=tavily_key,
             max_results=3,
             search_depth="basic",
         )

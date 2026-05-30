@@ -63,7 +63,10 @@
               @click="switchConversation(conv.id)"
             >
               <span class="conv-title">{{ conv.title || '未命名' }}</span>
-              <button class="delete-btn" @click.stop="deleteConversation(conv.id)">🗑️</button>
+              <div class="conv-actions">
+                <button class="action-btn rename-btn" @click.stop="renameConversationPrompt(conv.id, conv.title)">✏️</button>
+                <button class="action-btn delete-btn" @click.stop="deleteConversation(conv.id)">🗑️</button>
+              </div>
             </div>
           </div>
         </aside>
@@ -187,6 +190,7 @@ interface Message {
 interface Conversation {
   id: string
   title: string
+  model_id: string
 }
 
 interface ModelOption {
@@ -279,6 +283,9 @@ async function loadConversations() {
 // 加载消息
 async function loadMessages(convId: string) {
   const data = await apiFetch(`/api/v1/assistant/conversations/${convId}`)
+  if (data.model_id) {
+    selectedModel.value = data.model_id
+  }
   currentMessages.value = data.messages.map((m: { role: string; content: string; created_at?: string }) => ({
     role: m.role as 'user' | 'assistant',
     content: m.content,
@@ -302,6 +309,10 @@ async function createNewChat() {
 async function switchConversation(id: string) {
   if (currentConvId.value === id) return
   currentConvId.value = id
+  const conv = conversations.value.find(c => c.id === id)
+  if (conv && conv.model_id) {
+    selectedModel.value = conv.model_id
+  }
   await loadMessages(id)
 }
 
@@ -371,6 +382,46 @@ async function streamChat(userMessage: string, onChunk: (chunk: string) => void,
   onEnd()
 }
 
+// 请求后端进行 AI 标题总结并重命名
+async function triggerAiSummarize(id: string) {
+  try {
+    const data = await apiFetch(`/api/v1/assistant/conversations/${id}/summarize`, {
+      method: 'POST'
+    })
+    if (data.title) {
+      const conv = conversations.value.find(c => c.id === id)
+      if (conv) {
+        conv.title = data.title
+      }
+    }
+  } catch (e) {
+    // 自动总结重命名静默失败
+  }
+}
+
+// 手动重命名对话
+async function renameConversationPrompt(id: string, oldTitle: string) {
+  const newTitle = prompt('请输入新的对话名称：', oldTitle)
+  if (newTitle === null) return
+  const trimmed = newTitle.trim()
+  if (!trimmed) {
+    alert('对话名称不能为空')
+    return
+  }
+  try {
+    await apiFetch(`/api/v1/assistant/conversations/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ title: trimmed }),
+    })
+    const conv = conversations.value.find(c => c.id === id)
+    if (conv) {
+      conv.title = trimmed
+    }
+  } catch {
+    alert('重命名对话失败')
+  }
+}
+
 // 发送消息
 async function sendMessage() {
   if (!inputMessage.value.trim() || isTyping.value) return
@@ -398,7 +449,14 @@ async function sendMessage() {
         currentMessages.value[assistantIdx].content = accumulated
         scrollToBottom()
       },
-      () => { isTyping.value = false }
+      () => {
+        isTyping.value = false
+        // 流式会话顺利结束后，若为默认标题则触发 AI 自动总结
+        const currentConv = conversations.value.find(c => c.id === currentConvId.value)
+        if (currentConv && currentConv.title === '新对话') {
+          triggerAiSummarize(currentConvId.value!)
+        }
+      }
     )
   } catch {
     currentMessages.value[assistantIdx].content = '服务暂时不可用，请稍后重试。'
@@ -677,12 +735,23 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.delete-btn {
+.conv-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.action-btn {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   color: #aaa;
+  transition: color 0.2s ease;
+  padding: 2px;
+}
+
+.rename-btn:hover {
+  color: #007aff;
 }
 
 .delete-btn:hover {

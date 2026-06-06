@@ -28,11 +28,11 @@
 }
 
 [data-oracle-theme='light'] {
-  --oracle-bg: #fdfaf4;
-  --oracle-bg-deep: #f5efe3;
-  --oracle-panel: rgba(255, 253, 249, 0.9);
-  --oracle-panel-soft: rgba(250, 245, 235, 0.82);
-  --oracle-panel-solid: #fffdfa;
+  --oracle-bg: #fefcf8;
+  --oracle-bg-deep: #fefcf8;
+  --oracle-panel: rgba(253, 249, 243, 0.92);
+  --oracle-panel-soft: rgba(253, 249, 243, 0.80);
+  --oracle-panel-solid: #fdf9f3;
   --oracle-border: rgba(180, 140, 85, 0.32);
   --oracle-border-soft: rgba(74, 58, 37, 0.08);
   --oracle-gold: #b28542;

@@ -63,6 +63,10 @@ To ensure that background details do not interfere with text readability, we wil
 }
 ```
 
+### 3. Removal of Grid Decoration
+We will remove the `.oracle-layout::before` pseudo-element selector from [OracleLayout.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/layouts/OracleLayout.vue) to eliminate the grid lines background.
+
+
 ## Verification Plan
 1. **Asset Generation**: Confirm that the generated image files are valid, seamless, and correctly placed in `public/`.
 2. **Text Readability**: Verify on `/oracle` under both dark and light modes that text, icons, and cards remain clearly readable.

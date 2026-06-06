@@ -10,7 +10,7 @@
       </div>
 
       <nav class="oracle-nav">
-        <router-link to="/home" class="oracle-nav-item" active-class="active">
+        <router-link to="/oracle" class="oracle-nav-item" active-class="active">
           <span class="oracle-nav-icon">⌂</span>
           <span class="oracle-nav-text">首页</span>
         </router-link>

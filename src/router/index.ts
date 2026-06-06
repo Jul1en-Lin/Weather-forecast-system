@@ -26,6 +26,12 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/oracle',
+    name: 'WeatherOracle',
+    component: () => import('../views/WeatherOracle.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/intelligent-assistant',
     name: 'IntelligentAssistant',
     component: () => import('../views/IntelligentAssistant.vue'),
@@ -60,15 +66,15 @@ router.beforeEach(async (to, _from, next) => {
     if (!isAuthenticated) {
       next('/login')
     } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
-      next('/home')
+      next('/oracle')
     } else {
       next()
     }
   } else {
     if (to.path === '/login' && isAuthenticated) {
-      next('/home')
+      next('/oracle')
     } else if (to.path === '/register' && isAuthenticated) {
-      next('/home')
+      next('/oracle')
     } else {
       next()
     }

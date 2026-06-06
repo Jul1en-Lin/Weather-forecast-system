@@ -32,10 +32,12 @@ Status: Weather Oracle frontend, backend, and tarot assets are implemented and v
 - Generated 78 tarot card PNG assets under `public/tarot/cards/` from the manually exported Figma group images in `docs/images/78 Tarot Cards (Community)`.
 - Enabled tarot card image loading in `src/data/tarotCards.ts` and adjusted the card display ratio to match the exported PNGs.
 - Verified the Weather Oracle page loads a real tarot PNG at desktop 1440px and mobile 390px without fallback or horizontal overflow.
+- Generated, optimized (resized to 512x512, converted to true PNG, compressed to ~456KB), and saved the dark mode background texture asset under `public/mystical_bg_dark.png`.
 
 ## In progress
 
 - None.
+
 
 ## Notes
 

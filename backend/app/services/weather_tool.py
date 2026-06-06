@@ -165,7 +165,7 @@ def _fetch_realtime_alerts(location: str = "") -> str:
     return f"【预警信号标准定义】\n{db_result}\n\n（以上为预警信号标准定义，非实时预警）"
 
 
-def _fetch_qweather_realtime(location: str):
+def _fetch_qweather_realtime(location: str) -> Optional[dict]:
     qweather_key, qweather_host = _get_qweather_config()
     if not qweather_key or not location:
         return None
@@ -174,13 +174,17 @@ def _fetch_qweather_realtime(location: str):
         with httpx.Client(timeout=10.0) as client:
             geo_data = {}
             for geo_host in _qweather_geo_hosts(qweather_host):
-                geo_resp = client.get(
-                    f"https://{geo_host}/geo/v2/city/lookup",
-                    params={"location": location, "key": qweather_key, "number": 1},
-                )
-                geo_data = geo_resp.json()
-                if geo_data.get("code") == "200" and geo_data.get("location"):
-                    break
+                try:
+                    geo_resp = client.get(
+                        f"https://{geo_host}/geo/v2/city/lookup",
+                        params={"location": location, "key": qweather_key, "number": 1},
+                    )
+                    geo_data = geo_resp.json()
+                    if geo_data.get("code") == "200" and geo_data.get("location"):
+                        break
+                except Exception as e:
+                    logger.warning("QWeather geo lookup failed for %s on %s: %s", location, geo_host, e)
+                    continue
             else:
                 logger.warning(
                     "QWeather geo lookup returned no location for %s, code=%s",
@@ -211,9 +215,9 @@ def _fetch_qweather_realtime(location: str):
                 "humidity": _to_int_or_none(now.get("humidity")),
                 "pressure": _to_int_or_none(now.get("pressure")),
                 "wind_speed": _to_int_or_none(now.get("windSpeed")),
-                "wind_direction": now.get("windDir", ""),
-                "condition": now.get("text", ""),
-                "observed_at": now.get("obsTime", ""),
+                "wind_direction": now.get("windDir") or "",
+                "condition": now.get("text") or "",
+                "observed_at": now.get("obsTime") or "",
             }
     except Exception as e:
         logger.exception("QWeather realtime call failed: %s", e)
@@ -318,7 +322,7 @@ class WeatherToolService:
         )
 
     @staticmethod
-    def fetch_realtime_weather(location: str):
+    def fetch_realtime_weather(location: str) -> Optional[dict]:
         return _fetch_qweather_realtime(location)
 
     @staticmethod

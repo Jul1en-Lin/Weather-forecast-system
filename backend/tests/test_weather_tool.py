@@ -159,6 +159,79 @@ class StructuredWeatherNowTests(unittest.TestCase):
         self.assertIsNone(result)
         client_cls.assert_not_called()
 
+    @patch("app.services.weather_tool.httpx.Client")
+    @patch("app.services.weather_tool._get_qweather_config")
+    def test_fetch_realtime_weather_keeps_trying_other_geo_hosts(self, get_qweather_config, client_cls):
+        get_qweather_config.return_value = ("demo-key", "devapi.qweather.com")
+
+        class FakeResponse:
+            def __init__(self, payload):
+                self._payload = payload
+
+            def json(self):
+                return self._payload
+
+        class FakeClient:
+            def __init__(self, *args, **kwargs):
+                self.requests = []
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def get(self, url, params=None):
+                self.requests.append((url, params))
+                if url.startswith("https://devapi.qweather.com/geo/v2/city/lookup"):
+                    raise RuntimeError("dev geo host down")
+                if url.endswith("/geo/v2/city/lookup"):
+                    return FakeResponse(
+                        {
+                            "code": "200",
+                            "location": [
+                                {
+                                    "id": "101020100",
+                                    "name": "上海",
+                                }
+                            ],
+                        }
+                    )
+                if url.endswith("/v7/weather/now"):
+                    return FakeResponse(
+                        {
+                            "code": "200",
+                            "now": {
+                                "obsTime": None,
+                                "temp": "22",
+                                "humidity": "78",
+                                "pressure": "1012",
+                                "windSpeed": "12",
+                                "windDir": None,
+                                "text": None,
+                            },
+                        }
+                    )
+                raise AssertionError(f"Unexpected URL: {url}")
+
+        client_cls.return_value = FakeClient()
+
+        result = WeatherToolService.fetch_realtime_weather("上海")
+
+        self.assertEqual(
+            result,
+            {
+                "city": "上海",
+                "temperature": 22,
+                "humidity": 78,
+                "pressure": 1012,
+                "wind_speed": 12,
+                "wind_direction": "",
+                "condition": "",
+                "observed_at": "",
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

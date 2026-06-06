@@ -33,6 +33,7 @@ Status: Weather Oracle frontend, backend, and tarot assets are implemented and v
 - Enabled tarot card image loading in `src/data/tarotCards.ts` and adjusted the card display ratio to match the exported PNGs.
 - Verified the Weather Oracle page loads a real tarot PNG at desktop 1440px and mobile 390px without fallback or horizontal overflow.
 - Generated, optimized (resized to 512x512, converted to true PNG, compressed to ~456KB), and saved the dark mode background texture asset under `public/mystical_bg_dark.png`.
+- Generated, optimized (resized to 512x512, converted to true PNG, compressed to ~405KB), and saved the light mode background texture asset under `public/mystical_bg_light.png`.
 
 ## In progress
 

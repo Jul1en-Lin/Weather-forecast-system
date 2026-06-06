@@ -555,91 +555,113 @@ def generate_weather_card(
     db: Session = Depends(get_db_session),
     current_user: dict = Depends(get_current_user),
 ):
-    from app.services.weather_tool import _query_weather
-    from app.services.llm import get_llm, strip_thinking_tags
     import json
-    
-    # 1. 查询指定城市的实时天气
-    try:
-        weather_info = _query_weather(location=req.city, days=1, query=f"{req.city}天气")
-    except Exception as e:
-        logger.exception("Failed to query weather for card")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"天气查询失败: {str(e)}"
-        )
-        
-    if "未查询到" in weather_info or "暂不可用" in weather_info or "未配置" in weather_info:
+    from zoneinfo import ZoneInfo
+
+    from app.models.model_config import ModelConfig
+
+    city = req.city.strip()
+    weather = WeatherToolService.fetch_realtime_weather(city)
+    if not weather:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"未能获取到 {req.city} 的天气数据，请确认城市名称是否正确。"
+            detail=f"未能获取到 {city} 的天气数据，请确认城市名称是否正确。",
         )
 
-    # 2. 确定所用模型
+    now = datetime.now(ZoneInfo("Asia/Shanghai"))
+    date_key = now.strftime("%Y-%m-%d")
+    weather_fingerprint = build_weather_fingerprint(weather)
+    deterministic_tarot_id = select_tarot_card_id(
+        weather["city"],
+        date_key,
+        weather_fingerprint,
+    )
+    tarot_id = req.tarot_card_id or deterministic_tarot_id
+    tarot = TAROT_CARD_META.get(tarot_id) or TAROT_CARD_META[deterministic_tarot_id]
+
     model_id = req.model_id
     if not model_id:
-        from app.models.model_config import ModelConfig
         first_model = db.query(ModelConfig).order_by(ModelConfig.created_at.asc()).first()
         if not first_model:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="没有可用的模型配置，请先到系统设置中配置 LLM。"
+                detail="没有可用的模型配置，请先到系统设置中配置 LLM。",
             )
         model_id = first_model.id
 
-    # 3. 构造 prompt 并调用 LLM
     prompt = (
-        "你是一个年轻幽默、深谙打工人自嘲和互联网流行梗的“今日气象占卜师”。\n"
-        f"当前天气数据如下：\n{weather_info}\n\n"
-        "请结合这些天气参数（如温度、下雨、风力、空气质量），生成今日气象卡片。\n"
-        "你必须输出以下 JSON 格式的数据，不要包含任何 markdown 格式标记（如 ```json 等），不要有任何解释文字，直接以 { 开头，以 } 结尾，以便用 json.loads 解析：\n"
-        "{\n"
-        f'  "location": "{req.city}",\n'
-        '  "weather_summary": "精简的天气状况，如：晴转多云 / 28℃",\n'
-        '  "mood_title": "一个结合天气和生活状态的创意幽默标签（6字以内），如：微焦打工人、防潮型人类、冰美式依赖体",\n'
-        '  "fortune_rating": "今日运势星级（1-5颗星星），如：⭐⭐⭐⭐",\n'
-        '  "mood_analysis": "一段结合天气的幽默、共鸣或治愈的今日状态解读，用瑞幸/打工人卡片式的文案风格（60-100字左右），充满共鸣或吐槽感",\n'
-        '  "suggestion_yee": "今日宜，简短幽默，4-10字左右，如：带薪摸鱼 / 狂喝冰水",\n'
-        '  "suggestion_kee": "今日忌，简短幽默，4-10字左右，如：和老板对视 / 忘记带伞"\n'
-        "}"
+        "你是天气占卜师。你不会播报天气，而是把天气参数翻译成今天的个人运势和情绪状态指南。\n"
+        "只使用给定天气数据和塔罗牌，不要编造额外天气事实。\n"
+        "直接输出 JSON，不要 markdown，不要解释。\n"
+        f"城市：{weather['city']}\n"
+        f"日期：{date_key}，时区：Asia/Shanghai\n"
+        f"天气数据：{json.dumps(weather, ensure_ascii=False)}\n"
+        f"塔罗牌：{json.dumps(tarot, ensure_ascii=False)}\n"
+        "JSON 结构必须包含 fortune、mood_guide、weather_mappings。"
     )
 
+    fallback = {
+        "fortune": {
+            "title": "云隙微光",
+            "summary": "今天适合先观察，再行动。把节奏放慢一点，很多事会自然变清楚。",
+            "lucky_color": "雾紫色",
+            "lucky_number": 7,
+            "good_for": "整理思路",
+            "avoid": "冲动争执",
+        },
+        "mood_guide": {
+            "title": "缓慢回神",
+            "analysis": "天气信号偏向内收，适合减少无效沟通，把精力留给真正需要处理的事。",
+            "suggestions": ["留二十分钟独处", "喝点热饮", "把决定放到明天"],
+        },
+        "weather_mappings": [
+            {
+                "metric": "temperature",
+                "label": "温度",
+                "value": f"{weather.get('temperature')}°C",
+                "reading": "平和舒适",
+                "score": 70,
+            },
+            {
+                "metric": "humidity",
+                "label": "湿度",
+                "value": f"{weather.get('humidity')}%",
+                "reading": "内收敏感",
+                "score": 65,
+            },
+            {
+                "metric": "pressure",
+                "label": "气压",
+                "value": f"{weather.get('pressure')} hPa",
+                "reading": "掌控感提升",
+                "score": 68,
+            },
+            {
+                "metric": "wind_speed",
+                "label": "风速",
+                "value": f"{weather.get('wind_speed')} km/h",
+                "reading": "思绪流动",
+                "score": 60,
+            },
+        ],
+    }
+
+    card_data = fallback
     try:
         llm = get_llm(model_id, temperature=0.7, streaming=False, db=db)
         resp = llm.invoke(prompt)
-        content = strip_thinking_tags(resp.content).strip()
-        
-        # 去除 markdown 标记
-        if content.startswith("```"):
-            start = content.find("{")
-            end = content.rfind("}")
-            if start != -1 and end != -1:
-                content = content[start:end+1]
-        
-        card_data = json.loads(content)
-        
-        # 验证必需字段
-        required_fields = ["location", "weather_summary", "mood_title", "fortune_rating", "mood_analysis", "suggestion_yee", "suggestion_kee"]
-        for field in required_fields:
-            if field not in card_data:
-                card_data[field] = "获取失败"
-                
-        return WeatherCardResponse(**card_data)
-        
-    except json.JSONDecodeError as je:
-        logger.error("JSON decode failed: %s, raw content: %s", str(je), content)
-        return WeatherCardResponse(
-            location=req.city,
-            weather_summary="解析失败",
-            mood_title="神秘天气观测者",
-            fortune_rating="⭐⭐⭐",
-            mood_analysis="AI 占卜的纸条被雨水打湿了，暂时看不清内容。也许是今天的气压太低，连 AI 都想摸鱼了。",
-            suggestion_yee="再试一次",
-            suggestion_kee="较真抓狂"
-        )
-    except Exception as e:
-        logger.exception("Failed to generate weather card content")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"生成卡片失败: {str(e)}"
-        )
+        card_data = json.loads(clean_json_object_text(resp.content))
+    except Exception:
+        logger.exception("Failed to generate weather oracle JSON; using fallback")
+
+    return WeatherCardResponse(
+        city=weather["city"],
+        date=date_key,
+        timezone="Asia/Shanghai",
+        updated_at=now.isoformat(),
+        weather=weather,
+        tarot=tarot,
+        fortune=card_data["fortune"],
+        mood_guide=card_data["mood_guide"],
+        weather_mappings=card_data["weather_mappings"],
+    )

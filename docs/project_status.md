@@ -34,6 +34,8 @@ Status: Weather Oracle frontend, backend, and tarot assets are implemented and v
 - Verified the Weather Oracle page loads a real tarot PNG at desktop 1440px and mobile 390px without fallback or horizontal overflow.
 - Generated, optimized (resized to 512x512, converted to true PNG, compressed to ~456KB), and saved the dark mode background texture asset under `public/mystical_bg_dark.png`.
 - Generated, optimized (resized to 512x512, converted to true PNG, compressed to ~405KB), and saved the light mode background texture asset under `public/mystical_bg_light.png`.
+- Integrated tarot background patterns (`mystical_bg_dark.png` and `mystical_bg_light.png`) as smooth-transitioning pseudo-element overlays under default (dark) and light themes in the Oracle layout.
+- Verified frontend build and layout compilation, and checked branch changes against `ab970dc` (Task 4).
 
 ## In progress
 
@@ -65,6 +67,9 @@ Status: Weather Oracle frontend, backend, and tarot assets are implemented and v
 - Ran `npm run build` after enabling tarot assets.
 - Ran `git diff --check` after enabling tarot assets.
 - Ran Chrome DevTools layout checks for `/oracle` at 1440x900 and 390x844 with cache disabled; `major-17-star.png` loaded as `image/png` with HTTP 200 and natural size `500x836`.
+- Ran `npm run build` successfully to verify Vite compilation for Task 4.
+- Checked git status and styling rules since `ab970dc` to verify style/asset integration.
+- Ran backend pytest suite ensuring all 22 tests pass with zero regressions.
 
 ## Next actions
 

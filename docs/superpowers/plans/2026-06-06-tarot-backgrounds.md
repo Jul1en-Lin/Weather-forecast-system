@@ -104,11 +104,14 @@
   }
   ```
 
-- [ ] **Step 3: Commit styling modifications**
+- [ ] **Step 3: Remove the old grid background pattern in `src/layouts/OracleLayout.vue`**
+  Modify: `src/layouts/OracleLayout.vue` styles to delete the `.oracle-layout::before` CSS block (around lines 184-197).
+
+- [ ] **Step 4: Commit styling modifications**
   Run:
   ```bash
   git add src/styles/oracle-theme.css src/layouts/OracleLayout.vue
-  git commit -m "style: integrate tarot background pattern with smooth transitions"
+  git commit -m "style: integrate tarot background pattern and remove grid background"
   ```
 
 ---

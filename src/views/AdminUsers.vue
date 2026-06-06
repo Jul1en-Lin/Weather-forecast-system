@@ -1,54 +1,6 @@
 <template>
-  <div class="home-container">
-    <!-- 左侧导航栏 -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="logo">
-          <span class="logo-icon">🌤️</span>
-        </div>
-        <h2 class="platform-name">气象平台</h2>
-      </div>
-
-      <nav class="nav-menu">
-        <router-link to="/home" class="nav-item" active-class="active">
-          <span class="nav-icon">🏠</span>
-          <span class="nav-text">首页</span>
-        </router-link>
-
-        <router-link to="/intelligent-assistant" class="nav-item" active-class="active">
-          <span class="nav-icon">🤖</span>
-          <span class="nav-text">智能助手</span>
-        </router-link>
-
-        <router-link to="/settings" class="nav-item" active-class="active">
-          <span class="nav-icon">⚙️</span>
-          <span class="nav-text">系统设置</span>
-        </router-link>
-
-        <router-link to="/admin/users" class="nav-item active" active-class="active">
-          <span class="nav-icon">👥</span>
-          <span class="nav-text">用户管理</span>
-        </router-link>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="user-info">
-          <div class="user-avatar">
-            {{ userInitial }}
-          </div>
-          <div class="user-details">
-            <p class="username">{{ username }}</p>
-            <p class="user-role">{{ isAdmin ? '管理员' : '普通用户' }}</p>
-          </div>
-        </div>
-        <button @click="handleLogout" class="logout-button">
-          退出登录
-        </button>
-      </div>
-    </aside>
-
-    <!-- 右侧主内容区 -->
-    <main class="main-content">
+  <OracleLayout>
+    <div class="admin-users-page">
       <div class="content-wrapper">
         <!-- 用户列表 -->
         <div v-if="loading" class="loading-state">
@@ -102,25 +54,13 @@
 
         <div v-if="successMessage" class="success-msg">{{ successMessage }}</div>
       </div>
-    </main>
-  </div>
+    </div>
+  </OracleLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
-
-const router = useRouter()
-const authStore = useAuthStore()
-
-const username = computed(() => authStore.username)
-const isAdmin = computed(() => authStore.isAdmin)
-
-const userInitial = computed(() => {
-  const name = username.value
-  return name ? name.charAt(0).toUpperCase() : 'U'
-})
+import { ref, onMounted } from 'vue'
+import OracleLayout from '../layouts/OracleLayout.vue'
 
 interface User {
   id: number
@@ -198,203 +138,18 @@ const formatDate = (dateStr: string) => {
   return date.toLocaleString('zh-CN')
 }
 
-const handleLogout = async () => {
-  await authStore.logout()
-  router.push('/login')
-}
-
 onMounted(fetchUsers)
 </script>
 
 <style scoped>
-/* ===== 沿用 Home.vue 的框架样式 ===== */
-.home-container {
-  display: flex;
+.admin-users-page {
   min-height: 100vh;
-  background-image: url('/background.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
-}
-
-.home-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(2px);
-  z-index: 0;
-}
-
-.sidebar {
-  width: 260px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(15px);
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  flex-direction: column;
-  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  height: 100vh;
-  left: 0;
-  top: 0;
-  z-index: 10;
-}
-
-.sidebar-header {
-  padding: 30px 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.logo {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.logo-icon {
-  font-size: 40px;
-}
-
-.platform-name {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1d1d1f;
-  margin: 0;
-  text-align: center;
-}
-
-.nav-menu {
-  flex: 1;
-  padding: 20px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  text-decoration: none;
-  color: #1d1d1f;
-  font-size: 15px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.nav-item:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.nav-item.active {
-  background: #007aff;
-  color: white;
-}
-
-.nav-icon {
-  font-size: 20px;
-}
-
-.nav-text {
-  flex: 1;
-}
-
-.sidebar-footer {
-  padding: 20px;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.user-details {
-  flex: 1;
-}
-
-.username {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1d1d1f;
-}
-
-.user-role {
-  margin: 0;
-  font-size: 12px;
-  color: #86868b;
-}
-
-.logout-button {
-  width: 100%;
-  padding: 12px;
-  background: #f5f5f7;
-  border: none;
-  border-radius: 10px;
-  color: #1d1d1f;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.logout-button:hover {
-  background: #e8e8ed;
-}
-
-.main-content {
-  flex: 1;
-  margin-left: 260px;
-  min-height: 100vh;
-  background-image: url('/background.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
-}
-
-.main-content::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(2px);
-  z-index: 0;
 }
 
 .content-wrapper {
   padding: 40px;
   max-width: 1400px;
   margin: 0 auto;
-  position: relative;
-  z-index: 1;
 }
 
 /* ===== 用户管理特有样式 ===== */
@@ -581,35 +336,6 @@ onMounted(fetchUsers)
 
 /* 响应式 */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 80px;
-  }
-
-  .sidebar-header {
-    padding: 20px 10px;
-  }
-
-  .platform-name {
-    display: none;
-  }
-
-  .nav-text {
-    display: none;
-  }
-
-  .nav-item {
-    justify-content: center;
-    padding: 14px;
-  }
-
-  .user-details-sidebar {
-    display: none;
-  }
-
-  .main-content {
-    margin-left: 80px;
-  }
-
   .content-wrapper {
     padding: 20px;
   }

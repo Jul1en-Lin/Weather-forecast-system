@@ -14,6 +14,294 @@ WEATHER_TOOL_KEYWORDS = [
     "空气质量", "pm2.5", "出行", "穿衣", "冷不冷", "热不热",
 ]
 ALERT_TOOL_KEYWORDS = ["预警", "警报", "告警", "气象灾害", "台风", "暴雨", "高温", "寒潮", "雷雨大风", "冰雹"]
+TAROT_CARD_IDS = [
+    "major-00-fool",
+    "major-01-magician",
+    "major-02-high-priestess",
+    "major-03-empress",
+    "major-04-emperor",
+    "major-05-hierophant",
+    "major-06-lovers",
+    "major-07-chariot",
+    "major-08-strength",
+    "major-09-hermit",
+    "major-10-wheel-of-fortune",
+    "major-11-justice",
+    "major-12-hanged-man",
+    "major-13-death",
+    "major-14-temperance",
+    "major-15-devil",
+    "major-16-tower",
+    "major-17-star",
+    "major-18-moon",
+    "major-19-sun",
+    "major-20-judgement",
+    "major-21-world",
+    "wands-01-ace",
+    "wands-02-two",
+    "wands-03-three",
+    "wands-04-four",
+    "wands-05-five",
+    "wands-06-six",
+    "wands-07-seven",
+    "wands-08-eight",
+    "wands-09-nine",
+    "wands-10-ten",
+    "wands-11-king",
+    "wands-12-knight",
+    "wands-13-page",
+    "wands-14-queen",
+    "cups-01-ace",
+    "cups-02-two",
+    "cups-03-three",
+    "cups-04-four",
+    "cups-05-five",
+    "cups-06-six",
+    "cups-07-seven",
+    "cups-08-eight",
+    "cups-09-nine",
+    "cups-10-ten",
+    "cups-11-king",
+    "cups-12-knight",
+    "cups-13-page",
+    "cups-14-queen",
+    "swords-01-ace",
+    "swords-02-two",
+    "swords-03-three",
+    "swords-04-four",
+    "swords-05-five",
+    "swords-06-six",
+    "swords-07-seven",
+    "swords-08-eight",
+    "swords-09-nine",
+    "swords-10-ten",
+    "swords-11-king",
+    "swords-12-knight",
+    "swords-13-page",
+    "swords-14-queen",
+    "pentacles-01-ace",
+    "pentacles-02-two",
+    "pentacles-03-three",
+    "pentacles-04-four",
+    "pentacles-05-five",
+    "pentacles-06-six",
+    "pentacles-07-seven",
+    "pentacles-08-eight",
+    "pentacles-09-nine",
+    "pentacles-10-ten",
+    "pentacles-11-king",
+    "pentacles-12-knight",
+    "pentacles-13-page",
+    "pentacles-14-queen",
+]
+_MAJOR_TAROT_CARD_META = {
+    "major-00-fool": {
+        "id": "major-00-fool",
+        "name_en": "The Fool",
+        "name_zh": "愚者",
+        "image": "/tarot/cards/major-00-fool.png",
+        "keywords": ["开始", "自由", "冒险"],
+    },
+    "major-01-magician": {
+        "id": "major-01-magician",
+        "name_en": "The Magician",
+        "name_zh": "魔术师",
+        "image": "/tarot/cards/major-01-magician.png",
+        "keywords": ["行动", "资源", "表达"],
+    },
+    "major-02-high-priestess": {
+        "id": "major-02-high-priestess",
+        "name_en": "The High Priestess",
+        "name_zh": "女祭司",
+        "image": "/tarot/cards/major-02-high-priestess.png",
+        "keywords": ["直觉", "沉静", "观察"],
+    },
+    "major-03-empress": {
+        "id": "major-03-empress",
+        "name_en": "The Empress",
+        "name_zh": "皇后",
+        "image": "/tarot/cards/major-03-empress.png",
+        "keywords": ["滋养", "创造", "丰盛"],
+    },
+    "major-04-emperor": {
+        "id": "major-04-emperor",
+        "name_en": "The Emperor",
+        "name_zh": "皇帝",
+        "image": "/tarot/cards/major-04-emperor.png",
+        "keywords": ["秩序", "边界", "掌控"],
+    },
+    "major-05-hierophant": {
+        "id": "major-05-hierophant",
+        "name_en": "The Hierophant",
+        "name_zh": "教皇",
+        "image": "/tarot/cards/major-05-hierophant.png",
+        "keywords": ["传统", "学习", "建议"],
+    },
+    "major-06-lovers": {
+        "id": "major-06-lovers",
+        "name_en": "The Lovers",
+        "name_zh": "恋人",
+        "image": "/tarot/cards/major-06-lovers.png",
+        "keywords": ["选择", "关系", "协调"],
+    },
+    "major-07-chariot": {
+        "id": "major-07-chariot",
+        "name_en": "The Chariot",
+        "name_zh": "战车",
+        "image": "/tarot/cards/major-07-chariot.png",
+        "keywords": ["推进", "方向", "意志"],
+    },
+    "major-08-strength": {
+        "id": "major-08-strength",
+        "name_en": "Strength",
+        "name_zh": "力量",
+        "image": "/tarot/cards/major-08-strength.png",
+        "keywords": ["耐心", "柔韧", "内力"],
+    },
+    "major-09-hermit": {
+        "id": "major-09-hermit",
+        "name_en": "The Hermit",
+        "name_zh": "隐者",
+        "image": "/tarot/cards/major-09-hermit.png",
+        "keywords": ["独处", "思考", "寻找"],
+    },
+    "major-10-wheel-of-fortune": {
+        "id": "major-10-wheel-of-fortune",
+        "name_en": "Wheel of Fortune",
+        "name_zh": "命运之轮",
+        "image": "/tarot/cards/major-10-wheel-of-fortune.png",
+        "keywords": ["变化", "周期", "转机"],
+    },
+    "major-11-justice": {
+        "id": "major-11-justice",
+        "name_en": "Justice",
+        "name_zh": "正义",
+        "image": "/tarot/cards/major-11-justice.png",
+        "keywords": ["判断", "平衡", "原则"],
+    },
+    "major-12-hanged-man": {
+        "id": "major-12-hanged-man",
+        "name_en": "The Hanged Man",
+        "name_zh": "倒吊人",
+        "image": "/tarot/cards/major-12-hanged-man.png",
+        "keywords": ["暂停", "换位", "等待"],
+    },
+    "major-13-death": {
+        "id": "major-13-death",
+        "name_en": "Death",
+        "name_zh": "死神",
+        "image": "/tarot/cards/major-13-death.png",
+        "keywords": ["结束", "转化", "告别"],
+    },
+    "major-14-temperance": {
+        "id": "major-14-temperance",
+        "name_en": "Temperance",
+        "name_zh": "节制",
+        "image": "/tarot/cards/major-14-temperance.png",
+        "keywords": ["调和", "修复", "节奏"],
+    },
+    "major-15-devil": {
+        "id": "major-15-devil",
+        "name_en": "The Devil",
+        "name_zh": "恶魔",
+        "image": "/tarot/cards/major-15-devil.png",
+        "keywords": ["欲望", "束缚", "清醒"],
+    },
+    "major-16-tower": {
+        "id": "major-16-tower",
+        "name_en": "The Tower",
+        "name_zh": "高塔",
+        "image": "/tarot/cards/major-16-tower.png",
+        "keywords": ["打破", "突变", "释放"],
+    },
+    "major-17-star": {
+        "id": "major-17-star",
+        "name_en": "The Star",
+        "name_zh": "星星",
+        "image": "/tarot/cards/major-17-star.png",
+        "keywords": ["希望", "治愈", "指引"],
+    },
+    "major-18-moon": {
+        "id": "major-18-moon",
+        "name_en": "The Moon",
+        "name_zh": "月亮",
+        "image": "/tarot/cards/major-18-moon.png",
+        "keywords": ["潜意识", "梦境", "不安"],
+    },
+    "major-19-sun": {
+        "id": "major-19-sun",
+        "name_en": "The Sun",
+        "name_zh": "太阳",
+        "image": "/tarot/cards/major-19-sun.png",
+        "keywords": ["明朗", "活力", "坦诚"],
+    },
+    "major-20-judgement": {
+        "id": "major-20-judgement",
+        "name_en": "Judgement",
+        "name_zh": "审判",
+        "image": "/tarot/cards/major-20-judgement.png",
+        "keywords": ["回应", "复盘", "觉察"],
+    },
+    "major-21-world": {
+        "id": "major-21-world",
+        "name_en": "The World",
+        "name_zh": "世界",
+        "image": "/tarot/cards/major-21-world.png",
+        "keywords": ["完成", "整合", "抵达"],
+    },
+}
+_MINOR_TAROT_SUIT_NAME_ZH = {
+    "wands": "权杖",
+    "cups": "圣杯",
+    "swords": "宝剑",
+    "pentacles": "星币",
+}
+_MINOR_TAROT_RANK_NAME_EN = {
+    "ace": "Ace",
+    "two": "Two",
+    "three": "Three",
+    "four": "Four",
+    "five": "Five",
+    "six": "Six",
+    "seven": "Seven",
+    "eight": "Eight",
+    "nine": "Nine",
+    "ten": "Ten",
+    "king": "King",
+    "knight": "Knight",
+    "page": "Page",
+    "queen": "Queen",
+}
+_MINOR_TAROT_RANK_NAME_ZH = {
+    "ace": "一",
+    "two": "二",
+    "three": "三",
+    "four": "四",
+    "five": "五",
+    "six": "六",
+    "seven": "七",
+    "eight": "八",
+    "nine": "九",
+    "ten": "十",
+    "king": "国王",
+    "knight": "骑士",
+    "page": "侍从",
+    "queen": "王后",
+}
+TAROT_CARD_META = dict(_MAJOR_TAROT_CARD_META)
+for suit in ("wands", "cups", "swords", "pentacles"):
+    for index, rank in enumerate(
+        ("ace", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "king", "knight", "page", "queen"),
+        start=1,
+    ):
+        card_id = f"{suit}-{index:02d}-{rank}"
+        TAROT_CARD_META[card_id] = {
+            "id": card_id,
+            "name_en": f"{_MINOR_TAROT_RANK_NAME_EN[rank]} of {suit.capitalize()}",
+            "name_zh": f"{_MINOR_TAROT_SUIT_NAME_ZH[suit]}{_MINOR_TAROT_RANK_NAME_ZH[rank]}",
+            "image": f"/tarot/cards/{card_id}.png",
+            "keywords": ["行动", "情绪", "提醒"],
+        }
 from app.dependencies import get_db_session, get_current_user
 from app.services.conversation import ConversationService
 from app.services.llm import get_llm, stream_llm_response, strip_thinking_tags, ThinkingFilter, get_model_config
@@ -57,6 +345,37 @@ def resolve_tool_ids(
     if any(keyword in normalized for keyword in ALERT_TOOL_KEYWORDS):
         tool_ids.append("alert_query")
     return tool_ids
+
+
+def clean_json_object_text(content: str) -> str:
+    text = strip_thinking_tags(content or "").strip()
+    if text.startswith("```"):
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1:
+            return text[start:end + 1]
+    return text
+
+
+def build_weather_fingerprint(weather: dict) -> str:
+    return "|".join(
+        [
+            str(weather.get("temperature")),
+            str(weather.get("humidity")),
+            str(weather.get("pressure")),
+            str(weather.get("wind_speed")),
+            str(weather.get("condition")),
+        ]
+    )
+
+
+def select_tarot_card_id(city: str, date_key: str, weather_fingerprint: str) -> str:
+    import hashlib
+
+    seed = f"{city}|{date_key}|{weather_fingerprint}".encode("utf-8")
+    digest = hashlib.sha256(seed).hexdigest()
+    index = int(digest[:8], 16) % len(TAROT_CARD_IDS)
+    return TAROT_CARD_IDS[index]
 
 # ---- 模型列表 ----
 @router.get("/models", response_model=ModelsResponse)

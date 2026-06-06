@@ -11,7 +11,7 @@ export interface TarotCard {
 
 const image = (id: string) => `/tarot/cards/${id}.png`
 
-export const tarotAssetsReady = false
+export const tarotAssetsReady = true
 
 export const tarotCards: TarotCard[] = [
   { id: 'major-00-fool', nameEn: 'The Fool', nameZh: '愚者', arcana: 'major', suit: 'major', rank: '0', image: image('major-00-fool'), keywords: ['开始', '自由', '冒险'] },

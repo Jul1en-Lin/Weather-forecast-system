@@ -57,11 +57,11 @@ watch(
 .tarot-card-fallback {
   width: 100%;
   max-width: 278px;
-  aspect-ratio: 2 / 3;
+  aspect-ratio: 500 / 836;
   justify-self: center;
   border: 1px solid var(--oracle-border);
   border-radius: 8px;
-  object-fit: cover;
+  object-fit: contain;
   background:
     linear-gradient(180deg, rgba(246, 234, 216, 0.12), transparent 34%),
     linear-gradient(160deg, #0f1c31, #26395b 48%, #6b5435);

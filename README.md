@@ -49,6 +49,8 @@
 ├── tsconfig.app.json              # TypeScript 应用配置
 ├── openapi.yaml                   # 后端 API 规格（OpenAPI 3.0）
 ├── README.md                      # 项目说明
+├── AGENTS.md                      # AI 编码代理项目入口说明
+├── CLAUDE.md                      # Claude 到 AGENTS.md 的桥接文件
 │
 ├── src/                           # 前端源码
 │   ├── main.ts                    # 应用入口
@@ -85,17 +87,19 @@
 │       └── core/                  # 工具模块（安全加密、SSE 封装）
 │
 ├── docs/                          # 项目文档
-│   ├── project_spec.md            # 产品需求与设计规格
-│   ├── architecture.md            # 架构文档
-│   ├── project_status.md          # 项目状态与里程碑
-│   └── changelog.md               # 变更日志
+│   ├── project_status.md          # 当前任务状态与下一步
+│   ├── agent_workflow.md          # 代理协作与交接流程
+│   ├── images/                    # README 截图
+│   └── manuals/                   # 导出的用户手册等 PDF（git 忽略）
 │
-├── scripts/                        # 工具脚本
+├── scripts/                       # 工具脚本
 │   ├── generate-ppt.cjs           # PPT 生成脚本
-│   └── build-ppt.cjs              # PPT 构建脚本
+│   ├── build-ppt.cjs              # PPT 构建脚本
+│   ├── check-ppt.py               # PPT 检查脚本
+│   └── md-to-html.py              # Markdown 转 HTML 辅助脚本
 │
 ├── public/                        # 静态公共资源
-├── dist/                          # 前端生产构建产物
+├── dist/                          # 前端生产构建产物（git 忽略）
 └── .gitignore
 ```
 

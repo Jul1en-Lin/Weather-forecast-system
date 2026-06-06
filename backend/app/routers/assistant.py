@@ -26,6 +26,7 @@ from app.schemas.assistant import (
     KnowledgeBasesResponse, KnowledgeBaseInfo,
     ToolsResponse, ToolInfo,
     ChatStreamRequest,
+    WeatherCardRequest, WeatherCardResponse,
 )
 from app.schemas.conversation import (
     ConversationsResponse, ConversationItem,
@@ -426,3 +427,98 @@ def batch_delete_conversations(
 ):
     count = ConversationService.batch_delete(db, req.conversation_ids, current_user["user_id"])
     return {"detail": f"Deleted {count} conversations"}
+
+@router.post("/weather-card", response_model=WeatherCardResponse)
+def generate_weather_card(
+    req: WeatherCardRequest,
+    db: Session = Depends(get_db_session),
+    current_user: dict = Depends(get_current_user),
+):
+    from app.services.weather_tool import _query_weather
+    from app.services.llm import get_llm, strip_thinking_tags
+    import json
+    
+    # 1. 查询指定城市的实时天气
+    try:
+        weather_info = _query_weather(location=req.city, days=1, query=f"{req.city}天气")
+    except Exception as e:
+        logger.exception("Failed to query weather for card")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"天气查询失败: {str(e)}"
+        )
+        
+    if "未查询到" in weather_info or "暂不可用" in weather_info or "未配置" in weather_info:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"未能获取到 {req.city} 的天气数据，请确认城市名称是否正确。"
+        )
+
+    # 2. 确定所用模型
+    model_id = req.model_id
+    if not model_id:
+        from app.models.model_config import ModelConfig
+        first_model = db.query(ModelConfig).order_by(ModelConfig.created_at.asc()).first()
+        if not first_model:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="没有可用的模型配置，请先到系统设置中配置 LLM。"
+            )
+        model_id = first_model.id
+
+    # 3. 构造 prompt 并调用 LLM
+    prompt = (
+        "你是一个年轻幽默、深谙打工人自嘲和互联网流行梗的“今日气象占卜师”。\n"
+        f"当前天气数据如下：\n{weather_info}\n\n"
+        "请结合这些天气参数（如温度、下雨、风力、空气质量），生成今日气象卡片。\n"
+        "你必须输出以下 JSON 格式的数据，不要包含任何 markdown 格式标记（如 ```json 等），不要有任何解释文字，直接以 { 开头，以 } 结尾，以便用 json.loads 解析：\n"
+        "{\n"
+        f'  "location": "{req.city}",\n'
+        '  "weather_summary": "精简的天气状况，如：晴转多云 / 28℃",\n'
+        '  "mood_title": "一个结合天气和生活状态的创意幽默标签（6字以内），如：微焦打工人、防潮型人类、冰美式依赖体",\n'
+        '  "fortune_rating": "今日运势星级（1-5颗星星），如：⭐⭐⭐⭐",\n'
+        '  "mood_analysis": "一段结合天气的幽默、共鸣或治愈的今日状态解读，用瑞幸/打工人卡片式的文案风格（60-100字左右），充满共鸣或吐槽感",\n'
+        '  "suggestion_yee": "今日宜，简短幽默，4-10字左右，如：带薪摸鱼 / 狂喝冰水",\n'
+        '  "suggestion_kee": "今日忌，简短幽默，4-10字左右，如：和老板对视 / 忘记带伞"\n'
+        "}"
+    )
+
+    try:
+        llm = get_llm(model_id, temperature=0.7, streaming=False, db=db)
+        resp = llm.invoke(prompt)
+        content = strip_thinking_tags(resp.content).strip()
+        
+        # 去除 markdown 标记
+        if content.startswith("```"):
+            start = content.find("{")
+            end = content.rfind("}")
+            if start != -1 and end != -1:
+                content = content[start:end+1]
+        
+        card_data = json.loads(content)
+        
+        # 验证必需字段
+        required_fields = ["location", "weather_summary", "mood_title", "fortune_rating", "mood_analysis", "suggestion_yee", "suggestion_kee"]
+        for field in required_fields:
+            if field not in card_data:
+                card_data[field] = "获取失败"
+                
+        return WeatherCardResponse(**card_data)
+        
+    except json.JSONDecodeError as je:
+        logger.error("JSON decode failed: %s, raw content: %s", str(je), content)
+        return WeatherCardResponse(
+            location=req.city,
+            weather_summary="解析失败",
+            mood_title="神秘天气观测者",
+            fortune_rating="⭐⭐⭐",
+            mood_analysis="AI 占卜的纸条被雨水打湿了，暂时看不清内容。也许是今天的气压太低，连 AI 都想摸鱼了。",
+            suggestion_yee="再试一次",
+            suggestion_kee="较真抓狂"
+        )
+    except Exception as e:
+        logger.exception("Failed to generate weather card content")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"生成卡片失败: {str(e)}"
+        )

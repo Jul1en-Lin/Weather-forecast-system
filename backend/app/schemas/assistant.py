@@ -31,3 +31,16 @@ class ChatStreamRequest(BaseModel):
     conversation_id: Optional[str] = None
     knowledge_base_ids: Optional[List[str]] = None
     tool_ids: Optional[List[str]] = None
+
+class WeatherCardRequest(BaseModel):
+    city: str = Field(..., min_length=1)
+    model_id: Optional[str] = None
+
+class WeatherCardResponse(BaseModel):
+    location: str
+    weather_summary: str
+    mood_title: str
+    fortune_rating: str
+    mood_analysis: str
+    suggestion_yee: str
+    suggestion_kee: str

@@ -9,8 +9,14 @@ lerna-debug.log*
 
 node_modules
 dist/
-docs/*
-!docs/images/
+dist-ssr
+*.local
+.local/
+
+# Docs
+docs/**/*.pdf
+docs/archive/
+docs/generated/
 docs/images/*
 !docs/images/home.png
 !docs/images/home2.png
@@ -18,8 +24,6 @@ docs/images/*
 !docs/images/setting1.png
 !docs/images/setting2.png
 !docs/images/setting3.png
-dist-ssr
-*.local
 
 # Editor directories and files
 .vscode/*

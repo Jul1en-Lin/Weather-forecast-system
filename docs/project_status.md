@@ -37,6 +37,7 @@ Status: Weather Oracle frontend and backend code is implemented. Figma tarot ass
 ## Blocked / Questions
 
 - Figma MCP calls currently fail during startup while initializing against `https://chatgpt.com/backend-api/wham/apps`; tarot PNG export cannot be completed until the connector works again.
+- Latest continuation check: `tool_search` did not expose `use_figma` / `get_metadata` schemas, so no Figma asset export call can be issued in the current tool state.
 
 ## Checkpoints
 

@@ -18,46 +18,60 @@ defineProps<{ mappings: WeatherOracleMapping[] }>()
 <style scoped>
 .weather-metric-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
 }
 
 .weather-metric-grid article {
   display: grid;
-  gap: 8px;
-  min-height: 160px;
-  padding: 18px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.72);
+  gap: 9px;
+  min-height: 148px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--oracle-border);
+  border-radius: 8px;
+  background: var(--oracle-panel);
+  box-shadow: var(--oracle-shadow);
 }
 
 .weather-metric-grid span {
-  color: #6b7280;
+  color: var(--oracle-muted);
   font-size: 13px;
+  font-weight: 700;
 }
 
 .weather-metric-grid strong {
-  color: #111827;
-  font-size: 24px;
+  color: var(--oracle-text);
+  font-size: 25px;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
 }
 
 .weather-metric-grid p {
   margin: 0;
-  color: #374151;
+  color: var(--oracle-faint);
   font-size: 14px;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .weather-metric-grid meter {
   width: 100%;
   height: 10px;
   align-self: end;
+  accent-color: var(--oracle-purple);
 }
 
-@media (max-width: 1100px) {
-  .weather-metric-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.weather-metric-grid meter::-webkit-meter-bar {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.weather-metric-grid meter::-webkit-meter-optimum-value {
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--oracle-purple), var(--oracle-gold));
 }
 
 @media (max-width: 620px) {

@@ -187,10 +187,17 @@ async function sendMessage(message: string) {
 <style scoped>
 .oracle-chat-panel {
   display: grid;
+  grid-template-rows: auto auto minmax(220px, 1fr) auto auto;
   gap: 16px;
-  padding: 24px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.72);
+  min-width: 0;
+  min-height: 100%;
+  padding: 22px;
+  border: 1px solid var(--oracle-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(127, 183, 255, 0.11), transparent 30%),
+    var(--oracle-panel);
+  box-shadow: var(--oracle-shadow);
 }
 
 .oracle-chat-panel header {
@@ -198,18 +205,20 @@ async function sendMessage(message: string) {
   align-items: start;
   justify-content: space-between;
   gap: 16px;
+  min-width: 0;
 }
 
 .oracle-chat-panel header span,
 .oracle-chat-panel header small {
-  color: #6b7280;
+  color: var(--oracle-muted);
   font-size: 13px;
 }
 
 .oracle-chat-panel h2 {
   margin: 4px 0 0;
-  color: #111827;
+  color: var(--oracle-text);
   font-size: 22px;
+  overflow-wrap: anywhere;
 }
 
 .oracle-chat-suggestions {
@@ -220,17 +229,26 @@ async function sendMessage(message: string) {
 
 .oracle-chat-suggestions button,
 .oracle-chat-input button {
-  border: 0;
-  border-radius: 10px;
-  background: #1d1d1f;
-  color: #fff;
+  border: 1px solid var(--oracle-border-soft);
+  border-radius: 8px;
+  background: var(--oracle-panel-soft);
+  color: var(--oracle-text);
   cursor: pointer;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .oracle-chat-suggestions button {
   padding: 8px 12px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.oracle-chat-suggestions button:not(:disabled):hover,
+.oracle-chat-input button:not(:disabled):hover {
+  border-color: var(--oracle-gold);
+  color: var(--oracle-gold-strong);
 }
 
 .oracle-chat-suggestions button:disabled,
@@ -242,65 +260,106 @@ async function sendMessage(message: string) {
 
 .oracle-chat-messages {
   display: grid;
+  align-content: start;
   gap: 12px;
-  max-height: 320px;
+  min-height: 0;
+  max-height: 520px;
   overflow: auto;
   padding-right: 4px;
 }
 
 .oracle-chat-empty {
   margin: 0;
-  color: #6b7280;
+  color: var(--oracle-muted);
 }
 
 .oracle-chat-message {
   display: grid;
   gap: 4px;
   padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--oracle-border-soft);
+  border-radius: 8px;
+  background: var(--oracle-panel-soft);
 }
 
 .oracle-chat-message.is-user {
-  background: rgba(29, 29, 31, 0.08);
+  border-color: rgba(168, 138, 223, 0.32);
+  background: rgba(168, 138, 223, 0.14);
 }
 
 .oracle-chat-message span {
-  color: #6b7280;
+  color: var(--oracle-muted);
   font-size: 12px;
+  font-weight: 700;
 }
 
 .oracle-chat-message p {
   margin: 0;
-  color: #111827;
+  color: var(--oracle-text);
   line-height: 1.7;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .oracle-chat-input {
   display: flex;
   gap: 10px;
+  min-width: 0;
 }
 
 .oracle-chat-input input {
   min-width: 0;
   flex: 1;
   height: 42px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 10px;
+  border: 1px solid var(--oracle-border);
+  border-radius: 8px;
   padding: 0 12px;
-  background: rgba(255, 255, 255, 0.78);
-  color: #1d1d1f;
+  background: var(--oracle-panel-soft);
+  color: var(--oracle-text);
+}
+
+.oracle-chat-input input::placeholder {
+  color: var(--oracle-muted);
 }
 
 .oracle-chat-input button {
   min-width: 78px;
   height: 42px;
+  border-color: var(--oracle-border);
+  background: linear-gradient(135deg, var(--oracle-purple), var(--oracle-gold));
+  color: #141015;
 }
 
 .oracle-chat-error {
   margin: 0;
-  color: #b42318;
+  color: var(--oracle-danger);
   font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1280px) {
+  .oracle-chat-messages {
+    max-height: 360px;
+  }
+}
+
+@media (max-width: 560px) {
+  .oracle-chat-panel {
+    grid-template-rows: auto auto minmax(190px, auto) auto auto;
+    padding: 18px;
+  }
+
+  .oracle-chat-panel header {
+    display: grid;
+  }
+
+  .oracle-chat-input {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 72px;
+  }
+
+  .oracle-chat-input button {
+    min-width: 0;
+  }
 }
 </style>

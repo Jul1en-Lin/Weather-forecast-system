@@ -8,9 +8,10 @@
     />
     <div v-else class="tarot-card-fallback" aria-hidden="true">
       <span>{{ fallbackInitial }}</span>
+      <small>牌面待导出</small>
     </div>
     <div class="tarot-card-copy">
-      <span>今日天气塔罗牌</span>
+      <span class="oracle-eyebrow">今日天气塔罗牌</span>
       <h2>{{ tarot.name_zh || tarot.name_en || tarot.id }}</h2>
       <p>{{ tarot.keywords.join(' · ') }}</p>
     </div>
@@ -40,30 +41,46 @@ watch(
 <style scoped>
 .tarot-card-display {
   display: grid;
-  grid-template-columns: minmax(120px, 180px) 1fr;
-  gap: 24px;
-  align-items: center;
-  padding: 24px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: 0 20px 50px rgba(31, 41, 55, 0.12);
+  align-content: start;
+  gap: 18px;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--oracle-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(215, 174, 105, 0.1), transparent 32%),
+    var(--oracle-panel);
+  box-shadow: var(--oracle-shadow);
 }
 
 .tarot-card-display img,
 .tarot-card-fallback {
   width: 100%;
+  max-width: 278px;
   aspect-ratio: 2 / 3;
-  border-radius: 14px;
+  justify-self: center;
+  border: 1px solid var(--oracle-border);
+  border-radius: 8px;
   object-fit: cover;
-  background: linear-gradient(160deg, #233047, #6c5b7b 52%, #f8b195);
-  box-shadow: 0 14px 30px rgba(31, 41, 55, 0.22);
+  background:
+    linear-gradient(180deg, rgba(246, 234, 216, 0.12), transparent 34%),
+    linear-gradient(160deg, #0f1c31, #26395b 48%, #6b5435);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.32);
 }
 
 .tarot-card-fallback {
   display: grid;
+  align-content: center;
   place-items: center;
-  color: #fff;
+  gap: 10px;
+  color: var(--oracle-text);
   font-size: 48px;
+  font-weight: 800;
+}
+
+.tarot-card-fallback small {
+  color: var(--oracle-muted);
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -72,32 +89,34 @@ watch(
   gap: 10px;
 }
 
-.tarot-card-copy span {
-  font-size: 13px;
-  color: #6b7280;
-}
-
 .tarot-card-copy h2 {
   margin: 0;
-  color: #111827;
-  font-size: 30px;
+  color: var(--oracle-text);
+  font-size: clamp(26px, 3vw, 34px);
   line-height: 1.15;
 }
 
 .tarot-card-copy p {
   margin: 0;
-  color: #374151;
+  color: var(--oracle-faint);
   line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 1280px) {
   .tarot-card-display {
-    grid-template-columns: 1fr;
+    align-content: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .tarot-card-display {
+    padding: 18px;
   }
 
   .tarot-card-display img,
   .tarot-card-fallback {
-    max-width: 180px;
+    max-width: 210px;
   }
 }
 </style>

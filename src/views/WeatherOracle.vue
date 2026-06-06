@@ -3,11 +3,12 @@
     <div class="weather-oracle-page">
       <section class="oracle-hero">
         <div>
-          <p>AI 为你抽取今日的天气指引</p>
+          <p class="oracle-eyebrow">Daily weather divination</p>
           <h1>今日天气塔罗牌</h1>
           <span v-if="reading">
             {{ reading.city }} · {{ reading.weather.condition || '实时天气' }} · {{ reading.date }}
           </span>
+          <span v-else>输入城市，抽取当天的天气牌和状态建议</span>
         </div>
         <QuickCityPicker :loading="isLoading" @draw="drawCity" />
       </section>
@@ -21,8 +22,9 @@
       </section>
 
       <section v-else class="oracle-dashboard">
-        <TarotCardDisplay :tarot="reading.tarot" />
-        <div class="oracle-fortune">
+        <TarotCardDisplay class="oracle-tarot-area" :tarot="reading.tarot" />
+        <div class="oracle-fortune oracle-surface">
+          <span class="oracle-eyebrow">今日指引</span>
           <h2>{{ reading.fortune.title }}</h2>
           <p>{{ reading.fortune.summary }}</p>
           <dl>
@@ -39,9 +41,9 @@
             天气观测时间：{{ reading.weather.observed_at }}
           </small>
         </div>
-        <WeatherMetricGrid :mappings="reading.weather_mappings" />
-        <MoodGuidePanel :guide="reading.mood_guide" />
-        <OracleChatPanel :city="reading.city" :reading="reading" />
+        <WeatherMetricGrid class="oracle-metrics-area" :mappings="reading.weather_mappings" />
+        <MoodGuidePanel class="oracle-mood-area" :guide="reading.mood_guide" />
+        <OracleChatPanel class="oracle-chat-area" :city="reading.city" :reading="reading" />
       </section>
     </div>
   </OracleLayout>
@@ -57,7 +59,7 @@ import MoodGuidePanel from '../components/oracle/MoodGuidePanel.vue'
 import OracleChatPanel from '../components/oracle/OracleChatPanel.vue'
 import { generateWeatherOracleReading } from '../api/weatherOracle'
 import { useAuthStore } from '../stores/auth'
-import { getTarotCardById } from '../data/tarotCards'
+import { getTarotCardById, tarotAssetsReady } from '../data/tarotCards'
 import { getShanghaiDateKey } from '../utils/tarot'
 import type { WeatherOracleReading, WeatherOracleTarot } from '../types/weatherOracle'
 
@@ -123,7 +125,7 @@ function mergeLocalTarot(tarot: WeatherOracleTarot): WeatherOracleTarot {
       ...tarot,
       name_en: tarot.name_en || tarot.id,
       name_zh: tarot.name_zh || tarot.name_en || tarot.id,
-      image: tarot.image || '',
+      image: tarotAssetsReady ? tarot.image || '' : '',
       keywords: tarot.keywords?.length ? tarot.keywords : ['天气', '提示'],
     }
   }
@@ -132,7 +134,7 @@ function mergeLocalTarot(tarot: WeatherOracleTarot): WeatherOracleTarot {
     id: tarot.id,
     name_en: localCard.nameEn,
     name_zh: localCard.nameZh,
-    image: localCard.image,
+    image: tarotAssetsReady ? localCard.image : '',
     keywords: localCard.keywords,
   }
 }
@@ -141,9 +143,8 @@ function mergeLocalTarot(tarot: WeatherOracleTarot): WeatherOracleTarot {
 <style scoped>
 .weather-oracle-page {
   display: grid;
-  gap: 22px;
-  min-height: 100vh;
-  padding: 36px;
+  gap: 16px;
+  min-width: 0;
 }
 
 .oracle-hero {
@@ -151,22 +152,27 @@ function mergeLocalTarot(tarot: WeatherOracleTarot): WeatherOracleTarot {
   align-items: end;
   justify-content: space-between;
   gap: 24px;
-  padding: 28px;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.68);
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--oracle-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(215, 174, 105, 0.09), transparent 38%),
+    var(--oracle-panel);
+  box-shadow: var(--oracle-shadow);
 }
 
 .oracle-hero p,
 .oracle-hero span {
   margin: 0;
-  color: #4b5563;
+  color: var(--oracle-muted);
   line-height: 1.6;
 }
 
 .oracle-hero h1 {
   margin: 8px 0;
-  color: #111827;
-  font-size: 40px;
+  color: var(--oracle-text);
+  font-size: clamp(30px, 4vw, 44px);
   line-height: 1.1;
 }
 
@@ -174,16 +180,17 @@ function mergeLocalTarot(tarot: WeatherOracleTarot): WeatherOracleTarot {
 .oracle-error,
 .oracle-empty {
   padding: 18px 20px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid var(--oracle-border);
+  border-radius: 8px;
+  background: var(--oracle-panel);
 }
 
 .oracle-notice {
-  color: #6b4f00;
+  color: var(--oracle-gold-strong);
 }
 
 .oracle-error {
-  color: #b42318;
+  color: var(--oracle-danger);
 }
 
 .oracle-empty {
@@ -191,6 +198,7 @@ function mergeLocalTarot(tarot: WeatherOracleTarot): WeatherOracleTarot {
   gap: 10px;
   min-height: 260px;
   place-content: center;
+  padding: 34px 20px;
   text-align: center;
 }
 
@@ -200,32 +208,53 @@ function mergeLocalTarot(tarot: WeatherOracleTarot): WeatherOracleTarot {
 }
 
 .oracle-empty h2 {
-  color: #111827;
+  color: var(--oracle-text);
   font-size: 28px;
 }
 
 .oracle-empty p {
-  color: #4b5563;
+  color: var(--oracle-muted);
 }
 
 .oracle-dashboard {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
-  gap: 18px;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(360px, 1.2fr) minmax(300px, 0.9fr);
+  gap: 16px;
+  align-items: stretch;
+  min-width: 0;
 }
 
-.weather-metric-grid,
-.mood-guide-panel,
-.oracle-chat-panel {
-  grid-column: 1 / -1;
+.oracle-tarot-area {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.oracle-fortune {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.oracle-metrics-area {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.oracle-mood-area {
+  grid-column: 1 / span 2;
+  grid-row: 3;
+}
+
+.oracle-chat-area {
+  grid-column: 3;
+  grid-row: 1 / span 3;
 }
 
 .oracle-fortune {
   display: grid;
-  gap: 14px;
-  padding: 24px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.72);
+  align-content: start;
+  gap: 13px;
+  min-width: 0;
+  padding: 22px;
 }
 
 .oracle-fortune h2,
@@ -234,40 +263,71 @@ function mergeLocalTarot(tarot: WeatherOracleTarot): WeatherOracleTarot {
 }
 
 .oracle-fortune h2 {
-  color: #111827;
+  color: var(--oracle-text);
   font-size: 24px;
 }
 
 .oracle-fortune p {
-  color: #374151;
-  line-height: 1.8;
+  color: var(--oracle-faint);
+  line-height: 1.75;
 }
 
 .oracle-fortune dl {
   display: grid;
-  grid-template-columns: 88px 1fr;
+  grid-template-columns: 76px minmax(0, 1fr);
   gap: 10px 12px;
   margin: 0;
+  padding-top: 6px;
+  border-top: 1px solid var(--oracle-border-soft);
 }
 
 .oracle-fortune dt {
-  color: #6b7280;
+  color: var(--oracle-muted);
 }
 
 .oracle-fortune dd {
   margin: 0;
-  color: #111827;
+  color: var(--oracle-text);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .oracle-fortune small {
-  color: #6b7280;
+  color: var(--oracle-muted);
+}
+
+@media (max-width: 1280px) {
+  .oracle-dashboard {
+    grid-template-columns: minmax(260px, 0.9fr) minmax(360px, 1.1fr);
+  }
+
+  .oracle-tarot-area {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .oracle-fortune {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .oracle-metrics-area {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .oracle-mood-area {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .oracle-chat-area {
+    grid-column: 2;
+    grid-row: 3;
+  }
 }
 
 @media (max-width: 980px) {
-  .weather-oracle-page {
-    padding: 24px;
-  }
-
   .oracle-hero {
     align-items: stretch;
     flex-direction: column;
@@ -276,15 +336,32 @@ function mergeLocalTarot(tarot: WeatherOracleTarot): WeatherOracleTarot {
   .oracle-dashboard {
     grid-template-columns: 1fr;
   }
+
+  .oracle-tarot-area,
+  .oracle-fortune,
+  .oracle-metrics-area,
+  .oracle-mood-area,
+  .oracle-chat-area {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
 
-@media (max-width: 768px) {
-  .weather-oracle-page {
+@media (max-width: 560px) {
+  .oracle-hero {
     padding: 18px;
   }
 
   .oracle-hero h1 {
-    font-size: 32px;
+    font-size: 30px;
+  }
+
+  .oracle-fortune {
+    padding: 18px;
+  }
+
+  .oracle-fortune dl {
+    grid-template-columns: 64px minmax(0, 1fr);
   }
 }
 </style>

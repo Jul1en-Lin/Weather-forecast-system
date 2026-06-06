@@ -38,11 +38,13 @@ Status: Weather Oracle frontend, backend, and tarot assets are implemented and v
 - Removed the old grid background pattern from `OracleLayout.vue` to allow mystical tarot backgrounds to stand out cleanly.
 - Verified frontend build and layout compilation, and checked branch changes against `ab970dc` (Task 4).
 - Processed light mode background pattern image `public/mystical_bg_light.png` to be a transparent PNG with `#efdac9` color lines, resizing it to 512x512 and optimizing file size (~208KB).
+- Updated light theme variables (off-white base `#fefcf8` and semi-transparent `#fdf9f3` card backgrounds) in `src/styles/oracle-theme.css`.
+- Updated opacity of light mode pattern in `src/layouts/OracleLayout.vue` to 0.85.
+- Ran frontend build and backend tests verifying that everything compiles successfully and passes with no regressions.
 
 ## In progress
 
 - None.
-
 
 ## Notes
 
@@ -78,7 +80,8 @@ Status: Weather Oracle frontend, backend, and tarot assets are implemented and v
 - Ran `npm run build` and `pytest` verifying zero regressions.
 - Updated light theme variables (off-white base `#fefcf8` and semi-transparent `#fdf9f3` card backgrounds) in `src/styles/oracle-theme.css`.
 - Updated opacity of light mode pattern in `src/layouts/OracleLayout.vue` to 0.85.
+- Ran frontend build (`npm run build`) and backend regression tests successfully to verify Task 4.
 
 ## Next actions
 
-1. Proceed with the remaining tasks or review other components.
+- None. All tasks for the Weather Oracle and Light Mode Tuning have been implemented, verified, and completed. Awaiting user feedback.

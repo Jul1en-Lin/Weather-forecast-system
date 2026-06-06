@@ -195,7 +195,7 @@ onUnmounted(() => {
 }
 
 .oracle-layout[data-oracle-theme='light']::after {
-  opacity: 0.08;
+  opacity: 0.85;
 }
 
 /* Header Navbar Styles */

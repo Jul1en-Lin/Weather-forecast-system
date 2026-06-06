@@ -76,8 +76,9 @@ Status: Weather Oracle frontend, backend, and tarot assets are implemented and v
 - Processed light mode background pattern image `public/mystical_bg_light.png` to be transparent with `#efdac9` lines.
 - Verified `public/mystical_bg_light.png` is an optimized PNG image (512x512, ~208KB, <400KB).
 - Ran `npm run build` and `pytest` verifying zero regressions.
+- Updated light theme variables (off-white base `#fefcf8` and semi-transparent `#fdf9f3` card backgrounds) in `src/styles/oracle-theme.css`.
+- Updated opacity of light mode pattern in `src/layouts/OracleLayout.vue` to 0.85.
 
 ## Next actions
 
-1. Review `.local/archive/2026-06-06-cleanup/` and delete it later if the archived files are no longer needed.
-2. Inspect the app manually at `http://localhost:5173/oracle`.
+1. Proceed with the remaining tasks or review other components.

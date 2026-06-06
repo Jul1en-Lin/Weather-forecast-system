@@ -181,20 +181,6 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-.oracle-layout::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    linear-gradient(var(--oracle-border-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--oracle-border-soft) 1px, transparent 1px);
-  background-size: 64px 64px, 64px 64px;
-  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.1) 100%);
-  opacity: 0.8;
-}
-
 .oracle-layout::after {
   content: '';
   position: fixed;

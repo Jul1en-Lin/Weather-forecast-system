@@ -35,6 +35,7 @@ Status: Weather Oracle frontend, backend, and tarot assets are implemented and v
 - Generated, optimized (resized to 512x512, converted to true PNG, compressed to ~456KB), and saved the dark mode background texture asset under `public/mystical_bg_dark.png`.
 - Generated, optimized (resized to 512x512, converted to true PNG, compressed to ~405KB), and saved the light mode background texture asset under `public/mystical_bg_light.png`.
 - Integrated tarot background patterns (`mystical_bg_dark.png` and `mystical_bg_light.png`) as smooth-transitioning pseudo-element overlays under default (dark) and light themes in the Oracle layout.
+- Removed the old grid background pattern from `OracleLayout.vue` to allow mystical tarot backgrounds to stand out cleanly.
 - Verified frontend build and layout compilation, and checked branch changes against `ab970dc` (Task 4).
 
 ## In progress
@@ -70,6 +71,7 @@ Status: Weather Oracle frontend, backend, and tarot assets are implemented and v
 - Ran `npm run build` successfully to verify Vite compilation for Task 4.
 - Checked git status and styling rules since `ab970dc` to verify style/asset integration.
 - Ran backend pytest suite ensuring all 22 tests pass with zero regressions.
+- Ran `npm run build` successfully after removing the old grid background pattern from `OracleLayout.vue`.
 
 ## Next actions
 

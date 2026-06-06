@@ -179,7 +179,7 @@ def _fetch_qweather_realtime(location: str):
                     params={"location": location, "key": qweather_key, "number": 1},
                 )
                 geo_data = geo_resp.json()
-                if geo_data.get("code") == 200 and geo_data.get("location"):
+                if geo_data.get("code") == "200" and geo_data.get("location"):
                     break
             else:
                 logger.warning(
@@ -200,7 +200,7 @@ def _fetch_qweather_realtime(location: str):
                 params={"location": location_id, "key": qweather_key},
             )
             weather_data = weather_resp.json()
-            if weather_data.get("code") != 200 or not weather_data.get("now"):
+            if weather_data.get("code") != "200" or not weather_data.get("now"):
                 logger.warning("QWeather realtime returned code %s", weather_data.get("code"))
                 return None
 

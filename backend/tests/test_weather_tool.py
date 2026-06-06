@@ -104,7 +104,7 @@ class StructuredWeatherNowTests(unittest.TestCase):
                 if url.endswith("/geo/v2/city/lookup"):
                     return FakeResponse(
                         {
-                            "code": 200,
+                            "code": "200",
                             "location": [
                                 {
                                     "id": "101020100",
@@ -116,7 +116,7 @@ class StructuredWeatherNowTests(unittest.TestCase):
                 if url.endswith("/v7/weather/now"):
                     return FakeResponse(
                         {
-                            "code": 200,
+                            "code": "200",
                             "now": {
                                 "obsTime": "2026-06-06T09:00+08:00",
                                 "temp": "22",

@@ -1,74 +1,104 @@
 <template>
   <div class="oracle-layout" :data-oracle-theme="theme">
-    <aside class="oracle-sidebar">
-      <div class="oracle-brand">
-        <span class="oracle-brand-icon">☁</span>
-        <div>
-          <strong>Weather Oracle</strong>
-          <span>气象平台</span>
-        </div>
-      </div>
-
-      <nav class="oracle-nav">
-        <router-link to="/oracle" class="oracle-nav-item" active-class="active" aria-label="首页">
-          <span class="oracle-nav-icon">⌂</span>
-          <span class="oracle-nav-text">首页</span>
-        </router-link>
-        <router-link to="/intelligent-assistant" class="oracle-nav-item" active-class="active" aria-label="智能对话">
-          <span class="oracle-nav-icon">✦</span>
-          <span class="oracle-nav-text">智能对话</span>
-        </router-link>
-        <router-link v-if="isAdmin" to="/settings" class="oracle-nav-item" active-class="active" aria-label="系统设置">
-          <span class="oracle-nav-icon">⚙</span>
-          <span class="oracle-nav-text">系统设置</span>
-        </router-link>
-        <router-link v-if="isAdmin" to="/admin/users" class="oracle-nav-item" active-class="active" aria-label="用户管理">
-          <span class="oracle-nav-icon">👥</span>
-          <span class="oracle-nav-text">用户管理</span>
-        </router-link>
-      </nav>
-
-      <div class="oracle-user">
-        <div class="oracle-avatar">{{ userInitial }}</div>
-        <div class="oracle-user-copy">
-          <strong>{{ username }}</strong>
-          <span>{{ isAdmin ? '管理员' : '普通用户' }}</span>
-        </div>
-        <div class="oracle-user-actions">
-          <button type="button" class="oracle-theme-toggle" @click="toggleTheme">
-            {{ isLightTheme ? '夜间' : '日间' }}
-          </button>
-          <button type="button" @click="handleLogout">退出</button>
-        </div>
-      </div>
-    </aside>
-
-    <main class="oracle-main">
-      <header class="oracle-topbar">
-        <div class="oracle-topbar-title">
-          <span class="oracle-eyebrow">Weather Oracle</span>
-          <strong>气象占卜台</strong>
-        </div>
-        <div class="oracle-topbar-actions">
-          <div class="oracle-phase">
-            <span>☾</span>
-            <span>◐</span>
-            <span>☀</span>
-            <span>◑</span>
-            <span>☽</span>
+    <!-- Top Horizontal Navigation Header -->
+    <header class="oracle-header">
+      <div class="oracle-header-inner">
+        <!-- Logo Brand -->
+        <div class="oracle-header-brand" @click="router.push('/oracle')">
+          <svg class="oracle-header-logo-svg" viewBox="0 0 24 24" width="28" height="28">
+            <path fill="currentColor" d="M12 2s.07.01.07.07l1.78 3.61 3.98.58c.06.01.08.08.04.12l-2.88 2.81.68 3.97c.01.06-.05.1-.1.07l-3.57-1.87-3.57 1.87c-.05.03-.11-.01-.1-.07l.68-3.97-2.88-2.81c-.04-.04-.02-.11.04-.12l3.98-.58 1.78-3.61c.01-.06.07-.07.07-.07z" />
+            <path fill="currentColor" opacity="0.5" d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zm0-1c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9-4.03 9-9 9z" />
+            <circle cx="12" cy="12" r="3" fill="currentColor" />
+          </svg>
+          <div class="oracle-header-brand-text">
+            <strong>Weather Oracle</strong>
+            <span>气象占卜台</span>
           </div>
-          <button type="button" class="oracle-topbar-theme" @click="toggleTheme">
-            {{ isLightTheme ? '夜间' : '日间' }}
-          </button>
         </div>
-      </header>
-      <slot />
+
+        <!-- Horizontal Nav Links -->
+        <nav class="oracle-header-nav">
+          <router-link to="/oracle" class="oracle-header-nav-item" active-class="active">
+            <span class="nav-dot"></span> 首页
+          </router-link>
+          <router-link to="/intelligent-assistant" class="oracle-header-nav-item" active-class="active">
+            <span class="nav-dot"></span> 智能对话
+          </router-link>
+          <router-link to="/oracle" class="oracle-header-nav-item" active-class="active" @click="handleWeatherSearchClick">
+            <span class="nav-dot"></span> 天气查询
+          </router-link>
+          <router-link to="/knowledge-base" class="oracle-header-nav-item" active-class="active">
+            <span class="nav-dot"></span> 知识库
+          </router-link>
+          <router-link v-if="isAdmin" to="/admin/users" class="oracle-header-nav-item" active-class="active">
+            <span class="nav-dot"></span> 用户管理
+          </router-link>
+        </nav>
+
+        <!-- Right Side Controls & Profile Dropdown -->
+        <div class="oracle-header-right">
+          <!-- Moon Phase Decoration -->
+          <div class="oracle-header-moon-phases">
+            <span class="phase-symbol select-none">)</span>
+            <span class="phase-symbol select-none">☽</span>
+            <span class="phase-symbol select-none">◯</span>
+            <span class="phase-symbol select-none">☾</span>
+            <span class="phase-symbol select-none">(</span>
+          </div>
+
+          <!-- User Profile Dropdown -->
+          <div class="oracle-header-user-wrapper" ref="dropdownRef">
+            <div class="oracle-header-profile-trigger" @click="toggleDropdown">
+              <div class="oracle-header-avatar">{{ userInitial }}</div>
+              <div class="oracle-header-user-info">
+                <span class="user-level-badge">{{ userTitle }}</span>
+                <span class="user-trigger-name">{{ username }} ▾</span>
+              </div>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <transition name="fade-slide">
+              <div v-if="isDropdownOpen" class="oracle-header-dropdown-menu oracle-surface oracle-gold-corners">
+                <div class="dropdown-header">
+                  <strong>{{ username }}</strong>
+                  <span class="dropdown-subtitle">{{ isAdmin ? '皇家大占卜师' : '占卜师学徒' }}</span>
+                </div>
+                <div class="oracle-divider"></div>
+                <ul class="dropdown-list">
+                  <li v-if="isAdmin" @click="navigateTo('/settings')">
+                    <span class="dropdown-icon">⚙</span> 系统设置
+                  </li>
+                  <li @click="toggleTheme">
+                    <span class="dropdown-icon">{{ isLightTheme ? '🌙' : '☀️' }}</span>
+                    {{ isLightTheme ? '夜间模式' : '日间模式' }}
+                  </li>
+                  <li class="logout-item" @click="handleLogout">
+                    <span class="dropdown-icon">🚪</span> 退出登录
+                  </li>
+                </ul>
+              </div>
+            </transition>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Slot wrapper -->
+    <main class="oracle-main">
+      <div class="oracle-main-content">
+        <slot />
+      </div>
     </main>
+
+    <!-- Global Footer -->
+    <footer class="oracle-layout-footer">
+      <p>© 2026 Weather Oracle 气象占卜台 | 以天象知人心</p>
+    </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
@@ -83,6 +113,13 @@ const isAdmin = computed(() => authStore.isAdmin)
 const userInitial = computed(() => username.value ? username.value.charAt(0).toUpperCase() : 'U')
 const isLightTheme = computed(() => theme.value === 'light')
 
+const userTitle = computed(() => {
+  return isAdmin.value ? 'Lv.5 皇家大占卜师' : 'Lv.3 占卜师学徒'
+})
+
+const isDropdownOpen = ref(false)
+const dropdownRef = ref<HTMLElement | null>(null)
+
 watch(theme, value => {
   localStorage.setItem('weather_oracle:theme', value)
 })
@@ -91,10 +128,43 @@ function toggleTheme() {
   theme.value = theme.value === 'light' ? 'dark' : 'light'
 }
 
+function toggleDropdown() {
+  isDropdownOpen.value = !isDropdownOpen.value
+}
+
+function navigateTo(path: string) {
+  isDropdownOpen.value = false
+  router.push(path)
+}
+
 async function handleLogout() {
+  isDropdownOpen.value = false
   await authStore.logout()
   router.push('/login')
 }
+
+function handleWeatherSearchClick() {
+  // If we're already on the oracle page, scroll to tarot draw section or trigger dropdown focus
+  if (router.currentRoute.value.path === '/oracle') {
+    const el = document.querySelector('.oracle-city-select-trigger') as HTMLElement
+    if (el) el.click()
+  }
+}
+
+// Click outside helper to close dropdown
+function handleClickOutside(event: MouseEvent) {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+    isDropdownOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
@@ -104,9 +174,11 @@ async function handleLogout() {
   position: relative;
   isolation: isolate;
   background:
-    linear-gradient(115deg, rgba(215, 174, 105, 0.08), transparent 28%),
-    linear-gradient(245deg, rgba(168, 138, 223, 0.08), transparent 34%),
-    linear-gradient(135deg, var(--oracle-bg-deep), var(--oracle-bg) 42%, var(--oracle-panel-solid));
+    linear-gradient(115deg, rgba(215, 174, 105, 0.05), transparent 30%),
+    linear-gradient(245deg, rgba(142, 110, 194, 0.05), transparent 35%),
+    linear-gradient(135deg, var(--oracle-bg-deep), var(--oracle-bg) 45%, var(--oracle-panel-solid));
+  display: flex;
+  flex-direction: column;
 }
 
 .oracle-layout::before {
@@ -118,273 +190,347 @@ async function handleLogout() {
   background-image:
     linear-gradient(var(--oracle-border-soft) 1px, transparent 1px),
     linear-gradient(90deg, var(--oracle-border-soft) 1px, transparent 1px);
-  background-size: 72px 72px, 72px 72px;
-  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.72) 54%, rgba(0, 0, 0, 0.22) 100%);
+  background-size: 64px 64px, 64px 64px;
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.1) 100%);
+  opacity: 0.8;
 }
 
-.oracle-sidebar {
+.oracle-layout::after {
+  content: '';
   position: fixed;
-  inset: 0 auto 0 0;
-  z-index: 2;
-  width: var(--oracle-sidebar-width);
-  box-sizing: border-box;
-  min-height: 100vh;
-  padding: 24px 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent 46%), var(--oracle-panel);
-  backdrop-filter: blur(18px);
-  border-right: 1px solid var(--oracle-border);
-  box-shadow: 18px 0 42px rgba(0, 0, 0, 0.22);
-  display: flex;
-  flex-direction: column;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--oracle-bg-pattern);
+  background-repeat: repeat;
+  background-size: 360px;
+  opacity: 0.12;
+  transition: opacity 0.5s ease, background-image 0.5s ease;
 }
 
-.oracle-brand {
+.oracle-layout[data-oracle-theme='light']::after {
+  opacity: 0.08;
+}
+
+/* Header Navbar Styles */
+.oracle-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent), var(--oracle-panel);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--oracle-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+}
+
+.oracle-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo Brand */
+.oracle-header-brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--oracle-border-soft);
+  cursor: pointer;
+  user-select: none;
 }
 
-.oracle-brand-icon {
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--oracle-border);
-  border-radius: 8px;
-  background: linear-gradient(145deg, rgba(215, 174, 105, 0.24), rgba(168, 138, 223, 0.12)), var(--oracle-panel-soft);
+.oracle-header-logo-svg {
   color: var(--oracle-gold);
-  display: grid;
-  place-items: center;
-  font-size: 26px;
+  filter: drop-shadow(0 0 4px var(--oracle-gold-glow));
+  animation: pulse-mystical 3s ease-in-out infinite;
 }
 
-.oracle-brand strong,
-.oracle-user-copy strong {
+.oracle-header-brand-text strong {
   display: block;
-  font-size: 15px;
+  font-family: var(--oracle-font-display);
+  font-size: 16px;
   font-weight: 700;
   color: var(--oracle-text);
+  letter-spacing: 0.05em;
 }
 
-.oracle-brand span,
-.oracle-user-copy span {
+.oracle-header-brand-text span {
   display: block;
+  font-size: 11px;
+  color: var(--oracle-gold);
+  margin-top: 1px;
+  letter-spacing: 0.1em;
+}
+
+/* Horizontal Nav */
+.oracle-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.oracle-header-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 20px;
+  color: var(--oracle-faint);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--oracle-gold);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s ease;
+}
+
+.oracle-header-nav-item:hover {
+  color: var(--oracle-text);
+  background: var(--oracle-panel-soft);
+  border-color: var(--oracle-border-soft);
+}
+
+.oracle-header-nav-item.active {
+  color: var(--oracle-gold-strong);
+  background: linear-gradient(135deg, rgba(215, 174, 105, 0.12), rgba(142, 110, 194, 0.08));
+  border-color: var(--oracle-border);
+  box-shadow: 0 0 15px rgba(215, 174, 105, 0.05);
+}
+
+.oracle-header-nav-item.active .nav-dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Header Right Control Pane */
+.oracle-header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.oracle-header-moon-phases {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--oracle-gold);
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+.phase-symbol {
+  letter-spacing: 2px;
+}
+
+/* User Dropdown Trigger */
+.oracle-header-user-wrapper {
+  position: relative;
+}
+
+.oracle-header-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 30px;
+  border: 1px solid var(--oracle-border-soft);
+  background: var(--oracle-panel-soft);
+  transition: all 0.3s ease;
+}
+
+.oracle-header-profile-trigger:hover {
+  border-color: var(--oracle-border);
+  background: var(--oracle-panel);
+  box-shadow: 0 0 10px var(--oracle-gold-glow);
+}
+
+.oracle-header-avatar {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--oracle-border);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--oracle-purple-soft), rgba(215, 174, 105, 0.2));
+  color: var(--oracle-text);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 0 6px rgba(215, 174, 105, 0.2);
+}
+
+.oracle-header-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.user-level-badge {
+  font-size: 9px;
+  background: linear-gradient(90deg, var(--oracle-gold), var(--oracle-gold-strong));
+  color: #120e0a;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.user-trigger-name {
   font-size: 12px;
+  font-weight: 600;
   color: var(--oracle-muted);
   margin-top: 2px;
 }
 
-.oracle-brand strong {
-  color: var(--oracle-text);
+/* Dropdown Menu Styles */
+.oracle-header-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 200px;
+  padding: 16px 0 8px 0;
+  z-index: 10;
 }
 
-.oracle-nav {
-  flex: 1;
-  display: grid;
-  align-content: start;
-  gap: 4px;
-  padding: 24px 0;
+.dropdown-header {
+  padding: 0 18px 12px 18px;
 }
 
-.oracle-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  color: var(--oracle-faint);
+.dropdown-header strong {
+  display: block;
   font-size: 15px;
-  font-weight: 700;
-  text-decoration: none;
-  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
-}
-
-.oracle-nav-item:hover {
-  border-color: var(--oracle-border-soft);
-  background: var(--oracle-panel-soft);
   color: var(--oracle-text);
 }
 
-.oracle-nav-item.active {
-  border-color: var(--oracle-border);
-  background: linear-gradient(135deg, rgba(215, 174, 105, 0.18), rgba(168, 138, 223, 0.14));
-  color: var(--oracle-gold-strong);
+.dropdown-subtitle {
+  display: block;
+  font-size: 11px;
+  color: var(--oracle-muted);
+  margin-top: 2px;
 }
 
-.oracle-nav-icon {
-  width: 20px;
-  text-align: center;
-  font-size: 18px;
+.dropdown-list {
+  list-style: none;
+  padding: 8px 6px 0 6px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.oracle-user {
-  display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: 12px;
-  padding-top: 20px;
-  border-top: 1px solid var(--oracle-border-soft);
-}
-
-.oracle-avatar {
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--oracle-border);
+.dropdown-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(168, 138, 223, 0.32), rgba(215, 174, 105, 0.18));
-  color: var(--oracle-text);
-  display: grid;
-  place-items: center;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.oracle-user-actions {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.oracle-user button {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--oracle-border-soft);
-  border-radius: 8px;
-  background: var(--oracle-panel-soft);
-  color: var(--oracle-text);
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--oracle-faint);
+  transition: all 0.2s ease;
 }
 
-.oracle-user button:hover {
-  border-color: var(--oracle-border);
-}
-
-.oracle-theme-toggle {
-  color: var(--oracle-gold-strong);
-}
-
-.oracle-main {
-  min-height: 100vh;
-  margin-left: var(--oracle-sidebar-width);
-  padding: 18px 20px 28px;
-  position: relative;
-  z-index: 1;
-}
-
-.oracle-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  min-height: 58px;
-  padding: 0 16px 18px;
-  color: var(--oracle-text);
-}
-
-.oracle-topbar-title {
-  display: grid;
-  gap: 3px;
-}
-
-.oracle-topbar strong {
-  color: var(--oracle-text);
-  font-size: 20px;
-}
-
-.oracle-phase {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  color: var(--oracle-gold);
-}
-
-.oracle-topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.oracle-topbar-theme {
-  display: none;
-  padding: 9px 12px;
-  border: 1px solid var(--oracle-border);
-  border-radius: 8px;
+.dropdown-list li:hover {
   background: var(--oracle-panel-soft);
   color: var(--oracle-gold-strong);
-  font-weight: 700;
 }
 
-@media (max-width: 900px) {
-  .oracle-sidebar {
-    inset: auto 12px 12px;
-    width: auto;
-    min-height: 0;
-    padding: 8px;
-    border: 1px solid var(--oracle-border);
-    border-radius: 8px;
-    flex-direction: row;
-    align-items: center;
-  }
+.dropdown-icon {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+}
 
-  .oracle-brand,
-  .oracle-user {
+.logout-item {
+  border-top: 1px solid var(--oracle-border-soft);
+  margin-top: 4px;
+  border-radius: 0 0 8px 8px !important;
+}
+
+.logout-item:hover {
+  color: var(--oracle-danger) !important;
+}
+
+/* Transition Animations */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* Main Area Layout */
+.oracle-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 0 48px;
+}
+
+.oracle-main-content {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+/* Footer styling */
+.oracle-layout-footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--oracle-muted);
+  font-size: 12px;
+  border-top: 1px solid var(--oracle-border-soft);
+  background: rgba(0, 0, 0, 0.1);
+  margin-top: auto;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .oracle-header-moon-phases {
     display: none;
-  }
-
-  .oracle-nav {
-    flex: 1;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
-    padding: 0;
-  }
-
-  .oracle-nav-item {
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 8px;
-    min-width: 0;
-    font-size: 12px;
-  }
-
-  .oracle-nav-icon {
-    width: auto;
-    font-size: 16px;
-  }
-
-  .oracle-nav-text {
-    display: none;
-  }
-
-  .oracle-main {
-    margin-left: 0;
-    padding: 14px 12px 92px;
-  }
-
-  .oracle-topbar {
-    padding: 0 4px 12px;
-  }
-
-  .oracle-phase {
-    display: none;
-  }
-
-  .oracle-topbar-theme {
-    display: inline-flex;
   }
 }
 
-@media (max-width: 560px) {
-  .oracle-nav-item {
-    gap: 0;
-    padding: 11px 6px;
+@media (max-width: 768px) {
+  .oracle-header-inner {
+    padding: 0 16px;
+    height: 64px;
   }
 
-  .oracle-nav-icon {
-    font-size: 18px;
+  .oracle-header-nav {
+    display: none; /* Can add burger or keep simple for mobile */
+  }
+
+  .oracle-header-user-info {
+    display: none;
+  }
+
+  .oracle-main-content {
+    padding: 0 16px;
   }
 }
 </style>

@@ -11,7 +11,7 @@ We will generate two seamless tileable background textures and save them in the 
    - **Generation Prompt**: `mystical dark celestial tarot card background pattern, seamless tileable, subtle gold stars, constellations, alchemy lines, sacred geometry, low contrast, deep blue and black obsidian, premium clean texture, flat design, no frame, no device mockups`
 
 2. **Light Mode Background (`public/mystical_bg_light.png`)**
-   - **Visuals**: Warm vintage parchment/cream texture with delicate sepia/bronze astrological lines, stars, and tarot symbols.
+   - **Visuals**: Warm vintage parchment texture with delicate sepia/bronze lines. We process this image to have transparent background and color the pattern lines exactly `#efdac9`.
    - **Generation Prompt**: `mystical light celestial tarot card background pattern, seamless tileable, subtle sepia stars, constellations, alchemy lines, sacred geometry, low contrast, warm parchment cream color, premium clean texture, flat design, no frame, no device mockups`
 
 ## Frontend Implementation
@@ -26,13 +26,17 @@ We will define the background pattern assets as CSS variables and apply them to 
 }
 
 [data-oracle-theme='light'] {
-  /* ... existing variables ... */
+  --oracle-bg: #fefcf8;
+  --oracle-bg-deep: #fefcf8;
+  --oracle-panel: rgba(253, 249, 243, 0.92);
+  --oracle-panel-soft: rgba(253, 249, 243, 0.8);
+  --oracle-panel-solid: #fdf9f3;
   --oracle-bg-pattern: url('/mystical_bg_light.png');
 }
 ```
 
 ### 2. Readability & Smooth Transition
-To ensure that background details do not interfere with text readability, we will apply the background pattern to a pseudo-element (`::after`) with low opacity (`0.12` for dark mode, `0.08` for light mode). This technique places the pattern on a separate layer above the solid background but below all content.
+To ensure that background details do not interfere with text readability, we will apply the background pattern to a pseudo-element (`::after`) with low opacity (`0.12` for dark mode, `0.85` for light mode). This technique places the pattern on a separate layer above the solid background but below all content.
 
 ```css
 .oracle-layout {
@@ -59,7 +63,7 @@ To ensure that background details do not interfere with text readability, we wil
 }
 
 [data-oracle-theme='light'] .oracle-layout::after {
-  opacity: 0.08; /* Light mode opacity */
+  opacity: 0.85; /* Light mode opacity */
 }
 ```
 

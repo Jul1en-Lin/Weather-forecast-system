@@ -113,6 +113,67 @@ class WeatherCardEndpointTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("未能获取", response.json()["detail"])
 
+    @patch("app.routers.assistant.get_llm")
+    @patch("app.services.weather_tool.WeatherToolService.fetch_realtime_weather")
+    def test_weather_card_falls_back_when_llm_payload_structure_is_invalid(self, fetch_weather, get_llm):
+        fetch_weather.return_value = {
+            "city": "上海",
+            "temperature": None,
+            "humidity": 78,
+            "pressure": 1012,
+            "wind_speed": None,
+            "wind_direction": "东北风",
+            "condition": "多云",
+            "observed_at": "2026-06-06T09:00+08:00",
+        }
+
+        class FakeLLM:
+            def invoke(self, prompt):
+                return SimpleNamespace(content='{"fortune": {}}')
+
+        get_llm.return_value = FakeLLM()
+
+        response = self.client.post(
+            "/api/v1/assistant/weather-card",
+            json={"city": "上海", "model_id": "kimi-k2.5", "tarot_card_id": "major-17-star"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["fortune"]["title"], "云隙微光")
+        self.assertEqual(data["weather_mappings"][0]["value"], "未知")
+        self.assertEqual(data["weather_mappings"][3]["value"], "未知")
+
+    @patch("app.routers.assistant.get_llm")
+    @patch("app.services.weather_tool.WeatherToolService.fetch_realtime_weather")
+    def test_weather_card_falls_back_when_llm_invoke_raises(self, fetch_weather, get_llm):
+        fetch_weather.return_value = {
+            "city": "上海",
+            "temperature": 22,
+            "humidity": 78,
+            "pressure": 1012,
+            "wind_speed": 12,
+            "wind_direction": "东北风",
+            "condition": "多云",
+            "observed_at": "2026-06-06T09:00+08:00",
+        }
+
+        class FakeLLM:
+            def invoke(self, prompt):
+                raise RuntimeError("llm boom")
+
+        get_llm.return_value = FakeLLM()
+
+        response = self.client.post(
+            "/api/v1/assistant/weather-card",
+            json={"city": "上海", "model_id": "kimi-k2.5", "tarot_card_id": "major-17-star"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["fortune"]["title"], "云隙微光")
+        self.assertEqual(data["weather_mappings"][0]["value"], "22°C")
+
 
 if __name__ == "__main__":
     unittest.main()

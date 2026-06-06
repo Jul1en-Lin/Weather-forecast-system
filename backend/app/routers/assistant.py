@@ -179,6 +179,12 @@ def select_tarot_card_id(city: str, date_key: str, weather_fingerprint: str) -> 
     index = int(digest[:8], 16) % len(TAROT_CARD_IDS)
     return TAROT_CARD_IDS[index]
 
+
+def format_weather_metric_value(value, unit: str = "") -> str:
+    if value is None:
+        return "未知"
+    return f"{value}{unit}"
+
 # ---- 模型列表 ----
 @router.get("/models", response_model=ModelsResponse)
 def get_models(db: Session = Depends(get_db_session)):
@@ -618,50 +624,64 @@ def generate_weather_card(
             {
                 "metric": "temperature",
                 "label": "温度",
-                "value": f"{weather.get('temperature')}°C",
+                "value": format_weather_metric_value(weather.get("temperature"), "°C"),
                 "reading": "平和舒适",
                 "score": 70,
             },
             {
                 "metric": "humidity",
                 "label": "湿度",
-                "value": f"{weather.get('humidity')}%",
+                "value": format_weather_metric_value(weather.get("humidity"), "%"),
                 "reading": "内收敏感",
                 "score": 65,
             },
             {
                 "metric": "pressure",
                 "label": "气压",
-                "value": f"{weather.get('pressure')} hPa",
+                "value": format_weather_metric_value(weather.get("pressure"), " hPa"),
                 "reading": "掌控感提升",
                 "score": 68,
             },
             {
                 "metric": "wind_speed",
                 "label": "风速",
-                "value": f"{weather.get('wind_speed')} km/h",
+                "value": format_weather_metric_value(weather.get("wind_speed"), " km/h"),
                 "reading": "思绪流动",
                 "score": 60,
             },
         ],
     }
 
-    card_data = fallback
+    response_payload = {
+        "city": weather["city"],
+        "date": date_key,
+        "timezone": "Asia/Shanghai",
+        "updated_at": now.isoformat(),
+        "weather": weather,
+        "tarot": tarot,
+        "fortune": fallback["fortune"],
+        "mood_guide": fallback["mood_guide"],
+        "weather_mappings": fallback["weather_mappings"],
+    }
     try:
         llm = get_llm(model_id, temperature=0.7, streaming=False, db=db)
         resp = llm.invoke(prompt)
         card_data = json.loads(clean_json_object_text(resp.content))
+        response_payload = {
+            "city": weather["city"],
+            "date": date_key,
+            "timezone": "Asia/Shanghai",
+            "updated_at": now.isoformat(),
+            "weather": weather,
+            "tarot": tarot,
+            "fortune": card_data["fortune"],
+            "mood_guide": card_data["mood_guide"],
+            "weather_mappings": card_data["weather_mappings"],
+        }
+        return WeatherCardResponse.model_validate(response_payload, strict=True)
+    except HTTPException:
+        raise
     except Exception:
         logger.exception("Failed to generate weather oracle JSON; using fallback")
 
-    return WeatherCardResponse(
-        city=weather["city"],
-        date=date_key,
-        timezone="Asia/Shanghai",
-        updated_at=now.isoformat(),
-        weather=weather,
-        tarot=tarot,
-        fortune=card_data["fortune"],
-        mood_guide=card_data["mood_guide"],
-        weather_mappings=card_data["weather_mappings"],
-    )
+    return WeatherCardResponse.model_validate(response_payload, strict=True)

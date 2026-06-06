@@ -4,7 +4,7 @@
 
 Goal: Add Weather Oracle page with tarot-based weather interpretation.
 
-Status: Weather Oracle frontend and backend code is implemented. Figma tarot asset export is blocked by the Figma MCP startup failure.
+Status: Weather Oracle frontend and backend code is implemented. Figma tarot asset export is blocked by the Figma MCP Starter plan tool-call limit.
 
 ## Done
 
@@ -36,8 +36,8 @@ Status: Weather Oracle frontend and backend code is implemented. Figma tarot ass
 
 ## Blocked / Questions
 
-- Figma MCP calls currently fail during startup while initializing against `https://chatgpt.com/backend-api/wham/apps`; tarot PNG export cannot be completed until the connector works again.
-- Latest continuation check: `tool_search` did not expose `use_figma` / `get_metadata` schemas, so no Figma asset export call can be issued in the current tool state.
+- Figma MCP metadata access now works again for file `Ekroehh3gLkbPnj2raccJH`.
+- Figma PNG export is blocked by the Figma MCP Starter plan tool-call limit: `You've reached the Figma MCP tool call limit on the Starter plan. Upgrade your plan for more tool calls`.
 
 ## Checkpoints
 
@@ -58,5 +58,5 @@ Status: Weather Oracle frontend and backend code is implemented. Figma tarot ass
 ## Next actions
 
 1. Review `.local/archive/2026-06-06-cleanup/` and delete it later if the archived files are no longer needed.
-2. Retry Figma export for 78 tarot PNG assets from file `Ekroehh3gLkbPnj2raccJH`, then place them under `public/tarot/cards/`.
+2. Retry Figma export for 78 tarot PNG assets from file `Ekroehh3gLkbPnj2raccJH` after MCP quota is available, then place them under `public/tarot/cards/`.
 3. Flip `tarotAssetsReady` to `true` in `src/data/tarotCards.ts` after the real PNGs exist and rerun `npm run build` plus the `/oracle` browser checks.

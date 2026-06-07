@@ -8,6 +8,7 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 
 ## Done
 
+- Polished IntelligentAssistant interactive elements: optimized transitions, focus states, active click scaling, and hover media query gating for new-chat-btn, chip, chat-input, and send-button in IntelligentAssistant.vue.
 - Polished notice/error banner slide-fade transitions in WeatherOracle.vue to add slide up/down motion using a premium ease-out bezier.
 - Started the project with `npm run dev`.
 - Verified frontend root returns HTTP 200 at `http://localhost:5173/`.

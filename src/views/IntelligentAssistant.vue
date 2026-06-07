@@ -606,11 +606,17 @@ onMounted(async () => {
   font-size: 16px;
   font-weight: 500;
   margin-bottom: 20px;
-  transition: background 0.2s;
+  transition: background-color 150ms ease-out, transform 150ms ease-out;
 }
 
-.new-chat-btn:hover {
-  background: #0e8e6e;
+@media (hover: hover) and (pointer: fine) {
+  .new-chat-btn:hover {
+    background: #0e8e6e;
+  }
+}
+
+.new-chat-btn:active {
+  transform: scale(0.97);
 }
 
 .history-sidebar-header {
@@ -894,15 +900,21 @@ onMounted(async () => {
   color: #1d1d1f;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out, box-shadow 150ms ease-out;
 }
 
-.chip:hover {
-  background: #007aff;
-  color: white;
-  border-color: #007aff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+@media (hover: hover) and (pointer: fine) {
+  .chip:hover {
+    background: #007aff;
+    color: white;
+    border-color: #007aff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  }
+}
+
+.chip:active {
+  transform: translateY(-1px) scale(0.96);
 }
 
 .message {
@@ -1078,7 +1090,7 @@ onMounted(async () => {
   border-radius: 24px;
   font-size: 15px;
   outline: none;
-  transition: all 0.3s ease;
+  transition: border-color 180ms ease-out, background-color 180ms ease-out, box-shadow 180ms ease-out;
   background: rgba(255, 255, 255, 0.6);
 }
 
@@ -1097,12 +1109,18 @@ onMounted(async () => {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 160ms ease-out, opacity 160ms ease-out;
 }
 
-.send-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+@media (hover: hover) and (pointer: fine) {
+  .send-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+  }
+}
+
+.send-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.96);
 }
 
 .send-button:disabled {

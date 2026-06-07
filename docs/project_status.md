@@ -8,6 +8,7 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 
 ## Done
 
+- Redesigned the login page (`src/views/Login.vue`) using a fullscreen glassmorphic container, theme switcher, custom star logo, inputs with prefix icons, and direct redirection to `/oracle` route upon successful login. Removed GitHub login button.
 - Redirected `/home` to `/oracle` in `src/router/index.ts` and deleted the unused `src/views/Home.vue` page.
 - Polished IntelligentAssistant interactive elements: optimized transitions, focus states, active click scaling, and hover media query gating for new-chat-btn, chip, chat-input, and send-button in IntelligentAssistant.vue.
 - Polished notice/error banner slide-fade transitions in WeatherOracle.vue to add slide up/down motion using a premium ease-out bezier.
@@ -234,6 +235,7 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Ran `PYTHONPATH=. venv/bin/python -m pytest tests/test_weather_card.py -q` (`12 passed, 4 warnings`) after the two-line advice footer and copy update.
 - Ran `PYTHONPATH=. venv/bin/python -m pytest tests -q` (`30 passed, 4 warnings`) after the two-line advice footer and copy update.
 - Ran `npm run build` successfully after the WeatherMetricGrid footer layout update.
+- Ran `npm run build` successfully after redesigning the Login page UI.
 
 ## Next actions
 

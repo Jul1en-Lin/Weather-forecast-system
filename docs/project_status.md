@@ -8,6 +8,7 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 
 ## Done
 
+- Polished notice/error banner slide-fade transitions in WeatherOracle.vue to add slide up/down motion using a premium ease-out bezier.
 - Started the project with `npm run dev`.
 - Verified frontend root returns HTTP 200 at `http://localhost:5173/`.
 - Verified backend health returns `{"status":"ok"}` at `http://localhost:8000/health`.
@@ -138,6 +139,7 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Ran `npm run build` successfully and removed generated `dist/`.
 - Ran `git diff --check` successfully.
 - Polished QuickCityPicker transitions & animations and verified frontend compilation successfully via `npm run build`.
+- Polished notice/error banner slide-fade transitions in WeatherOracle.vue.
 
 ## Next actions
 

@@ -62,6 +62,7 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Updated the city picker trigger to show `查询中` while a city request is running.
 - Polished QuickCityPicker dropdown & inputs: optimized transitions, focus states, click active animations, and hover media queries according to the design specification.
 - Polished OracleChatPanel suggestion chips, inputs, and submit button: optimized transitions, focus states, active click animations, and hover media queries according to the design specification.
+- Implemented Task 6: Stagger enter animations for weather metrics cards, and progress bar load animations in WeatherMetricGrid.vue.
 
 ## In progress
 
@@ -222,6 +223,7 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Ran Polished QuickCityPicker transitions & animations and verified frontend compilation successfully via `npm run build`.
 - Ran Polished notice/error banner slide-fade transitions in WeatherOracle.vue.
 - Ran `npm run build` successfully after implementing Tarot card 3D flip and dissolve blur on the right column.
+- Ran `npm run build` successfully after implementing stagger enter animations for weather metrics cards and progress bar load animations (Task 6).
 
 ## Next actions
 

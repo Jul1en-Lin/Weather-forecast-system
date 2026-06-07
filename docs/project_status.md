@@ -141,6 +141,87 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Ran `git diff --check` successfully.
 - Polished QuickCityPicker transitions & animations and verified frontend compilation successfully via `npm run build`.
 - Polished notice/error banner slide-fade transitions in WeatherOracle.vue.
+- Implemented 3D flip card effect on drawing/loading, and added a dissolve blur transition on the right fortune column in TarotCardDisplay.vue.
+
+## In progress
+
+- None.
+
+## Notes
+
+- Figma MCP metadata access now works again for file `Ekroehh3gLkbPnj2raccJH`.
+- Figma PNG export through MCP still hits the Starter plan tool-call limit: `You've reached the Figma MCP tool call limit on the Starter plan. Upgrade your plan for more tool calls`.
+- This no longer blocks the current implementation because the user manually exported the source images and the local PNG assets were generated from those files.
+- Current `/api/v1/assistant/models` returns Kimi, MiniMax, DeepSeek, and `mimo-v2.5`; the Oracle chat panel currently selects the first returned model, so it will default to Kimi unless the backend order changes or the frontend gets a selector/preference rule.
+- Real HTTP stream check: `mimo-v2.5` returned streamed text successfully. `MiniMax-M2.5` no longer returns `Invalid port: ':1'`, but the provider returned `429 usage limit exceeded (2056)`.
+- Direct weather check after the fix: Shanghai, Wuhan, Beijing, and Hangzhou all returned structured QWeather realtime data.
+- Authenticated `/api/v1/assistant/weather-card` check for Wuhan returned HTTP 200 with weather fields populated.
+- Browser automation tools were not available in this turn; visual verification should be done by refreshing `/oracle` in the existing Chrome page.
+- Authenticated `/api/v1/assistant/weather-card` check for Shanghai and Jiangmen returned the same tarot id (`swords-06-six`) and different weather temperatures, confirming card stability and city data refresh.
+- Authenticated `/api/v1/assistant/weather-card` check for Jiangmen without `model_id` now returns HTTP 200 in about 10.9s with weather values and four mappings; `mimo-v2.5` did not respond before the 10s weather-card timeout in that check, so fallback copy was used for readings.
+
+## Checkpoints
+
+- Ran setup-light initialization script.
+- Preserved archived local files instead of deleting them.
+- Confirmed the remaining root `index.html`, `package*.json`, and `tsconfig*.json` files are standard Vite/TypeScript project files.
+- Verified edited cleanup files with `git diff --check -- .gitignore README.md AGENTS.md CLAUDE.md docs/project_status.md docs/agent_workflow.md scripts/md-to-html.py`.
+- Ran `python3 -m py_compile scripts/md-to-html.py scripts/check-ppt.py`.
+- Ran `npm run build`.
+- Ran `npm run build` after Task 7 page/component implementation.
+- Ran `npm run build` after Task 9 theme implementation.
+- Ran `git diff --check -- src/styles/oracle-theme.css src/style.css src/layouts/OracleLayout.vue src/views/WeatherOracle.vue src/components/oracle`.
+- Ran `npm run build` after Task 9 review fixes.
+- Ran `git diff --check`.
+- Ran `PYTHONPATH=backend backend/venv/bin/python -m pytest backend/tests -q` (`22 passed, 4 warnings`).
+- Ran Chrome DevTools layout checks for `/oracle` at 1440x900 and 390x844 after logging in as `admin` and loading a same-day cached reading.
+- Verified `public/tarot/cards/` contains exactly 78 PNGs matching the tarot manifest, each at `500x836`.
+- Ran `npm run build` after enabling tarot assets.
+- Ran `git diff --check` after enabling tarot assets.
+- Ran Chrome DevTools layout checks for `/oracle` at 1440x900 and 390x844 with cache disabled; `major-17-star.png` loaded as `image/png` with HTTP 200 and natural size `500x836`.
+- Ran `npm run build` successfully to verify Vite compilation for Task 4.
+- Checked git status and styling rules since `ab970dc` to verify style/asset integration.
+- Ran backend pytest suite ensuring all 22 tests pass with zero regressions.
+- Ran `npm run build` successfully after removing the old grid background pattern from `OracleLayout.vue`.
+- Processed light mode background pattern image `public/mystical_bg_light.png` to be transparent with `#efdac9` lines.
+- Verified `public/mystical_bg_light.png` is an optimized PNG image (512x512, ~208KB, <400KB).
+- Ran `npm run build` and `pytest` verifying zero regressions.
+- Updated light theme variables (off-white base `#fefcf8` and semi-transparent `#fdf9f3` card backgrounds) in `src/styles/oracle-theme.css`.
+- Updated opacity of light mode pattern in `src/layouts/OracleLayout.vue` to 0.85.
+- Ran frontend build (`npm run build`) and backend regression tests successfully to verify Task 4.
+- Verified the new LLM regression test fails before the fix with `httpx.InvalidURL: Invalid port: ':1'`.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests/test_llm_config.py::LLMConfigTests::test_get_llm_ignores_invalid_ipv6_no_proxy_entry -q` successfully after the fix.
+- Ran direct backend cwd checks for `get_llm()` with `kimi-k2.5`, `MiniMax-M2.5`, and `mimo-v2.5`; all clients construct without the port error.
+- Ran authenticated HTTP stream checks for `MiniMax-M2.5` and `mimo-v2.5`; MiniMax returned provider 429, mimo streamed text.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests -q` (`23 passed, 4 warnings`).
+- Ran `npm run build` successfully.
+- Ran `git diff --check` successfully after whitespace cleanup.
+- Verified the new weather regression test fails before the fix because `NO_PROXY` still contains `::1`.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests/test_weather_tool.py::StructuredWeatherNowTests::test_fetch_realtime_weather_ignores_invalid_ipv6_no_proxy_entry tests/test_llm_config.py::LLMConfigTests::test_get_llm_ignores_invalid_ipv6_no_proxy_entry -q` successfully.
+- Ran direct backend cwd checks for `WeatherToolService.fetch_realtime_weather()` with Shanghai, Wuhan, Beijing, and Hangzhou; all returned data.
+- Ran authenticated HTTP check for `/api/v1/assistant/weather-card` with `city=武汉`; returned HTTP 200.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests -q` (`24 passed, 4 warnings`).
+- Ran `npm run build` successfully.
+- Ran `git diff --check` successfully.
+- Ran `npm run build` successfully after removing the tarot overlay.
+- Ran `git diff --check` successfully after removing the tarot overlay.
+- Confirmed `frame-label-banner`, `card-roman-num`, `card-zh-name`, and `romanNumeral` no longer appear in `TarotCardDisplay.vue`.
+- Verified new weather-card tests fail before the implementation because tarot selection still depends on city/weather and preferred model helper is missing.
+- Ran focused weather-card tests successfully after the implementation.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests -q` (`27 passed, 4 warnings`).
+- Ran `npm run build` successfully.
+- Ran `git diff --check` successfully.
+- Ran authenticated HTTP checks for Shanghai and Jiangmen weather-card responses; both returned HTTP 200 with the same tarot id and different weather values.
+- Verified the new LLM-shape regression test fails before the fix with `ValidationError` on `fortune`, `mood_guide`, and `weather_mappings`.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests/test_weather_card.py::WeatherCardEndpointTests::test_weather_card_coerces_common_llm_summary_shape tests/test_llm_config.py::LLMConfigTests::test_get_llm_passes_optional_timeout_and_retry_config -q` successfully.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests/test_weather_card.py tests/test_llm_config.py -q` (`15 passed, 4 warnings`).
+- Ran authenticated HTTP check for `/api/v1/assistant/weather-card` with Jiangmen and no `model_id`; returned HTTP 200 after the 10s model timeout with weather values populated.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests -q` (`29 passed, 4 warnings`).
+- Ran `npm run build` successfully and removed generated `dist/`.
+- Ran `git diff --check` successfully.
+- Ran Polished QuickCityPicker transitions & animations and verified frontend compilation successfully via `npm run build`.
+- Ran Polished notice/error banner slide-fade transitions in WeatherOracle.vue.
+- Ran `npm run build` successfully after implementing Tarot card 3D flip and dissolve blur on the right column.
 
 ## Next actions
 

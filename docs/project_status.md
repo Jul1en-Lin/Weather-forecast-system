@@ -59,6 +59,7 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Added a 10-second timeout and zero retries for Weather Oracle model summary calls so city weather data can still return if the model is slow.
 - Updated the city picker trigger to show `查询中` while a city request is running.
 - Polished QuickCityPicker dropdown & inputs: optimized transitions, focus states, click active animations, and hover media queries according to the design specification.
+- Polished OracleChatPanel suggestion chips, inputs, and submit button: optimized transitions, focus states, active click animations, and hover media queries according to the design specification.
 
 ## In progress
 

@@ -8,6 +8,7 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 
 ## Done
 
+- Redirected `/home` to `/oracle` in `src/router/index.ts` and deleted the unused `src/views/Home.vue` page.
 - Polished IntelligentAssistant interactive elements: optimized transitions, focus states, active click scaling, and hover media query gating for new-chat-btn, chip, chat-input, and send-button in IntelligentAssistant.vue.
 - Polished notice/error banner slide-fade transitions in WeatherOracle.vue to add slide up/down motion using a premium ease-out bezier.
 - Started the project with `npm run dev`.

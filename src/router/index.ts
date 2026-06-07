@@ -21,9 +21,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/home',
-    name: 'Home',
-    component: () => import('../views/Home.vue'),
-    meta: { requiresAuth: true }
+    redirect: '/oracle'
   },
   {
     path: '/oracle',

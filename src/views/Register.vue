@@ -1,53 +1,97 @@
 <template>
-  <div class="register-container">
-    <div class="register-card">
+  <div class="register-container" :class="theme">
+    <!-- Theme Switcher -->
+    <button class="theme-toggle" @click="toggleTheme" title="切换主题">
+      <!-- Sun Icon -->
+      <svg v-if="theme === 'dark'" viewBox="0 0 24 24" width="20" height="20">
+        <path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z" />
+      </svg>
+      <!-- Moon Icon -->
+      <svg v-else viewBox="0 0 24 24" width="20" height="20">
+        <path fill="currentColor" d="M12.3 22h-.1c-5.5 0-10-4.5-10-10 0-4.8 3.5-8.9 8.2-9.8.5-.1 1 .2 1.2.7.2.5 0 1.1-.4 1.4-2.8 1.9-4.3 5.3-3.8 8.8.6 3.9 3.8 7.1 7.7 7.7 3.5.5 6.9-1.1 8.8-3.8.3-.4.9-.6 1.4-.4.5.2.8.7.7 1.2-.9 4.7-5 8.2-9.8 8.2z" />
+      </svg>
+    </button>
+
+    <div class="register-card oracle-gold-corners">
+      <!-- Logo and Brand Header -->
       <div class="register-header">
         <div class="logo">
-          <span class="logo-icon">🌤️</span>
+          <svg class="logo-svg" viewBox="0 0 24 24" width="48" height="48">
+            <path fill="currentColor" d="M12 2s.07.01.07.07l1.78 3.61 3.98.58c.06.01.08.08.04.12l-2.88 2.81.68 3.97c.01.06-.05.1-.1.07l-3.57-1.87-3.57 1.87c-.05.03-.11-.01-.1-.07l.68-3.97-2.88-2.81c-.04-.04-.02-.11.04-.12l3.98-.58 1.78-3.61c.01-.06.07-.07.07-.07z" />
+            <path fill="currentColor" opacity="0.4" d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zm0-1c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9-4.03 9-9 9z" />
+            <circle cx="12" cy="12" r="3" fill="currentColor" />
+          </svg>
         </div>
-        <h1 class="title">用户注册</h1>
-        <p class="subtitle">创建您的账户</p>
+        <h1 class="brand-title">Weather Oracle</h1>
+        <p class="brand-subtitle">✦ 气象占卜台 ✦</p>
+      </div>
+
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <h2 class="welcome-title">创建您的账户</h2>
+        <p class="welcome-subtitle">✦ 开启你的天气占卜之旅 ✦</p>
       </div>
 
       <form @submit.prevent="handleRegister" class="register-form">
         <div class="form-group">
           <label for="username">用户名</label>
-          <input
-            id="username"
-            v-model="formData.username"
-            type="text"
-            placeholder="请输入用户名（3-64个字符）"
-            required
-            minlength="3"
-            maxlength="64"
-            class="input-field"
-          />
+          <div class="input-wrapper">
+            <span class="input-icon-span">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+              </svg>
+            </span>
+            <input
+              id="username"
+              v-model="formData.username"
+              type="text"
+              placeholder="请输入用户名（3-64个字符）"
+              required
+              minlength="3"
+              maxlength="64"
+              class="input-field"
+            />
+          </div>
         </div>
 
         <div class="form-group">
           <label for="password">密码</label>
-          <input
-            id="password"
-            v-model="formData.password"
-            type="password"
-            placeholder="请输入密码（6-128个字符）"
-            required
-            minlength="6"
-            maxlength="128"
-            class="input-field"
-          />
+          <div class="input-wrapper">
+            <span class="input-icon-span">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+              </svg>
+            </span>
+            <input
+              id="password"
+              v-model="formData.password"
+              type="password"
+              placeholder="请输入密码（6-128个字符）"
+              required
+              minlength="6"
+              maxlength="128"
+              class="input-field"
+            />
+          </div>
         </div>
 
         <div class="form-group">
           <label for="confirmPassword">确认密码</label>
-          <input
-            id="confirmPassword"
-            v-model="formData.confirmPassword"
-            type="password"
-            placeholder="请再次输入密码"
-            required
-            class="input-field"
-          />
+          <div class="input-wrapper">
+            <span class="input-icon-span">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+              </svg>
+            </span>
+            <input
+              id="confirmPassword"
+              v-model="formData.confirmPassword"
+              type="password"
+              placeholder="请再次输入密码"
+              required
+              class="input-field"
+            />
+          </div>
         </div>
 
         <button type="submit" class="register-button" :disabled="isLoading">
@@ -63,13 +107,14 @@
         <p class="footer-text">
           已有账号？<router-link to="/login" class="login-link">立即登录</router-link>
         </p>
+        <p class="footer-policy">继续即表示你同意我们的服务条款和隐私政策</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
@@ -85,6 +130,24 @@ const formData = ref({
 const isLoading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
+
+const theme = ref<'dark' | 'light'>('dark')
+
+const toggleTheme = () => {
+  theme.value = theme.value === 'light' ? 'dark' : 'light'
+  localStorage.setItem('weather_oracle:theme', theme.value)
+  document.documentElement.setAttribute('data-oracle-theme', theme.value)
+}
+
+onMounted(() => {
+  const savedTheme = localStorage.getItem('weather_oracle:theme')
+  if (savedTheme === 'light' || savedTheme === 'dark') {
+    theme.value = savedTheme
+  } else {
+    theme.value = 'dark'
+  }
+  document.documentElement.setAttribute('data-oracle-theme', theme.value)
+})
 
 const handleRegister = async () => {
   errorMessage.value = ''
@@ -116,48 +179,114 @@ const handleRegister = async () => {
 </script>
 
 <style scoped>
+.register-container.dark {
+  --bg-image: url('/login-dark-background.png');
+  --bg-overlay: rgba(10, 15, 30, 0.45);
+  --card-bg: rgba(8, 16, 29, 0.65);
+  --card-border: rgba(215, 174, 105, 0.25);
+  --text-color: #f5ebd9;
+  --text-muted: #af9f87;
+  --text-faint: rgba(245, 235, 217, 0.65);
+  --input-bg: rgba(14, 25, 43, 0.5);
+  --input-border: rgba(215, 174, 105, 0.15);
+  --input-focus-border: #d7ae69;
+  --input-focus-shadow: rgba(215, 174, 105, 0.2);
+  --btn-bg: linear-gradient(135deg, #d7ae69 0%, #b28542 100%);
+  --btn-hover-shadow: rgba(215, 174, 105, 0.3);
+  --btn-text: #120e0a;
+  --gold-color: #d7ae69;
+  --gold-glow: rgba(215, 174, 105, 0.15);
+}
+
+.register-container.light {
+  --bg-image: url('/login-background.png');
+  --bg-overlay: rgba(255, 255, 255, 0.35);
+  --card-bg: rgba(253, 249, 243, 0.65);
+  --card-border: rgba(180, 140, 85, 0.3);
+  --text-color: #3c3020;
+  --text-muted: #8c7b64;
+  --text-faint: rgba(60, 48, 32, 0.68);
+  --input-bg: rgba(253, 249, 243, 0.7);
+  --input-border: rgba(180, 140, 85, 0.2);
+  --input-focus-border: #b28542;
+  --input-focus-shadow: rgba(180, 140, 85, 0.15);
+  --btn-bg: linear-gradient(135deg, #b28542 0%, #8c6022 100%);
+  --btn-hover-shadow: rgba(180, 140, 85, 0.25);
+  --btn-text: #ffffff;
+  --gold-color: #b28542;
+  --gold-glow: rgba(180, 140, 85, 0.08);
+}
+
 .register-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url('/background.jpg');
+  background-image: var(--bg-image);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   padding: 20px;
   position: relative;
+  transition: background-image 0.5s ease;
+  overflow: hidden;
 }
 
 .register-container::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(5px);
+  inset: 0;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(8px);
+  z-index: 0;
+  transition: background 0.5s ease, backdrop-filter 0.5s ease;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--gold-color);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.08) rotate(15deg);
+  border-color: var(--gold-color);
+  box-shadow: 0 0 12px var(--gold-glow);
 }
 
 .register-card {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--card-bg);
   backdrop-filter: blur(20px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  padding: 48px 40px;
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  padding: 40px 36px;
   width: 100%;
   max-width: 420px;
-  animation: slideUp 0.6s ease-out;
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   z-index: 1;
+  color: var(--text-color);
+  transition: all 0.5s ease;
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px);
   }
   to {
     opacity: 1;
@@ -165,49 +294,102 @@ const handleRegister = async () => {
   }
 }
 
+.oracle-gold-corners::before,
+.oracle-gold-corners::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--gold-color);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.85;
+  transition: all 0.5s ease;
+}
+
+.oracle-gold-corners::before {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.oracle-gold-corners::after {
+  bottom: 8px;
+  right: 8px;
+  border-left: none;
+  border-top: none;
+}
+
 .register-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 }
 
 .logo {
-  margin-bottom: 20px;
-}
-
-.logo-icon {
-  font-size: 64px;
+  margin-bottom: 12px;
   display: inline-block;
-  animation: float 3s ease-in-out infinite;
 }
 
-@keyframes float {
+.logo-svg {
+  color: var(--gold-color);
+  filter: drop-shadow(0 0 4px var(--gold-glow));
+  animation: pulse-mystical 3s ease-in-out infinite;
+}
+
+@keyframes pulse-mystical {
   0%, 100% {
-    transform: translateY(0);
+    opacity: 0.8;
+    transform: scale(1);
   }
   50% {
-    transform: translateY(-10px);
+    opacity: 1;
+    transform: scale(1.05);
   }
 }
 
-.title {
+.brand-title {
+  font-family: 'Cinzel', serif, var(--oracle-font-display);
   font-size: 24px;
-  font-weight: 600;
-  color: #1d1d1f;
-  margin: 0 0 8px 0;
-  letter-spacing: -0.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0;
+  color: var(--text-color);
 }
 
-.subtitle {
-  font-size: 14px;
-  color: #1d1d1f;
+.brand-subtitle {
+  font-family: 'Marcellus', Georgia, serif;
+  font-size: 12px;
+  color: var(--gold-color);
+  letter-spacing: 0.25em;
+  margin: 4px 0 0 0;
+  text-transform: uppercase;
+}
+
+.welcome-banner {
+  text-align: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--input-border);
+  padding-bottom: 16px;
+}
+
+.welcome-title {
+  font-size: 18px;
+  font-weight: 600;
   margin: 0;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.05em;
+}
+
+.welcome-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 4px 0 0 0;
 }
 
 .register-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .form-group {
@@ -217,44 +399,62 @@ const handleRegister = async () => {
 }
 
 .form-group label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon-span {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
 }
 
 .input-field {
-  padding: 12px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 12px;
-  font-size: 16px;
-  transition: all 0.3s ease;
+  width: 100%;
+  padding: 12px 16px 12px 42px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  color: #1d1d1f;
-}
-
-.input-field:focus {
-  border-color: #007aff;
-  background: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
 .input-field::placeholder {
-  color: #86868b;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.input-field:focus {
+  border-color: var(--input-focus-border);
+  background: var(--card-bg);
+  box-shadow: 0 0 10px var(--input-focus-shadow);
 }
 
 .register-button {
-  margin-top: 10px;
-  padding: 14px;
-  background: linear-gradient(135deg, #007aff 0%, #0056cc 100%);
-  color: white;
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--btn-bg);
+  color: var(--btn-text);
   border: none;
-  border-radius: 12px;
-  font-size: 17px;
+  border-radius: 8px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -263,7 +463,8 @@ const handleRegister = async () => {
 
 .register-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 6px 20px var(--btn-hover-shadow);
+  filter: brightness(1.05);
 }
 
 .register-button:active:not(:disabled) {
@@ -271,15 +472,15 @@ const handleRegister = async () => {
 }
 
 .register-button:disabled {
-  opacity: 0.7;
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
 .loading-spinner {
   width: 20px;
   height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--btn-text);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -291,70 +492,67 @@ const handleRegister = async () => {
 }
 
 .error-message {
-  color: #ff3b30;
-  font-size: 14px;
+  color: #ff6b6b;
+  font-size: 13px;
   text-align: center;
-  margin: 0;
+  margin: 4px 0 0 0;
   padding: 10px;
-  background: rgba(255, 59, 48, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 59, 48, 0.3);
-  animation: shake 0.5s ease-in-out;
+  background: rgba(255, 107, 107, 0.12);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  animation: shake 0.4s ease-in-out;
 }
 
 .success-message {
-  color: #34c759;
-  font-size: 14px;
+  color: #378a68;
+  font-size: 13px;
   text-align: center;
-  margin: 0;
+  margin: 4px 0 0 0;
   padding: 10px;
-  background: rgba(52, 199, 89, 0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 8px;
-  border: 1px solid rgba(52, 199, 89, 0.3);
+  background: rgba(55, 138, 104, 0.12);
+  border-radius: 6px;
+  border: 1px solid rgba(55, 138, 104, 0.2);
 }
 
 @keyframes shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  75% {
-    transform: translateX(5px);
-  }
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
 }
 
 .register-footer {
-  margin-top: 30px;
+  margin-top: 24px;
   text-align: center;
 }
 
 .footer-text {
-  font-size: 14px;
-  color: #1d1d1f;
+  font-size: 13px;
+  color: var(--text-muted);
   margin: 0;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .login-link {
-  color: #007aff;
+  color: var(--gold-color);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .login-link:hover {
   text-decoration: underline;
 }
 
+.footer-policy {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin: 12px 0 0 0;
+  opacity: 0.8;
+}
+
 @media (max-width: 480px) {
   .register-card {
     padding: 32px 24px;
   }
-
-  .title {
+  .brand-title {
     font-size: 20px;
   }
 }

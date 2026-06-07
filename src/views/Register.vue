@@ -237,7 +237,7 @@ const handleRegister = async () => {
   position: absolute;
   inset: 0;
   background: var(--bg-overlay);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
   z-index: 0;
   transition: background 0.5s ease, backdrop-filter 0.5s ease;
 }

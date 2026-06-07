@@ -1,17 +1,5 @@
 <template>
   <div class="register-container" :class="theme">
-    <!-- Theme Switcher -->
-    <button class="theme-toggle" @click="toggleTheme" title="切换主题">
-      <!-- Sun Icon -->
-      <svg v-if="theme === 'dark'" viewBox="0 0 24 24" width="20" height="20">
-        <path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z" />
-      </svg>
-      <!-- Moon Icon -->
-      <svg v-else viewBox="0 0 24 24" width="20" height="20">
-        <path fill="currentColor" d="M12.3 22h-.1c-5.5 0-10-4.5-10-10 0-4.8 3.5-8.9 8.2-9.8.5-.1 1 .2 1.2.7.2.5 0 1.1-.4 1.4-2.8 1.9-4.3 5.3-3.8 8.8.6 3.9 3.8 7.1 7.7 7.7 3.5.5 6.9-1.1 8.8-3.8.3-.4.9-.6 1.4-.4.5.2.8.7.7 1.2-.9 4.7-5 8.2-9.8 8.2z" />
-      </svg>
-    </button>
-
     <div class="register-card oracle-gold-corners">
       <!-- Logo and Brand Header -->
       <div class="register-header">
@@ -133,12 +121,6 @@ const successMessage = ref('')
 
 const theme = ref<'dark' | 'light'>('dark')
 
-const toggleTheme = () => {
-  theme.value = theme.value === 'light' ? 'dark' : 'light'
-  localStorage.setItem('weather_oracle:theme', theme.value)
-  document.documentElement.setAttribute('data-oracle-theme', theme.value)
-}
-
 onMounted(() => {
   const savedTheme = localStorage.getItem('weather_oracle:theme')
   if (savedTheme === 'light' || savedTheme === 'dark') {
@@ -242,30 +224,7 @@ const handleRegister = async () => {
   transition: background 0.5s ease, backdrop-filter 0.5s ease;
 }
 
-.theme-toggle {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  color: var(--gold-color);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  z-index: 10;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-}
 
-.theme-toggle:hover {
-  transform: scale(1.08) rotate(15deg);
-  border-color: var(--gold-color);
-  box-shadow: 0 0 12px var(--gold-glow);
-}
 
 .register-card {
   background: var(--card-bg);

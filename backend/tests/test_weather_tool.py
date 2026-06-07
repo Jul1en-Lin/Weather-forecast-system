@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import patch
 
@@ -231,6 +232,67 @@ class StructuredWeatherNowTests(unittest.TestCase):
                 "observed_at": "",
             },
         )
+
+    @patch("app.services.weather_tool.httpx.Client")
+    @patch("app.services.weather_tool._get_qweather_config")
+    def test_fetch_realtime_weather_ignores_invalid_ipv6_no_proxy_entry(self, get_qweather_config, client_cls):
+        get_qweather_config.return_value = ("demo-key", "devapi.qweather.com")
+        test_case = self
+
+        class FakeResponse:
+            def __init__(self, payload):
+                self._payload = payload
+
+            def json(self):
+                return self._payload
+
+        class FakeClient:
+            def __init__(self, *args, **kwargs):
+                no_proxy = os.environ.get("NO_PROXY", "")
+                test_case.assertNotIn("::1", no_proxy)
+                test_case.assertNotIn("::1/128", no_proxy)
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def get(self, url, params=None):
+                if url.endswith("/geo/v2/city/lookup"):
+                    return FakeResponse(
+                        {
+                            "code": "200",
+                            "location": [{"id": "101200101", "name": "武汉"}],
+                        }
+                    )
+                if url.endswith("/v7/weather/now"):
+                    return FakeResponse(
+                        {
+                            "code": "200",
+                            "now": {
+                                "obsTime": "2026-06-06T15:30+08:00",
+                                "temp": "29",
+                                "humidity": "70",
+                                "pressure": "1004",
+                                "windSpeed": "9",
+                                "windDir": "东风",
+                                "text": "多云",
+                            },
+                        }
+                    )
+                raise AssertionError(f"Unexpected URL: {url}")
+
+        client_cls.side_effect = FakeClient
+        env = {
+            "NO_PROXY": "127.0.0.1,localhost,::1,127.0.0.0/8,::1/128",
+            "no_proxy": "127.0.0.1,localhost,::1,127.0.0.0/8,::1/128",
+        }
+
+        with patch.dict(os.environ, env):
+            result = WeatherToolService.fetch_realtime_weather("武汉")
+
+        self.assertEqual(result["city"], "武汉")
 
 
 if __name__ == "__main__":

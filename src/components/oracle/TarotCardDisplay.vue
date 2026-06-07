@@ -24,41 +24,27 @@
 
     <!-- Center Column: Card Image -->
     <div class="tarot-center-col">
-      <div class="tarot-card-container" :class="{ 'is-flipped': loading }">
-        <div class="tarot-card-inner">
-          <!-- Front Face -->
-          <div class="tarot-card-frame card-face card-front">
-            <img
-              v-if="tarot.image && !imageFailed"
-              :src="tarot.image"
-              :alt="tarot.name_zh || tarot.name_en || tarot.id"
-              class="tarot-card-img"
-              @error="imageFailed = true"
-            />
-            <div v-else class="tarot-card-fallback-frame" aria-hidden="true">
-              <span class="fallback-char">{{ fallbackInitial }}</span>
-              <small class="fallback-copy">牌面待导出</small>
-            </div>
-            <!-- Filigree gold border decorations -->
-            <div class="frame-gold-border"></div>
+      <div class="tarot-card-container">
+        <div class="tarot-card-frame">
+          <img
+            v-if="tarot.image && !imageFailed"
+            :src="tarot.image"
+            :alt="tarot.name_zh || tarot.name_en || tarot.id"
+            class="tarot-card-img"
+            @error="imageFailed = true"
+          />
+          <div v-else class="tarot-card-fallback-frame" aria-hidden="true">
+            <span class="fallback-char">{{ fallbackInitial }}</span>
+            <small class="fallback-copy">牌面待导出</small>
           </div>
-
-          <!-- Back Face -->
-          <div class="tarot-card-frame card-face card-back">
-            <div class="card-back-pattern">
-              <span class="back-mystical-symbol">✦</span>
-              <span class="back-mystical-eye">🔮</span>
-              <span class="back-mystical-symbol">✦</span>
-              <small class="back-mystical-label">召唤星盘中</small>
-            </div>
-            <div class="frame-gold-border"></div>
-          </div>
+          <!-- Filigree gold border decorations -->
+          <div class="frame-gold-border"></div>
         </div>
       </div>
     </div>
 
     <!-- Right Column: Fortune Guidance -->
-    <div class="tarot-right-col" :class="{ 'is-loading': loading }">
+    <div class="tarot-right-col">
       <div class="fortune-guidance-header">
         <span class="guidance-marker">✦</span>
         <span class="guidance-title">今日指引</span>
@@ -239,81 +225,17 @@ function getColorCode(colorName: string): string {
   justify-content: center;
 }
 
-/* 3D Tarot Card Container */
+/* Tarot Card Container */
 .tarot-card-container {
   width: 100%;
   max-width: 220px;
   aspect-ratio: 500 / 836;
-  perspective: 1000px;
-}
-
-.tarot-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 550ms cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.tarot-card-container.is-flipped .tarot-card-inner {
-  transform: rotateY(180deg);
-}
-
-.card-face {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  margin: 0 !important;
-}
-
-.card-front {
-  z-index: 2;
-  transform: rotateY(0deg);
-}
-
-.card-back {
-  transform: rotateY(180deg);
-  background: linear-gradient(135deg, #091220 0%, #060b13 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-back-pattern {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  color: var(--oracle-gold);
-}
-
-.back-mystical-eye {
-  font-size: 32px;
-  filter: drop-shadow(0 0 8px var(--oracle-gold-glow));
-  animation: pulse-mystical 2s ease-in-out infinite;
-}
-
-.back-mystical-symbol {
-  font-size: 14px;
-  opacity: 0.6;
-}
-
-.back-mystical-label {
-  font-family: var(--oracle-font-display);
-  font-size: 11px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--oracle-muted);
 }
 
 .tarot-card-frame {
   position: relative;
   width: 100%;
-  max-width: 220px;
+  max-width: none;
   aspect-ratio: 500 / 836;
   border-radius: var(--oracle-radius-inner);
   border: 1px solid var(--oracle-border);
@@ -363,19 +285,12 @@ function getColorCode(colorName: string): string {
 }
 
 /* Right Column (Fortune details) Styling */
-/* Right column dissolve blur */
 .tarot-right-col {
   display: flex;
   flex-direction: column;
   gap: 16px;
   border-left: 1px dashed var(--oracle-border-soft);
   padding-left: 24px;
-  transition: filter 250ms ease-out, opacity 250ms ease-out;
-}
-
-.tarot-right-col.is-loading {
-  filter: blur(4px);
-  opacity: 0.45;
 }
 
 .fortune-guidance-header {

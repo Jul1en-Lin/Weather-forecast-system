@@ -37,6 +37,11 @@ export interface WeatherOracleMoodGuide {
   suggestions: string[]
 }
 
+export interface WeatherOracleDailyAdvice {
+  travel: string
+  clothing: string
+}
+
 export interface WeatherOracleMapping {
   metric: 'temperature' | 'humidity' | 'pressure' | 'wind_speed'
   label: string
@@ -54,5 +59,6 @@ export interface WeatherOracleReading {
   tarot: WeatherOracleTarot
   fortune: WeatherOracleFortune
   mood_guide: WeatherOracleMoodGuide
+  daily_advice?: WeatherOracleDailyAdvice
   weather_mappings: WeatherOracleMapping[]
 }

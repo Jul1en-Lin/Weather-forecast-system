@@ -7,6 +7,7 @@ from langchain_core.tools import StructuredTool
 from app.config import settings
 from app.database import SessionLocal
 from app.models.alert import Alert
+from app.services.httpx_compat import httpx_compatible_proxy_env
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +127,7 @@ def _fetch_realtime_alerts(location: str = "") -> str:
         host = qweather_host
         geo_url = f"https://{host}/geo/v2/city/lookup"
         geo_params = {"location": location or "", "key": qweather_key, "number": 1}
-        with httpx.Client(timeout=10.0) as client:
+        with httpx_compatible_proxy_env(), httpx.Client(timeout=10.0) as client:
             geo_resp = client.get(geo_url, params=geo_params)
             geo_data = geo_resp.json()
             location_id = ""
@@ -171,7 +172,7 @@ def _fetch_qweather_realtime(location: str) -> Optional[dict]:
         return None
 
     try:
-        with httpx.Client(timeout=10.0) as client:
+        with httpx_compatible_proxy_env(), httpx.Client(timeout=10.0) as client:
             geo_data = {}
             for geo_host in _qweather_geo_hosts(qweather_host):
                 try:
@@ -230,7 +231,7 @@ def _fetch_qweather_forecast(location: str, days: int) -> Optional[str]:
         return None
 
     try:
-        with httpx.Client(timeout=10.0) as client:
+        with httpx_compatible_proxy_env(), httpx.Client(timeout=10.0) as client:
             geo_data = {}
             for geo_host in _qweather_geo_hosts(qweather_host):
                 geo_resp = client.get(

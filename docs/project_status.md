@@ -63,6 +63,8 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Polished QuickCityPicker dropdown & inputs: optimized transitions, focus states, click active animations, and hover media queries according to the design specification.
 - Polished OracleChatPanel suggestion chips, inputs, and submit button: optimized transitions, focus states, active click animations, and hover media queries according to the design specification.
 - Implemented Task 6: Stagger enter animations for weather metrics cards, and progress bar load animations in WeatherMetricGrid.vue.
+- Replaced the WeatherMetricGrid fake "带走烦恼百分比" wind footer with model-backed daily travel and clothing advice from the Weather Oracle weather-card response.
+- Adjusted the WeatherMetricGrid daily advice footer into a two-line layout and rewrote fallback travel/clothing copy to sound more direct and practical.
 
 ## In progress
 
@@ -142,7 +144,7 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Ran `git diff --check` successfully.
 - Polished QuickCityPicker transitions & animations and verified frontend compilation successfully via `npm run build`.
 - Polished notice/error banner slide-fade transitions in WeatherOracle.vue.
-- Implemented 3D flip card effect on drawing/loading, and added a dissolve blur transition on the right fortune column in TarotCardDisplay.vue.
+- Removed the city-switch tarot flip and fortune blur in TarotCardDisplay.vue; the daily tarot card and guidance now stay visually fixed while only weather data refreshes.
 
 ## In progress
 
@@ -222,8 +224,15 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Ran `git diff --check` successfully.
 - Ran Polished QuickCityPicker transitions & animations and verified frontend compilation successfully via `npm run build`.
 - Ran Polished notice/error banner slide-fade transitions in WeatherOracle.vue.
-- Ran `npm run build` successfully after implementing Tarot card 3D flip and dissolve blur on the right column.
+- Ran `npm run build` successfully after removing Tarot card flip and fortune blur from city switches.
 - Ran `npm run build` successfully after implementing stagger enter animations for weather metrics cards and progress bar load animations (Task 6).
+- Ran `python3 -m py_compile backend/app/routers/assistant.py backend/app/schemas/assistant.py`.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests/test_weather_card.py -q` (`12 passed, 4 warnings`).
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests -q` (`30 passed, 4 warnings`).
+- Ran `npm run build` successfully after adding daily travel and clothing advice to WeatherMetricGrid.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests/test_weather_card.py -q` (`12 passed, 4 warnings`) after the two-line advice footer and copy update.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests -q` (`30 passed, 4 warnings`) after the two-line advice footer and copy update.
+- Ran `npm run build` successfully after the WeatherMetricGrid footer layout update.
 
 ## Next actions
 

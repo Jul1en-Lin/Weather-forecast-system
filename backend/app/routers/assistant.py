@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import Any, List, Optional, Sequence
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 
 logger = logging.getLogger(__name__)
@@ -14,6 +14,7 @@ WEATHER_TOOL_KEYWORDS = [
     "空气质量", "pm2.5", "出行", "穿衣", "冷不冷", "热不热",
 ]
 ALERT_TOOL_KEYWORDS = ["预警", "警报", "告警", "气象灾害", "台风", "暴雨", "高温", "寒潮", "雷雨大风", "冰雹"]
+WEATHER_ORACLE_MODEL_PREFERENCE = ("mimo-v2.5", "MiniMax-M2.5")
 TAROT_CARD_IDS = [
     "major-00-fool",
     "major-01-magician",
@@ -171,19 +172,216 @@ def build_weather_fingerprint(weather: dict) -> str:
     )
 
 
-def select_tarot_card_id(city: str, date_key: str, weather_fingerprint: str) -> str:
+def select_tarot_card_id(subject_key: str, date_key: str, weather_fingerprint: str = "") -> str:
     import hashlib
 
-    seed = f"{city}|{date_key}|{weather_fingerprint}".encode("utf-8")
+    seed = f"{subject_key}|{date_key}".encode("utf-8")
     digest = hashlib.sha256(seed).hexdigest()
     index = int(digest[:8], 16) % len(TAROT_CARD_IDS)
     return TAROT_CARD_IDS[index]
+
+
+def select_preferred_weather_oracle_model_id(models: Sequence[object]) -> Optional[str]:
+    for preferred_id in WEATHER_ORACLE_MODEL_PREFERENCE:
+        if any(getattr(model, "id", None) == preferred_id for model in models):
+            return preferred_id
+    first_model = next(iter(models), None)
+    return getattr(first_model, "id", None)
 
 
 def format_weather_metric_value(value, unit: str = "") -> str:
     if value is None:
         return "未知"
     return f"{value}{unit}"
+
+
+def non_empty_text(value: Any) -> Optional[str]:
+    if isinstance(value, str):
+        text = value.strip()
+        return text or None
+    return None
+
+
+def parse_int_or_default(value: Any, default: int) -> int:
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        try:
+            return int(value.strip())
+        except ValueError:
+            return default
+    return default
+
+
+def strip_metric_prefix(value: str) -> str:
+    text = value.strip()
+    for separator in ("：", ":"):
+        if separator in text:
+            suffix = text.split(separator, 1)[1].strip()
+            if suffix:
+                return suffix
+    return text
+
+
+def build_weather_daily_advice(weather: dict) -> dict:
+    temperature = weather.get("temperature")
+    humidity = weather.get("humidity")
+    wind_speed = weather.get("wind_speed")
+    condition = str(weather.get("condition") or "")
+
+    rainy_keywords = ("雨", "雷", "阵雨", "降水")
+    snowy_keywords = ("雪", "冻雨")
+    hot = isinstance(temperature, (int, float)) and temperature >= 30
+    warm = isinstance(temperature, (int, float)) and 24 <= temperature < 30
+    mild = isinstance(temperature, (int, float)) and 20 <= temperature < 24
+    cool = isinstance(temperature, (int, float)) and 12 <= temperature < 20
+    cold = isinstance(temperature, (int, float)) and temperature < 12
+    humid = isinstance(humidity, (int, float)) and humidity >= 80
+    windy = isinstance(wind_speed, (int, float)) and wind_speed >= 25
+
+    if any(keyword in condition for keyword in rainy_keywords):
+        travel = "带伞出门，地面湿滑时别赶路。"
+    elif any(keyword in condition for keyword in snowy_keywords):
+        travel = "路面容易滑，通勤多留十分钟。"
+    elif hot:
+        travel = "中午少晒，外出带水和防晒。"
+    elif windy:
+        travel = "风比较大，骑车慢一点，帽子别戴太松。"
+    else:
+        travel = "正常出门就行，早晚留意临近预报。"
+
+    if cold:
+        clothing = "厚外套安排上，怕冷就加围巾。"
+    elif cool:
+        clothing = "长袖配薄外套，早晚别只穿短袖。"
+    elif hot and humid:
+        clothing = "穿透气短袖，少选闷汗面料。"
+    elif hot:
+        clothing = "短袖够用，外出加防晒衣或帽子。"
+    elif warm:
+        clothing = "短袖或薄衬衫，空调房备薄外套。"
+    elif mild:
+        clothing = "长袖或薄外套更合适，早晚别穿太少。"
+    else:
+        clothing = "穿日常衣物即可，怕冷就加一件薄外套。"
+
+    return {"travel": travel, "clothing": clothing}
+
+
+def normalize_daily_advice(raw_advice: Any, fallback: dict) -> dict:
+    daily_advice = dict(fallback)
+    if isinstance(raw_advice, dict):
+        travel = (
+            non_empty_text(raw_advice.get("travel"))
+            or non_empty_text(raw_advice.get("travel_advice"))
+            or non_empty_text(raw_advice.get("outdoor"))
+            or non_empty_text(raw_advice.get("出行"))
+            or non_empty_text(raw_advice.get("出行建议"))
+        )
+        clothing = (
+            non_empty_text(raw_advice.get("clothing"))
+            or non_empty_text(raw_advice.get("clothing_advice"))
+            or non_empty_text(raw_advice.get("dress"))
+            or non_empty_text(raw_advice.get("穿衣"))
+            or non_empty_text(raw_advice.get("穿衣建议"))
+        )
+        if travel:
+            daily_advice["travel"] = travel
+        if clothing:
+            daily_advice["clothing"] = clothing
+    else:
+        text = non_empty_text(raw_advice)
+        if text:
+            daily_advice["travel"] = text
+    return daily_advice
+
+
+def normalize_weather_oracle_model_data(card_data: dict, fallback: dict) -> dict:
+    raw_fortune = card_data.get("fortune")
+    fortune = dict(fallback["fortune"])
+    if isinstance(raw_fortune, dict):
+        for key in ("title", "summary", "lucky_color", "good_for", "avoid"):
+            text = non_empty_text(raw_fortune.get(key))
+            if text:
+                fortune[key] = text
+        fortune["lucky_number"] = parse_int_or_default(
+            raw_fortune.get("lucky_number"),
+            fortune["lucky_number"],
+        )
+    else:
+        summary = non_empty_text(raw_fortune)
+        if summary:
+            fortune["summary"] = summary
+
+    raw_mood = card_data.get("mood_guide")
+    mood_guide = dict(fallback["mood_guide"])
+    if isinstance(raw_mood, dict):
+        for key in ("title", "analysis"):
+            text = non_empty_text(raw_mood.get(key))
+            if text:
+                mood_guide[key] = text
+        suggestions = raw_mood.get("suggestions")
+        if isinstance(suggestions, list):
+            normalized_suggestions = [
+                item.strip()
+                for item in suggestions
+                if isinstance(item, str) and item.strip()
+            ]
+            if normalized_suggestions:
+                mood_guide["suggestions"] = normalized_suggestions
+        else:
+            suggestion = non_empty_text(suggestions)
+            if suggestion:
+                mood_guide["suggestions"] = [suggestion]
+    else:
+        analysis = non_empty_text(raw_mood)
+        if analysis:
+            mood_guide["analysis"] = analysis
+
+    raw_mappings = card_data.get("weather_mappings")
+    weather_mappings = [dict(item) for item in fallback["weather_mappings"]]
+    mapping_by_metric = {item["metric"]: item for item in weather_mappings}
+
+    if isinstance(raw_mappings, dict):
+        for metric, item in mapping_by_metric.items():
+            raw_value = raw_mappings.get(metric) or raw_mappings.get(item["label"])
+            if isinstance(raw_value, dict):
+                for key in ("label", "value", "reading"):
+                    text = non_empty_text(raw_value.get(key))
+                    if text:
+                        item[key] = text
+                item["score"] = parse_int_or_default(raw_value.get("score"), item["score"])
+            else:
+                text = non_empty_text(raw_value)
+                if text:
+                    item["reading"] = strip_metric_prefix(text)
+    elif isinstance(raw_mappings, list):
+        for index, raw_item in enumerate(raw_mappings):
+            if not isinstance(raw_item, dict):
+                continue
+            metric = non_empty_text(raw_item.get("metric"))
+            if not metric and index < len(weather_mappings):
+                metric = weather_mappings[index]["metric"]
+            if not metric or metric not in mapping_by_metric:
+                continue
+            item = mapping_by_metric[metric]
+            for key in ("label", "value", "reading"):
+                text = non_empty_text(raw_item.get(key))
+                if text:
+                    item[key] = text
+            item["score"] = parse_int_or_default(raw_item.get("score"), item["score"])
+
+    daily_advice = normalize_daily_advice(
+        card_data.get("daily_advice") or card_data.get("advice"),
+        fallback["daily_advice"],
+    )
+
+    return {
+        "fortune": fortune,
+        "mood_guide": mood_guide,
+        "daily_advice": daily_advice,
+        "weather_mappings": weather_mappings,
+    }
 
 # ---- 模型列表 ----
 @router.get("/models", response_model=ModelsResponse)
@@ -566,6 +764,7 @@ def generate_weather_card(
 
     from app.models.model_config import ModelConfig
 
+    user_id = current_user["user_id"]
     city = req.city.strip()
     weather = WeatherToolService.fetch_realtime_weather(city)
     if not weather:
@@ -576,34 +775,41 @@ def generate_weather_card(
 
     now = datetime.now(ZoneInfo("Asia/Shanghai"))
     date_key = now.strftime("%Y-%m-%d")
-    weather_fingerprint = build_weather_fingerprint(weather)
     deterministic_tarot_id = select_tarot_card_id(
-        weather["city"],
+        f"user:{user_id}",
         date_key,
-        weather_fingerprint,
     )
     tarot_id = req.tarot_card_id or deterministic_tarot_id
     tarot = TAROT_CARD_META.get(tarot_id) or TAROT_CARD_META[deterministic_tarot_id]
 
     model_id = req.model_id
     if not model_id:
-        first_model = db.query(ModelConfig).order_by(ModelConfig.created_at.asc()).first()
-        if not first_model:
+        models = db.query(ModelConfig).order_by(ModelConfig.created_at.asc()).all()
+        model_id = select_preferred_weather_oracle_model_id(models)
+        if not model_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="没有可用的模型配置，请先到系统设置中配置 LLM。",
             )
-        model_id = first_model.id
 
     prompt = (
         "你是天气占卜师。你不会播报天气，而是把天气参数翻译成今天的个人运势和情绪状态指南。\n"
         "只使用给定天气数据和塔罗牌，不要编造额外天气事实。\n"
-        "直接输出 JSON，不要 markdown，不要解释。\n"
+        "fortune 只围绕当天塔罗牌和日期生成，不要因为城市变化而改变当天核心指引。\n"
+        "weather_mappings 必须围绕当前城市天气数据生成，每个指标都要总结成简短能量解读。\n"
+        "daily_advice 必须基于当前城市天气数据给出当天出行和穿衣建议。"
+        "travel 和 clothing 都要像天气 App 的短提醒，每项 12 到 24 个中文字，口语、具体、能照着做；"
+        "不要写玄学比喻，不要写“根据天气”“建议”“适合”“注意安全”“按体感增减”这类空话。\n"
+        "直接输出 JSON，不要 markdown，不要解释，不要把对象字段写成字符串。\n"
         f"城市：{weather['city']}\n"
         f"日期：{date_key}，时区：Asia/Shanghai\n"
         f"天气数据：{json.dumps(weather, ensure_ascii=False)}\n"
         f"塔罗牌：{json.dumps(tarot, ensure_ascii=False)}\n"
-        "JSON 结构必须包含 fortune、mood_guide、weather_mappings。"
+        "JSON 结构必须包含："
+        "fortune={title,summary,lucky_color,lucky_number,good_for,avoid}；"
+        "mood_guide={title,analysis,suggestions}；"
+        "daily_advice={travel,clothing}；"
+        "weather_mappings=[{metric,label,value,reading,score}]。"
     )
 
     fallback = {
@@ -620,6 +826,7 @@ def generate_weather_card(
             "analysis": "天气信号偏向内收，适合减少无效沟通，把精力留给真正需要处理的事。",
             "suggestions": ["留二十分钟独处", "喝点热饮", "把决定放到明天"],
         },
+        "daily_advice": build_weather_daily_advice(weather),
         "weather_mappings": [
             {
                 "metric": "temperature",
@@ -661,24 +868,34 @@ def generate_weather_card(
         "tarot": tarot,
         "fortune": fallback["fortune"],
         "mood_guide": fallback["mood_guide"],
+        "daily_advice": fallback["daily_advice"],
         "weather_mappings": fallback["weather_mappings"],
     }
     try:
-        llm = get_llm(model_id, temperature=0.7, streaming=False, db=db)
+        llm = get_llm(
+            model_id,
+            temperature=0.7,
+            streaming=False,
+            db=db,
+            timeout=10.0,
+            max_retries=0,
+        )
         resp = llm.invoke(prompt)
         card_data = json.loads(clean_json_object_text(resp.content))
-        response_payload = {
+        normalized_card_data = normalize_weather_oracle_model_data(card_data, fallback)
+        model_payload = {
             "city": weather["city"],
             "date": date_key,
             "timezone": "Asia/Shanghai",
             "updated_at": now.isoformat(),
             "weather": weather,
             "tarot": tarot,
-            "fortune": card_data["fortune"],
-            "mood_guide": card_data["mood_guide"],
-            "weather_mappings": card_data["weather_mappings"],
+            "fortune": normalized_card_data["fortune"],
+            "mood_guide": normalized_card_data["mood_guide"],
+            "daily_advice": normalized_card_data["daily_advice"],
+            "weather_mappings": normalized_card_data["weather_mappings"],
         }
-        return WeatherCardResponse.model_validate(response_payload, strict=True)
+        return WeatherCardResponse.model_validate(model_payload, strict=True)
     except HTTPException:
         raise
     except Exception:

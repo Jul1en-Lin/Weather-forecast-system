@@ -36,33 +36,56 @@
     <!-- Decorative divider -->
     <div class="oracle-divider"></div>
 
-    <!-- Metaphorical Footer -->
+    <!-- Daily advice footer -->
     <div class="metric-footer-quote">
-      <span class="sparkle-icon">✨</span>
-      <span>今日风向：<strong>{{ windDirection || '和风' }}</strong>，带走你 <strong>{{ worryReductionPercent }}%</strong> 的烦恼。</span>
+      <div class="wind-line">
+        <span class="sparkle-icon">✨</span>
+        <span>今日风向：<strong>{{ windDirection || '和风' }}</strong></span>
+      </div>
+      <div class="advice-lines">
+        <p>
+          <span class="advice-label">出行：</span>
+          <span>{{ dailyTravelAdvice }}</span>
+        </p>
+        <p>
+          <span class="advice-label">穿衣：</span>
+          <span>{{ dailyClothingAdvice }}</span>
+        </p>
+      </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { WeatherOracleMapping } from '../../types/weatherOracle'
+import type { WeatherOracleDailyAdvice, WeatherOracleMapping } from '../../types/weatherOracle'
 
 const props = defineProps<{
   mappings: WeatherOracleMapping[]
   windDirection?: string
+  dailyAdvice?: WeatherOracleDailyAdvice
 }>()
 
-// Calculate worry reduction based on wind speed score
-const worryReductionPercent = computed(() => {
+const windSpeed = computed(() => {
   const windMetric = props.mappings.find(m => m.metric === 'wind_speed')
-  if (!windMetric) return 3
+  if (!windMetric) return null
+  const parsed = parseFloat(windMetric.value)
+  return Number.isFinite(parsed) ? parsed : null
+})
 
-  // Extract number from value string like "12 km/h" or "未知"
-  const valNum = parseFloat(windMetric.value) || 5
-  // Map value to worry reduction: e.g. 5 km/h -> 2%, 15 km/h -> 6%, 25 km/h -> 10%
-  const pct = Math.min(10, Math.max(1, Math.round(valNum / 2.5)))
-  return pct
+const dailyTravelAdvice = computed(() => {
+  const advice = props.dailyAdvice?.travel?.trim()
+  if (advice) return advice
+  if (windSpeed.value !== null && windSpeed.value >= 25) {
+    return '风比较大，骑车慢一点，帽子别戴太松。'
+  }
+  return '正常出门就行，早晚留意临近预报。'
+})
+
+const dailyClothingAdvice = computed(() => {
+  const advice = props.dailyAdvice?.clothing?.trim()
+  if (advice) return advice
+  return '穿日常衣物即可，怕冷就加一件薄外套。'
 })
 </script>
 
@@ -211,23 +234,47 @@ const worryReductionPercent = computed(() => {
   animation: fillProgress 850ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
-/* Metaphorical Footer */
 .metric-footer-quote {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 22px;
+  row-gap: 8px;
+  align-items: start;
   font-size: 13.5px;
   color: var(--oracle-faint);
-  padding: 4px 8px;
+  padding: 4px 8px 2px;
+  line-height: 1.7;
+}
+
+.wind-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 .sparkle-icon {
   font-size: 14px;
-  animation: float-mystical 3s ease-in-out infinite;
 }
 
 .metric-footer-quote strong {
   color: var(--oracle-gold);
+}
+
+.advice-label {
+  color: var(--oracle-gold);
+  font-weight: 700;
+}
+
+.advice-lines {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.advice-lines p {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 /* Responsive Grid styling */
@@ -243,6 +290,10 @@ const worryReductionPercent = computed(() => {
   }
   .metric-block {
     padding: 14px;
+  }
+  .metric-footer-quote {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 }
 </style>

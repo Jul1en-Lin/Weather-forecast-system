@@ -59,6 +59,7 @@
             v-if="reading"
             :mappings="reading.weather_mappings"
             :wind-direction="reading.weather.wind_direction"
+            :daily-advice="reading.daily_advice"
           />
 
           <!-- Mood Guide Row -->

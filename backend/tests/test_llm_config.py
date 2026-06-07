@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import patch
 
@@ -53,6 +54,40 @@ class LLMConfigTests(unittest.TestCase):
             streaming=False,
             temperature=0.2,
         )
+
+    def test_get_llm_passes_optional_timeout_and_retry_config(self):
+        settings.update_config(deepseek_api_key="sk-runtime-deepseek")
+
+        with patch("app.services.llm.ChatOpenAI") as chat_openai:
+            get_llm(
+                "deepseek-v4-flash",
+                temperature=0.2,
+                streaming=False,
+                timeout=12.0,
+                max_retries=0,
+            )
+
+        chat_openai.assert_called_once_with(
+            model="deepseek-v4-flash",
+            base_url="https://api.deepseek.com/v1",
+            api_key="sk-runtime-deepseek",
+            streaming=False,
+            temperature=0.2,
+            timeout=12.0,
+            max_retries=0,
+        )
+
+    def test_get_llm_ignores_invalid_ipv6_no_proxy_entry(self):
+        settings.update_config(minimax_api_key="sk-runtime-minimax")
+
+        env = {
+            "NO_PROXY": "127.0.0.1,localhost,::1,127.0.0.0/8,::1/128",
+            "no_proxy": "127.0.0.1,localhost,::1,127.0.0.0/8,::1/128",
+        }
+        with patch.dict(os.environ, env):
+            llm = get_llm("MiniMax-M2.5", streaming=False)
+
+        self.assertEqual(llm.model_name, "MiniMax-M2.5")
 
 
 if __name__ == "__main__":

@@ -70,6 +70,11 @@ class WeatherOracleMoodGuide(BaseModel):
     suggestions: List[str]
 
 
+class WeatherOracleDailyAdvice(BaseModel):
+    travel: str
+    clothing: str
+
+
 class WeatherOracleMapping(BaseModel):
     metric: str
     label: str
@@ -87,4 +92,5 @@ class WeatherCardResponse(BaseModel):
     tarot: WeatherOracleTarot
     fortune: WeatherOracleFortune
     mood_guide: WeatherOracleMoodGuide
+    daily_advice: WeatherOracleDailyAdvice
     weather_mappings: List[WeatherOracleMapping]

@@ -1,4 +1,5 @@
 import re
+import httpx
 from typing import AsyncIterator
 from langchain_openai import ChatOpenAI
 from app.config import settings
@@ -94,6 +95,7 @@ def get_llm(
     db: Session = None,
     timeout=None,
     max_retries=None,
+    use_env_proxy: bool = True,
 ) -> ChatOpenAI:
     config = get_model_config(model_id, db=db)
     kwargs = dict(
@@ -108,6 +110,9 @@ def get_llm(
         kwargs["timeout"] = timeout
     if max_retries is not None:
         kwargs["max_retries"] = max_retries
+    if not use_env_proxy:
+        kwargs["http_client"] = httpx.Client(trust_env=False)
+        return ChatOpenAI(**kwargs)
     with httpx_compatible_proxy_env():
         return ChatOpenAI(**kwargs)
 

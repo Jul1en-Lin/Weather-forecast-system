@@ -2,9 +2,9 @@
 
 ## Current goal
 
-Goal: Keep Weather Oracle daily tarot fixed while city changes update weather data.
+Goal: Improve Weather Oracle tarot metadata used by model prompts.
 
-Status: Daily tarot now stays fixed per user and Shanghai date; city switching returns weather data without the request-failed banner, even when the model returns a non-schema JSON shape or times out.
+Status: Backend now sends a very compact selected-card tarot prompt to the model, disables environment proxy for Weather Oracle model calls, uses lower temperature, and allows 20 seconds for `mimo-v2.5` to respond.
 
 ## Done
 
@@ -68,6 +68,12 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Replaced the WeatherMetricGrid fake "带走烦恼百分比" wind footer with model-backed daily travel and clothing advice from the Weather Oracle weather-card response.
 - Adjusted the WeatherMetricGrid daily advice footer into a two-line layout and rewrote fallback travel/clothing copy to sound more direct and practical.
 - Redesigned the register page (`src/views/Register.vue`) completely to match the exact visual style, background, glassmorphism, theme toggle, and fonts as the redesigned `Login.vue`, but with registration form fields (Username, Password, Confirm Password, Register button, Switch link, and Footer policy text).
+- Added backend Weather Oracle tarot metadata for all 78 cards, including names, keywords, core meaning, shadow meaning, mood angle, weather-oracle hint, and response style guidance.
+- Updated `/api/v1/assistant/weather-card` prompt input so the model receives the selected card's full meaning data instead of only the card id and generic keywords.
+- Added regression tests proving the backend tarot metadata contains real card meanings and the weather-card prompt includes selected-card meaning fields.
+- Shortened the Weather Oracle model prompt to only request `fortune` and `mood_guide` from a compact selected-card/weather payload; `daily_advice` and `weather_mappings` continue to use backend fallback unless the model returns them.
+- Changed the weather-card LLM call to `temperature=0.3`, `timeout=20.0`, `max_retries=0`, and `use_env_proxy=False`.
+- Added an LLM regression test proving `get_llm(..., use_env_proxy=False)` creates an `httpx.Client(trust_env=False)`.
 
 ## In progress
 
@@ -85,6 +91,8 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Browser automation tools were not available in this turn; visual verification should be done by refreshing `/oracle` in the existing Chrome page.
 - Authenticated `/api/v1/assistant/weather-card` check for Shanghai and Jiangmen returned the same tarot id (`swords-06-six`) and different weather temperatures, confirming card stability and city data refresh.
 - Authenticated `/api/v1/assistant/weather-card` check for Jiangmen without `model_id` now returns HTTP 200 in about 10.9s with weather values and four mappings; `mimo-v2.5` did not respond before the 10s weather-card timeout in that check, so fallback copy was used for readings.
+- Kimi should not be used for live checks because the current account is out of balance; use `mimo-v2.5` for Weather Oracle runtime tests.
+- Live `mimo-v2.5` checks with environment proxy disabled confirmed small JSON prompts can return in about 2 seconds, but Weather Oracle prompt calls still timed out at 20 seconds in two local endpoint checks and returned fallback.
 
 ## Checkpoints
 
@@ -158,6 +166,16 @@ Status: Daily tarot now stays fixed per user and Shanghai date; city switching r
 - Ran `npm run build` successfully after the WeatherMetricGrid footer layout update.
 - Ran `npm run build` successfully after redesigning the Login page UI.
 - Ran `npm run build` successfully after redesigning the Register page UI.
+- Ran focused Weather Oracle metadata regression tests after adding backend tarot meanings.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests/test_weather_card.py -q` (`13 passed, 4 warnings`).
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests -q` (`31 passed, 4 warnings`).
+- Ran `npm run build` successfully after backend tarot prompt updates.
+- Ran `git diff --check` successfully.
+- Ran focused no-proxy and compact-prompt regression tests after changing Weather Oracle model call settings.
+- Ran live authenticated `/api/v1/assistant/weather-card` checks with `model_id=mimo-v2.5`; response stayed HTTP 200 but used fallback after 20-second model read timeout.
+- Ran `PYTHONPATH=. venv/bin/python -m pytest tests -q` (`33 passed, 4 warnings`) after no-proxy, 20-second timeout, and compact prompt updates.
+- Ran `npm run build` successfully after the final Weather Oracle model-call updates.
+- Ran `git diff --check` successfully after the final Weather Oracle model-call updates.
 
 ## Next actions
 

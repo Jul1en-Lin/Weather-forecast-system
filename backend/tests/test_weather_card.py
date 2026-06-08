@@ -7,8 +7,10 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.routers.assistant import (
+    TAROT_CARD_META,
     build_weather_fingerprint,
     build_weather_daily_advice,
+    build_weather_oracle_prompt,
     clean_json_object_text,
     select_tarot_card_id,
     select_preferred_weather_oracle_model_id,
@@ -72,6 +74,50 @@ class WeatherCardHelperTests(unittest.TestCase):
             select_preferred_weather_oracle_model_id([SimpleNamespace(id="kimi-k2.5")]),
             "kimi-k2.5",
         )
+
+    def test_tarot_card_meta_contains_complete_deck_meanings(self):
+        self.assertEqual(len(TAROT_CARD_META), 78)
+
+        lovers = TAROT_CARD_META["major-06-lovers"]
+        self.assertEqual(lovers["name_en"], "The Lovers")
+        self.assertEqual(lovers["name_zh"], "恋人")
+        self.assertEqual(lovers["arcana"], "major")
+        self.assertEqual(lovers["rank"], "6")
+        self.assertEqual(lovers["keywords"], ["选择", "关系", "协调"])
+        self.assertIn("关系", lovers["core_meaning"])
+        self.assertIn("选择", lovers["weather_oracle_hint"])
+
+        ace_of_cups = TAROT_CARD_META["cups-01-ace"]
+        self.assertEqual(ace_of_cups["name_en"], "Ace of Cups")
+        self.assertEqual(ace_of_cups["name_zh"], "圣杯一")
+        self.assertEqual(ace_of_cups["suit"], "cups")
+        self.assertIn("情绪", ace_of_cups["core_meaning"])
+        self.assertIn("感受", ace_of_cups["weather_oracle_hint"])
+
+    def test_weather_oracle_prompt_stays_compact_with_card_meaning(self):
+        weather = {
+            "city": "杭州",
+            "temperature": 23,
+            "humidity": 78,
+            "pressure": 1004,
+            "wind_speed": 17,
+            "wind_direction": "东风",
+            "condition": "阴",
+            "observed_at": "2026-06-08T00:28+08:00",
+        }
+
+        prompt = build_weather_oracle_prompt(
+            weather=weather,
+            date_key="2026-06-08",
+            tarot=TAROT_CARD_META["major-06-lovers"],
+        )
+
+        self.assertLess(len(prompt), 800)
+        self.assertIn("恋人", prompt)
+        self.assertIn("The Lovers", prompt)
+        self.assertIn("core_meaning", prompt)
+        self.assertIn("weather_oracle_hint", prompt)
+        self.assertIn("fortune={title,summary,lucky_color,lucky_number,good_for,avoid}", prompt)
 
 
 class WeatherCardEndpointTests(unittest.TestCase):
@@ -146,7 +192,16 @@ class WeatherCardEndpointTests(unittest.TestCase):
         self.assertEqual(len(data["weather_mappings"]), 4)
         self.assertEqual(data["daily_advice"]["travel"], "云量偏多，通勤正常，长时间户外记得看路况。")
         self.assertEqual(data["daily_advice"]["clothing"], "体感清爽，薄外套加长袖更舒服。")
-        self.assertIn("daily_advice={travel,clothing}", fake_llm.prompt)
+        self.assertNotIn("daily_advice={travel,clothing}", fake_llm.prompt)
+        self.assertNotIn("weather_mappings=[", fake_llm.prompt)
+        self.assertIn("The Star", fake_llm.prompt)
+        self.assertIn("星星", fake_llm.prompt)
+        self.assertIn("希望", fake_llm.prompt)
+        self.assertIn("core_meaning", fake_llm.prompt)
+        self.assertIn("weather_oracle_hint", fake_llm.prompt)
+        self.assertEqual(get_llm.call_args.kwargs["timeout"], 20.0)
+        self.assertEqual(get_llm.call_args.kwargs["max_retries"], 0)
+        self.assertFalse(get_llm.call_args.kwargs["use_env_proxy"])
 
     @patch("app.routers.assistant.get_llm")
     @patch("app.services.weather_tool.WeatherToolService.fetch_realtime_weather")

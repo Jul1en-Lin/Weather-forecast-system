@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import Any, List, Optional, Sequence
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from app.data.tarot_cards import TAROT_CARD_IDS, TAROT_CARD_META
 
 logger = logging.getLogger(__name__)
 
@@ -15,96 +16,6 @@ WEATHER_TOOL_KEYWORDS = [
 ]
 ALERT_TOOL_KEYWORDS = ["预警", "警报", "告警", "气象灾害", "台风", "暴雨", "高温", "寒潮", "雷雨大风", "冰雹"]
 WEATHER_ORACLE_MODEL_PREFERENCE = ("mimo-v2.5", "MiniMax-M2.5")
-TAROT_CARD_IDS = [
-    "major-00-fool",
-    "major-01-magician",
-    "major-02-high-priestess",
-    "major-03-empress",
-    "major-04-emperor",
-    "major-05-hierophant",
-    "major-06-lovers",
-    "major-07-chariot",
-    "major-08-strength",
-    "major-09-hermit",
-    "major-10-wheel-of-fortune",
-    "major-11-justice",
-    "major-12-hanged-man",
-    "major-13-death",
-    "major-14-temperance",
-    "major-15-devil",
-    "major-16-tower",
-    "major-17-star",
-    "major-18-moon",
-    "major-19-sun",
-    "major-20-judgement",
-    "major-21-world",
-    "wands-01-ace",
-    "wands-02-two",
-    "wands-03-three",
-    "wands-04-four",
-    "wands-05-five",
-    "wands-06-six",
-    "wands-07-seven",
-    "wands-08-eight",
-    "wands-09-nine",
-    "wands-10-ten",
-    "wands-11-king",
-    "wands-12-knight",
-    "wands-13-page",
-    "wands-14-queen",
-    "cups-01-ace",
-    "cups-02-two",
-    "cups-03-three",
-    "cups-04-four",
-    "cups-05-five",
-    "cups-06-six",
-    "cups-07-seven",
-    "cups-08-eight",
-    "cups-09-nine",
-    "cups-10-ten",
-    "cups-11-king",
-    "cups-12-knight",
-    "cups-13-page",
-    "cups-14-queen",
-    "swords-01-ace",
-    "swords-02-two",
-    "swords-03-three",
-    "swords-04-four",
-    "swords-05-five",
-    "swords-06-six",
-    "swords-07-seven",
-    "swords-08-eight",
-    "swords-09-nine",
-    "swords-10-ten",
-    "swords-11-king",
-    "swords-12-knight",
-    "swords-13-page",
-    "swords-14-queen",
-    "pentacles-01-ace",
-    "pentacles-02-two",
-    "pentacles-03-three",
-    "pentacles-04-four",
-    "pentacles-05-five",
-    "pentacles-06-six",
-    "pentacles-07-seven",
-    "pentacles-08-eight",
-    "pentacles-09-nine",
-    "pentacles-10-ten",
-    "pentacles-11-king",
-    "pentacles-12-knight",
-    "pentacles-13-page",
-    "pentacles-14-queen",
-]
-TAROT_CARD_META = {
-    card_id: {
-        "id": card_id,
-        "name_en": card_id,
-        "name_zh": card_id,
-        "image": f"/tarot/cards/{card_id}.png",
-        "keywords": ["天气", "情绪", "今日指引"],
-    }
-    for card_id in TAROT_CARD_IDS
-}
 from app.dependencies import get_db_session, get_current_user
 from app.services.conversation import ConversationService
 from app.services.llm import get_llm, stream_llm_response, strip_thinking_tags, ThinkingFilter, get_model_config
@@ -382,6 +293,31 @@ def normalize_weather_oracle_model_data(card_data: dict, fallback: dict) -> dict
         "daily_advice": daily_advice,
         "weather_mappings": weather_mappings,
     }
+
+
+def build_weather_oracle_prompt(weather: dict, date_key: str, tarot: dict) -> str:
+    import json
+
+    weather_payload = {
+        "condition": weather.get("condition"),
+        "temperature": weather.get("temperature"),
+        "humidity": weather.get("humidity"),
+        "wind_speed": weather.get("wind_speed"),
+    }
+    card_payload = {
+        "name_zh": tarot.get("name_zh"),
+        "name_en": tarot.get("name_en"),
+        "keywords": tarot.get("keywords"),
+        "core_meaning": tarot.get("core_meaning"),
+        "weather_oracle_hint": tarot.get("weather_oracle_hint"),
+    }
+    return (
+        "只输出 JSON，不要 markdown。"
+        f"日期={date_key};天气={json.dumps(weather_payload, ensure_ascii=False)};"
+        f"塔罗={json.dumps(card_payload, ensure_ascii=False)};"
+        "生成 fortune={title,summary,lucky_color,lucky_number,good_for,avoid}"
+        " 和 mood_guide={title,analysis,suggestions}。"
+    )
 
 # ---- 模型列表 ----
 @router.get("/models", response_model=ModelsResponse)
@@ -792,25 +728,7 @@ def generate_weather_card(
                 detail="没有可用的模型配置，请先到系统设置中配置 LLM。",
             )
 
-    prompt = (
-        "你是天气占卜师。你不会播报天气，而是把天气参数翻译成今天的个人运势和情绪状态指南。\n"
-        "只使用给定天气数据和塔罗牌，不要编造额外天气事实。\n"
-        "fortune 只围绕当天塔罗牌和日期生成，不要因为城市变化而改变当天核心指引。\n"
-        "weather_mappings 必须围绕当前城市天气数据生成，每个指标都要总结成简短能量解读。\n"
-        "daily_advice 必须基于当前城市天气数据给出当天出行和穿衣建议。"
-        "travel 和 clothing 都要像天气 App 的短提醒，每项 12 到 24 个中文字，口语、具体、能照着做；"
-        "不要写玄学比喻，不要写“根据天气”“建议”“适合”“注意安全”“按体感增减”这类空话。\n"
-        "直接输出 JSON，不要 markdown，不要解释，不要把对象字段写成字符串。\n"
-        f"城市：{weather['city']}\n"
-        f"日期：{date_key}，时区：Asia/Shanghai\n"
-        f"天气数据：{json.dumps(weather, ensure_ascii=False)}\n"
-        f"塔罗牌：{json.dumps(tarot, ensure_ascii=False)}\n"
-        "JSON 结构必须包含："
-        "fortune={title,summary,lucky_color,lucky_number,good_for,avoid}；"
-        "mood_guide={title,analysis,suggestions}；"
-        "daily_advice={travel,clothing}；"
-        "weather_mappings=[{metric,label,value,reading,score}]。"
-    )
+    prompt = build_weather_oracle_prompt(weather, date_key, tarot)
 
     fallback = {
         "fortune": {
@@ -874,11 +792,12 @@ def generate_weather_card(
     try:
         llm = get_llm(
             model_id,
-            temperature=0.7,
+            temperature=0.3,
             streaming=False,
             db=db,
-            timeout=10.0,
+            timeout=20.0,
             max_retries=0,
+            use_env_proxy=False,
         )
         resp = llm.invoke(prompt)
         card_data = json.loads(clean_json_object_text(resp.content))

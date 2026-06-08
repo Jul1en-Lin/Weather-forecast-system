@@ -12,8 +12,10 @@ dist/
 dist-ssr
 *.local
 .local/
+.superpowers/
 
 # Docs
+docs/
 docs/**/*.pdf
 docs/archive/
 docs/generated/

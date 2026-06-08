@@ -77,6 +77,22 @@ class LLMConfigTests(unittest.TestCase):
             max_retries=0,
         )
 
+    def test_get_llm_can_disable_environment_proxy(self):
+        settings.update_config(deepseek_api_key="sk-runtime-deepseek")
+
+        with patch("app.services.llm.httpx.Client") as http_client:
+            with patch("app.services.llm.ChatOpenAI") as chat_openai:
+                get_llm(
+                    "deepseek-v4-flash",
+                    streaming=False,
+                    timeout=20.0,
+                    use_env_proxy=False,
+                )
+
+        http_client.assert_called_once_with(trust_env=False)
+        chat_openai.assert_called_once()
+        self.assertIs(chat_openai.call_args.kwargs["http_client"], http_client.return_value)
+
     def test_get_llm_ignores_invalid_ipv6_no_proxy_entry(self):
         settings.update_config(minimax_api_key="sk-runtime-minimax")
 

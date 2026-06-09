@@ -6,9 +6,14 @@
         <!-- Logo Brand -->
         <div class="oracle-header-brand" @click="router.push('/oracle')">
           <svg class="oracle-header-logo-svg" viewBox="0 0 24 24" width="28" height="28">
-            <path fill="currentColor" d="M12 2s.07.01.07.07l1.78 3.61 3.98.58c.06.01.08.08.04.12l-2.88 2.81.68 3.97c.01.06-.05.1-.1.07l-3.57-1.87-3.57 1.87c-.05.03-.11-.01-.1-.07l.68-3.97-2.88-2.81c-.04-.04-.02-.11.04-.12l3.98-.58 1.78-3.61c.01-.06.07-.07.07-.07z" />
-            <path fill="currentColor" opacity="0.5" d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zm0-1c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9-4.03 9-9 9z" />
-            <circle cx="12" cy="12" r="3" fill="currentColor" />
+            <!-- Sun (Backdrop) -->
+            <circle cx="8" cy="9" r="4" fill="currentColor" opacity="0.4" />
+            <!-- Sun rays -->
+            <path d="M8 3v2M4.46 5.46l1.42 1.42M2 9h2M4.46 12.54l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <!-- Cloud (Foreground) -->
+            <path d="M17.5 12.5a2.5 2.5 0 0 0-2.5-2.5c-.32 0-.62.06-.9.17a3.5 3.5 0 0 0-6.6 1.83 2.5 2.5 0 0 0 .5 4.5h9a2.5 2.5 0 0 0 .5-4z" fill="currentColor" />
+            <!-- AI Sparkle (Top-Right Accent) -->
+            <path d="M19 2l.75 1.75L21.5 4.5 19.75 5.25 19 7l-.75-1.75L16.5 4.5l1.75-.75L19 2z" fill="var(--oracle-gold)" />
           </svg>
           <div class="oracle-header-brand-text">
             <strong>Weather Oracle</strong>
@@ -23,9 +28,6 @@
           </router-link>
           <router-link to="/intelligent-assistant" class="oracle-header-nav-item" active-class="active">
             <span class="nav-dot"></span> 智能对话
-          </router-link>
-          <router-link to="/oracle" class="oracle-header-nav-item" active-class="active" @click="handleWeatherSearchClick">
-            <span class="nav-dot"></span> 天气查询
           </router-link>
           <router-link to="/knowledge-base" class="oracle-header-nav-item" active-class="active">
             <span class="nav-dot"></span> 知识库
@@ -141,14 +143,6 @@ async function handleLogout() {
   isDropdownOpen.value = false
   await authStore.logout()
   router.push('/login')
-}
-
-function handleWeatherSearchClick() {
-  // If we're already on the oracle page, scroll to tarot draw section or trigger dropdown focus
-  if (router.currentRoute.value.path === '/oracle') {
-    const el = document.querySelector('.oracle-city-select-trigger') as HTMLElement
-    if (el) el.click()
-  }
 }
 
 // Click outside helper to close dropdown

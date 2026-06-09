@@ -2,11 +2,17 @@
 
 ## Current goal
 
-Goal: Clean up and format Knowledge Base content to align with text-based built-in data representation.
+Goal: Complete visual polishing for weather assistant navigation bar and logo styling.
 
-Status: Completed. Removed tarot mappings, footer reference sections, and model-builtin badge elements. Structured all science articles (humidity, pressure, wind, solstices, and principles) into list format matching the temperature layout.
+Status: Completed. Replaced astrological logo with a clean sun-cloud-sparkle weather AI SVG, and deleted the redundant "天气查询" (Weather Search) navigation link and function.
 
 ## Done
+
+- Refactored Navigation and Brand Logo (OracleLayout.vue):
+  - Replaced the old astrological star/circle logo with a professional, theme-appropriate weather + AI SVG icon (a transparent sun ray backdrop, cloud foreground, and gold AI sparkle).
+  - Removed the redundant "天气查询" (Weather Search) link from the header navigation bar.
+  - Deleted the unused `handleWeatherSearchClick` handler function.
+  - Verified Vite compilation and pytest checks.
 
 - Refactored Knowledge Base content and template (KnowledgeBase.vue):
   - Removed all "趣味映射" (tarot references) from article descriptions.

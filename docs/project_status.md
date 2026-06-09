@@ -2,11 +2,17 @@
 
 ## Current goal
 
-Goal: Complete Task 4 of the dynamic weather tip implementation plan (pass weather_tip prop to OracleLeftSidebar component).
+Goal: Complete Task 5 of the dynamic weather tip implementation plan (bind dynamic tip to sidebar UI with fallback support).
 
 Status: Completed. Verified that the frontend builds successfully and committed the changes.
 
 ## Done
+
+- Completed Task 5 (frontend binding and fallback):
+  - Modified [OracleLeftSidebar.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/components/oracle/OracleLeftSidebar.vue) to import `WeatherOracleTip` type.
+  - Declared the `weatherTip` component prop.
+  - Defined the `displayTip` computed property to support the dynamic weather tip with static fallback logic.
+  - Rendered `displayTip` properties in the component template.
 
 - Completed Task 4 (frontend prop passing):
   - Passed the `:weather-tip` prop with `reading?.weather_tip` to `<OracleLeftSidebar />` in [WeatherOracle.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/WeatherOracle.vue).

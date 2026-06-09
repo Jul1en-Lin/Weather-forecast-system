@@ -257,6 +257,7 @@ onMounted(fetchUsers)
   font-weight: 600;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   border: 1px solid var(--oracle-border-soft);
+  flex-shrink: 0;
 }
 
 .user-name-role {

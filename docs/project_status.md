@@ -2,12 +2,17 @@
 
 ## Current goal
 
-Goal: Remove divination-related text from Login and Register pages.
+Goal: Update README with current screenshots, supported features, project structure, configuration, and startup guide.
 
-Status: Completed Task 1 (Modify Login Page Template and Styles) and Task 2 (Modify Register Page Template and Styles).
+Status: README has been rewritten against the current frontend/backend code and screenshot assets.
 
 ## Done
 
+- Rewrote [README.md](file:///Users/lien/GitRepo/Weather-forecast-system/README.md) to document the current app:
+  - Updated page screenshots to `docs/images/login.png`, `home-light.png`, `intelligent-assistant.png`, `setting1.png`, `setting2.png`, and `users.png`.
+  - Updated supported features for auth, Weather Oracle homepage, intelligent chat, knowledge base, settings, user management, weather tools, model/tool configuration, and session behavior.
+  - Updated tech stack, directory map, route table, API overview, environment variables, database tables, startup steps, commands, and troubleshooting notes.
+  - Updated [.gitignore](file:///Users/lien/GitRepo/Weather-forecast-system/.gitignore) to allow the new README screenshot files to be tracked.
 - Completed Task 2 (Modify Register Page Template and Styles):
   - Removed brand subtitle (`✦ 气象占卜台 ✦`) and welcome subtitle (`✦ 开启你的天气占卜之旅 ✦`) from [Register.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Register.vue).
   - Updated the welcome title to wrap stars in a span with gold color (`<span class="star-gold">✦</span> 创建您的账户 <span class="star-gold">✦</span>`) and added the `.star-gold` scoped CSS style in [Register.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Register.vue).
@@ -154,6 +159,10 @@ Status: Completed Task 1 (Modify Login Page Template and Styles) and Task 2 (Mod
 
 ## Checkpoints
 
+- Verified all README screenshot paths exist under `docs/images/`.
+- Verified README references `users.png` for the user management page.
+- Ran `git diff --check` after README and `.gitignore` edits.
+- Ran `npm run build` successfully after the README update and removed generated `dist/`.
 - Reproduced the failing path with `curl http://localhost:5174/api/v1/users`, which returned `307` and redirected to `http://localhost:8000/api/v1/users/`.
 - Verified `curl http://localhost:5174/api/v1/users/` returns directly without redirect (`401` when unauthenticated, as expected).
 - Ran `npm run build` successfully and removed the generated `dist/`.

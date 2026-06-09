@@ -25,6 +25,12 @@ docs/images/*
 !docs/images/assistant_page.png
 !docs/images/settings_page.png
 !docs/images/admin_users_page.png
+!docs/images/login.png
+!docs/images/home-light.png
+!docs/images/intelligent-assistant.png
+!docs/images/setting1.png
+!docs/images/setting2.png
+!docs/images/users.png
 
 # Editor directories and files
 .vscode/*

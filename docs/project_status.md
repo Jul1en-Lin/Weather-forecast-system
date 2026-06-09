@@ -2,11 +2,16 @@
 
 ## Current goal
 
-Goal: Complete final visual and layout adjustments on bottom cards.
+Goal: Complete visual polishing and scroll behavior corrections.
 
-Status: Completed. Removed redirection links to the knowledge base from the life weather index and travel advisory cards, and swapped the positions of the weather verse card and travel advisory card in OracleBottomCards.vue.
+Status: Completed. Added scrollBehavior configuration to Vue Router in src/router/index.ts to ensure navigation automatically scrolls to the top of the page.
 
 ## Done
+
+- Configured page scroll restoration on route change (src/router/index.ts):
+  - Added `scrollBehavior` method to Vue Router's configuration.
+  - Clicking any navigation links (such as "进入知识库" at the bottom of the dashboard) now automatically scrolls the window back to the top (`{ top: 0 }`) instead of maintaining the previous scroll level.
+  - Verified Vite compile and pytest backend test passes.
 
 - Adjusted bottom cards layout and links (OracleBottomCards.vue):
   - Removed `<router-link>` footer elements from "生活气象指数" and "出行建议" cards.

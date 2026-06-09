@@ -2,11 +2,16 @@
 
 ## Current goal
 
-Goal: Complete Task 2 of the dynamic weather tip implementation plan (implement LLM prompt & fallback for weather_tip).
+Goal: Complete Task 3 of the dynamic weather tip implementation plan (add weather_tip interface to typescript types).
 
-Status: Completed. Verified that all backend tests pass, including the new dynamic weather tip test.
+Status: Completed. Verified that the frontend builds successfully and committed the changes.
 
 ## Done
+
+- Completed Task 3 (frontend types):
+  - Added the `WeatherOracleTip` interface to `src/types/weatherOracle.ts`.
+  - Updated the `WeatherOracleReading` interface to include the `weather_tip` field.
+  - Verified successful Vite frontend compilation and committed the changes.
 
 - Implemented dynamic weather tip backend prompt and fallback logic (backend/app/routers/assistant.py):
   - Added helper function `build_fallback_weather_tip()` returning one of the 12 weather tips based on `datetime.now().day`.
@@ -15,6 +20,7 @@ Status: Completed. Verified that all backend tests pass, including the new dynam
   - Updated `generate_weather_card` to include `weather_tip` in the fallback, response payload, and model payload.
 - Added comprehensive endpoint test `test_weather_tip_generation_and_fallback(self)` in `backend/tests/test_weather_card.py` verifying both success and fallback modes.
 - Ran pytest suite ensuring all 37 backend tests pass.
+
 
 - Fixed logo border glow box issue (OracleLayout.vue):
   - Created a scoped keyframe animation `pulse-logo-glow` that uses SVG `filter: drop-shadow` and `opacity` modulation.

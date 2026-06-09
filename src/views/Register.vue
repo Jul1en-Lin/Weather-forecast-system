@@ -11,13 +11,11 @@
           </svg>
         </div>
         <h1 class="brand-title">Weather Oracle</h1>
-        <p class="brand-subtitle">✦ 气象占卜台 ✦</p>
       </div>
 
       <!-- Welcome Banner -->
       <div class="welcome-banner">
-        <h2 class="welcome-title">创建您的账户</h2>
-        <p class="welcome-subtitle">✦ 开启你的天气占卜之旅 ✦</p>
+        <h2 class="welcome-title"><span class="star-gold">✦</span> 创建您的账户 <span class="star-gold">✦</span></h2>
       </div>
 
       <form @submit.prevent="handleRegister" class="register-form">
@@ -316,15 +314,6 @@ const handleRegister = async () => {
   color: var(--text-color);
 }
 
-.brand-subtitle {
-  font-family: 'Marcellus', Georgia, serif;
-  font-size: 12px;
-  color: var(--gold-color);
-  letter-spacing: 0.25em;
-  margin: 4px 0 0 0;
-  text-transform: uppercase;
-}
-
 .welcome-banner {
   text-align: center;
   margin-bottom: 24px;
@@ -339,10 +328,8 @@ const handleRegister = async () => {
   letter-spacing: 0.05em;
 }
 
-.welcome-subtitle {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin: 4px 0 0 0;
+.star-gold {
+  color: var(--gold-color);
 }
 
 .register-form {

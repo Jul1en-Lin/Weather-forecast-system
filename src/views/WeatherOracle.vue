@@ -22,7 +22,7 @@
 
         <!-- Left Column: Navigation & Astrological status -->
         <div class="grid-left-col">
-          <OracleLeftSidebar />
+          <OracleLeftSidebar :weather-tip="reading?.weather_tip" />
         </div>
 
         <!-- Middle Column: Tarot banner, weather mapping list, checklist -->

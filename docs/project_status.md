@@ -2,11 +2,14 @@
 
 ## Current goal
 
-Goal: Complete Task 3 of the dynamic weather tip implementation plan (add weather_tip interface to typescript types).
+Goal: Complete Task 4 of the dynamic weather tip implementation plan (pass weather_tip prop to OracleLeftSidebar component).
 
 Status: Completed. Verified that the frontend builds successfully and committed the changes.
 
 ## Done
+
+- Completed Task 4 (frontend prop passing):
+  - Passed the `:weather-tip` prop with `reading?.weather_tip` to `<OracleLeftSidebar />` in [WeatherOracle.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/WeatherOracle.vue).
 
 - Completed Task 3 (frontend types):
   - Added the `WeatherOracleTip` interface to `src/types/weatherOracle.ts`.

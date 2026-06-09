@@ -32,9 +32,18 @@
 
       <div class="moon-phase-display">
         <!-- SVG Weather Graphic -->
-        <svg viewBox="0 0 24 24" width="72" height="72" class="moon-svg" style="color: var(--oracle-gold);">
-          <circle cx="12" cy="8" r="4" fill="currentColor" />
-          <path fill="currentColor" opacity="0.85" d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z" />
+        <svg viewBox="0 0 100 100" width="72" height="72" class="moon-svg">
+          <defs>
+            <radialGradient id="weatherGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff" stop-opacity="0.8" />
+              <stop offset="60%" stop-color="#fff8d6" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#d7ae69" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.03)" stroke="var(--oracle-border-soft)" stroke-width="1" />
+          <circle cx="50" cy="50" r="30" fill="url(#weatherGlow)" class="glow-circle" />
+          <circle cx="50" cy="50" r="20" fill="none" stroke="var(--oracle-gold)" stroke-width="1.5" stroke-dasharray="4 3" />
+          <path d="M 35 65 A 10 10 0 0 1 45 55 A 12 12 0 0 1 67 55 A 10 10 0 0 1 77 65 Z" fill="rgba(255,255,255,0.15)" stroke="var(--oracle-gold)" stroke-width="1" />
         </svg>
       </div>
 
@@ -47,11 +56,29 @@
         </router-link>
       </div>
     </div>
+
+    <!-- Weather Verse Scroll Card -->
+    <div class="verse-card oracle-surface oracle-gold-corners">
+      <span class="oracle-eyebrow">Weather Verse</span>
+      <h3 class="card-title">天气签文</h3>
+
+      <div class="verse-scroll-display">
+        <span class="verse-scroll-icon">📜</span>
+      </div>
+
+      <p class="verse-content-text">&ldquo;{{ currentVerse }}&rdquo;</p>
+
+      <div class="verse-footer">
+        <button type="button" class="change-verse-btn" @click="rotateVerse">
+          换一签 🔄
+        </button>
+      </div>
+    </div>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import type { WeatherOracleTip } from '../../types/weatherOracle'
 import { useAuthStore } from '../../stores/auth'
 
@@ -89,6 +116,42 @@ const displayTip = computed(() => {
 function handleSearchTrigger() {
   const el = document.querySelector('.oracle-city-select-trigger') as HTMLElement
   if (el) el.click()
+}
+
+// Weather verse data
+const verses = [
+  '云卷云舒皆有意，雨落雨停总相宜。心若明朗，处处晴晴。',
+  '长风破浪会有时，直挂云帆济沧海。今日有风，宜勇往直前。',
+  '随风潜入夜，漴物细无声。静待雨露滋润，思绪自然通达。',
+  '千山鸟飞绝，万径人踪灭。适宜静坐内省，归零后再出发。',
+  '东边日出西边雨，道是无晴却有晴。得失随缘，一切皆是最好安排。',
+  '山重水复疑无路，柳暗花明又一村。拨云见日，微光在前。',
+  '海阔凭鱼跃，天高任鸟飞。晴空万里，宜施展才干。',
+  '清风徐来，水波不兴。理顺呼吸，以平常心静观万物之变。',
+  '露从今夜白，月是故乡明。夹空寂静，宜与重要的人互致问候。',
+  '志如一夜春风来，千树万树梨花开。灵感如雪花，静静承接即可。',
+  '青笻筠，绳蜟衣，斜风细雨不须归。细雨斜飞，亦是诗意人生。',
+  '好雨知时节，当春水发生。顺应天时，正是积蓄力量的时刻。',
+  '天街小雨润如酯，草色遥看近却无。留意细微之处，惊喜正在醝酿。',
+  '回首向来耙煅处，归去，也无风雨也无晴。超然物外，心宽自安。',
+  '月落乌啊霜满天，江枫渔火对愁眠。虽有清冷凝霜，沉静思索更显珍贵。',
+  '昨夜星辰昨夜风，画楼西畜桂堂东。微风掠过，带走思绪中的繁杂。',
+  '水光潋滣晴方好，山色空蒙雨亦奇。晴雨皆是风景，接纳生活的全部面貌。',
+  '沿衣欲湿杏花雨，吹面不寒杨柳风。微风拂面，适宜放松身心，去户外走走。',
+  '千里黄云白日曲，北风吹雁雪纷纷。风雪虽急，信念坚定即可驱散寒意。',
+  '小楼一夜听春雨，深巷明朝卖杏花。雨后必有晴天，静候生活的美好结放。',
+  '行到水穷处，坐看云起时。不必急于求成，静观风起云溌。',
+  '明月别枝惊鹊，清风半夜鸣蝉。夏夜清凁，宜安枕无忧。',
+  '春风得意马蹄疾，一日看尽长安花。风和日丽，正是拼搯奋进的大好时机。',
+  '溪云初起日沉阁，山雨欲来风满楼。风起之时，宜沉着应对，做好万全准备。',
+  '白日依山尽，黄河入海流。欲穷千里目，更上一层楼。前路开阔，勇往直前。'
+]
+
+const currentVerseIndex = ref(new Date().getDate() % verses.length)
+const currentVerse = computed(() => verses[currentVerseIndex.value])
+
+function rotateVerse() {
+  currentVerseIndex.value = (currentVerseIndex.value + 1) % verses.length
 }
 </script>
 
@@ -204,5 +267,55 @@ function handleSearchTrigger() {
 .view-detail-link:hover {
   color: var(--oracle-gold-strong);
   transform: translateX(2px);
+}
+.verse-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.verse-scroll-display {
+  display: grid;
+  place-items: center;
+  padding: 6px 0;
+  font-size: 32px;
+  filter: drop-shadow(0 0 6px var(--oracle-gold-glow));
+}
+
+.verse-content-text {
+  font-family: var(--oracle-font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--oracle-faint);
+  line-height: 1.75;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.verse-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.change-verse-btn {
+  font-size: 11px;
+  color: var(--oracle-gold);
+  background: var(--oracle-panel-soft);
+  border: 1px solid var(--oracle-border-soft);
+  border-radius: 12px;
+  padding: 5px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.change-verse-btn:hover {
+  border-color: var(--oracle-gold);
+  color: var(--oracle-gold-strong);
+  background: var(--oracle-panel);
+  box-shadow: 0 0 6px var(--oracle-gold-glow);
 }
 </style>

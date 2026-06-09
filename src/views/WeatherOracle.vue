@@ -78,10 +78,7 @@
         </div>
       </div>
 
-      <!-- Bottom Row: 4 detailed rating cards -->
-      <div class="oracle-dashboard-bottom-row">
-        <OracleBottomCards :lucky-number="reading?.fortune.lucky_number" />
-      </div>
+
 
     </div>
   </OracleLayout>
@@ -96,7 +93,6 @@ import TarotCardDisplay from '../components/oracle/TarotCardDisplay.vue'
 import WeatherMetricGrid from '../components/oracle/WeatherMetricGrid.vue'
 import MoodGuidePanel from '../components/oracle/MoodGuidePanel.vue'
 import OracleChatPanel from '../components/oracle/OracleChatPanel.vue'
-import OracleBottomCards from '../components/oracle/OracleBottomCards.vue'
 import { generateWeatherOracleReading } from '../api/weatherOracle'
 import { useAuthStore } from '../stores/auth'
 import { getTarotCardById, tarotAssetsReady } from '../data/tarotCards'

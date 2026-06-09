@@ -2,11 +2,17 @@
 
 ## Current goal
 
-Goal: Complete visual polishing for weather assistant navigation bar and logo styling.
+Goal: Verify and polish layout branding aesthetics under light and dark modes.
 
-Status: Completed. Replaced astrological logo with a clean sun-cloud-sparkle weather AI SVG, and deleted the redundant "天气查询" (Weather Search) navigation link and function.
+Status: Completed. Fixed SVG logo border glow box issue by replacing DOM box-shadow animation with path-based drop-shadow animation in OracleLayout.vue.
 
 ## Done
+
+- Fixed logo border glow box issue (OracleLayout.vue):
+  - Created a scoped keyframe animation `pulse-logo-glow` that uses SVG `filter: drop-shadow` and `opacity` modulation.
+  - Replaced the global `pulse-mystical` animation reference which applied rectangular `box-shadow` to the small SVG element.
+  - The logo now blends transparently and naturally into any theme background (dark or light mode) without box outline flickers.
+  - Verified Vite compile and pytest backend test passes.
 
 - Refactored Navigation and Brand Logo (OracleLayout.vue):
   - Replaced the old astrological star/circle logo with a professional, theme-appropriate weather + AI SVG icon (a transparent sun ray backdrop, cloud foreground, and gold AI sparkle).

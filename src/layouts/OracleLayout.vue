@@ -226,7 +226,7 @@ onUnmounted(() => {
 .oracle-header-logo-svg {
   color: var(--oracle-gold);
   filter: drop-shadow(0 0 4px var(--oracle-gold-glow));
-  animation: pulse-mystical 3s ease-in-out infinite;
+  animation: pulse-logo-glow 3s ease-in-out infinite;
 }
 
 .oracle-header-brand-text strong {
@@ -511,6 +511,17 @@ onUnmounted(() => {
 
   .oracle-main-content {
     padding: 0 16px;
+  }
+}
+
+@keyframes pulse-logo-glow {
+  0%, 100% {
+    opacity: 0.85;
+    filter: drop-shadow(0 0 2px var(--oracle-gold-glow));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px var(--oracle-gold));
   }
 }
 </style>

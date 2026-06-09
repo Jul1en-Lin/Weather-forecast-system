@@ -10,7 +10,15 @@
             :class="['tab-btn', { active: activeTab === tab.id }]"
             @click="activeTab = tab.id"
           >
-            <span class="tab-icon">{{ tab.icon }}</span>
+            <span class="tab-icon">
+              <svg v-if="tab.id === 'models'" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/>
+              </svg>
+              <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <circle cx="12" cy="8" r="4" fill="currentColor"/>
+                <path opacity="0.85" fill="currentColor" d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z" />
+              </svg>
+            </span>
             <span class="tab-text">{{ tab.label }}</span>
           </button>
         </div>
@@ -23,14 +31,19 @@
 
         <div v-else>
           <!-- 模型管理 Tab -->
-          <div v-show="activeTab === 'models'" class="settings-form">
+          <div v-show="activeTab === 'models'" class="settings-form oracle-surface oracle-gold-corners">
             <div class="section-header flex-between">
               <div class="flex-align-center">
-                <span class="section-icon">🤖</span>
+                <svg class="section-icon-svg" viewBox="0 0 24 24" width="20" height="20" style="fill: currentColor; color: var(--oracle-gold); margin-right: 6px; vertical-align: middle;">
+                  <path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/>
+                </svg>
                 <span>模型管理</span>
               </div>
               <button v-if="!showModelForm" @click="startAddModel" class="btn-add-model">
-                ➕ 添加模型
+                <svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" style="fill: currentColor; margin-right: 4px; vertical-align: middle;">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                添加模型
               </button>
             </div>
 
@@ -139,7 +152,7 @@
                   <div class="model-card-header">
                     <div class="model-title-desc">
                       <h4>{{ m.name }}</h4>
-                      <span class="model-badge" :class="{ 'local-badge': m.is_local }">
+                      <span class="badge-pill" :class="{ 'badge-pill-local': m.is_local }">
                         {{ m.is_local ? 'Ollama 本地' : '云端 API' }}
                       </span>
                     </div>
@@ -173,7 +186,10 @@
                       </div>
                       <div class="meta-row">
                         <span class="meta-label">工具支持:</span>
-                        <span class="meta-value">{{ m.supports_tools ? '✅ 支持' : '❌ 不支持' }}</span>
+                        <span class="meta-value status-indicator" :class="{ 'active': m.supports_tools }">
+                          <span class="status-dot"></span>
+                          <span class="status-text">{{ m.supports_tools ? '支持' : '不支持' }}</span>
+                        </span>
                       </div>
                       <div class="meta-row">
                         <span class="meta-label">温度:</span>
@@ -187,10 +203,13 @@
           </div>
 
           <!-- 天气服务 Tab -->
-          <div v-show="activeTab === 'tools'" class="settings-form">
+          <div v-show="activeTab === 'tools'" class="settings-form oracle-surface oracle-gold-corners">
             <div class="section-header flex-between">
               <div class="flex-align-center">
-                <span class="section-icon">🌤️</span>
+                <svg class="section-icon-svg" viewBox="0 0 24 24" width="20" height="20" style="fill: currentColor; color: var(--oracle-gold); margin-right: 6px; vertical-align: middle;">
+                  <circle cx="12" cy="8" r="4" fill="currentColor" />
+                  <path fill="currentColor" opacity="0.85" d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z" />
+                </svg>
                 <span>天气服务与工具管理</span>
               </div>
             </div>
@@ -246,7 +265,7 @@
                   <div class="model-card-header">
                     <div class="model-title-desc">
                       <h4>{{ t.name }}</h4>
-                      <span class="model-badge">系统内置</span>
+                      <span class="badge-pill badge-pill-builtin">系统内置</span>
                     </div>
                     <div class="model-card-actions">
                       <button @click="editTool(t)" class="btn-card-action edit-btn">配置 API</button>
@@ -299,8 +318,8 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const tabs = [
-  { id: 'models', label: '模型管理', icon: '🤖' },
-  { id: 'tools', label: '天气服务', icon: '🌤️' },
+  { id: 'models', label: '模型管理' },
+  { id: 'tools', label: '天气服务' },
 ]
 
 const activeTab = ref('models')

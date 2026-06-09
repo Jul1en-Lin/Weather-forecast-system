@@ -8,6 +8,12 @@ Status: Redesigned the Intelligent Assistant page to match the glassmorphic them
 
 ## Done
 
+- Redesigned the UI template elements in [Settings.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Settings.vue) (Task 1):
+  - Added `.oracle-surface` class to model and tools tab panel container forms.
+  - Replaced `.model-badge` / `.local-badge` classes with `.badge-pill` / `.badge-pill-local`.
+  - Replaced status emojis with the `.status-indicator` dot and text element.
+  - Replaced system built-in status badge with `.badge-pill.badge-pill-builtin`.
+  - Verified compilation of Vue templates via `npm run build`.
 - Redesigned the Intelligent Assistant page ([IntelligentAssistant.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/IntelligentAssistant.vue)):
   - Replaced cheap, cartoonish emojis (🤖, 🗑️, ✏️, 📋) with clean, professional SVG vector icons.
   - Aligned colors, backgrounds, borders, and input focus states with the gold-accented glassmorphic theme via CSS variables from `oracle-theme.css`.

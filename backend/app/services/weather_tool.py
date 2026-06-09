@@ -7,6 +7,7 @@ from langchain_core.tools import StructuredTool
 from app.config import settings
 from app.database import SessionLocal
 from app.models.alert import Alert
+from app.services.httpx_compat import httpx_compatible_proxy_env
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +97,15 @@ def _qweather_geo_hosts(api_host: str) -> list[str]:
     return hosts
 
 
+def _to_int_or_none(value):
+    try:
+        if value is None or value == "":
+            return None
+        return int(float(value))
+    except (TypeError, ValueError):
+        return None
+
+
 def _get_tavily_key() -> str:
     api_key, _ = _get_tool_config("weather_query")
     return api_key or settings.tavily_api_key
@@ -117,7 +127,7 @@ def _fetch_realtime_alerts(location: str = "") -> str:
         host = qweather_host
         geo_url = f"https://{host}/geo/v2/city/lookup"
         geo_params = {"location": location or "", "key": qweather_key, "number": 1}
-        with httpx.Client(timeout=10.0) as client:
+        with httpx_compatible_proxy_env(), httpx.Client(timeout=10.0) as client:
             geo_resp = client.get(geo_url, params=geo_params)
             geo_data = geo_resp.json()
             location_id = ""
@@ -156,13 +166,72 @@ def _fetch_realtime_alerts(location: str = "") -> str:
     return f"【预警信号标准定义】\n{db_result}\n\n（以上为预警信号标准定义，非实时预警）"
 
 
+def _fetch_qweather_realtime(location: str) -> Optional[dict]:
+    qweather_key, qweather_host = _get_qweather_config()
+    if not qweather_key or not location:
+        return None
+
+    try:
+        with httpx_compatible_proxy_env(), httpx.Client(timeout=10.0) as client:
+            geo_data = {}
+            for geo_host in _qweather_geo_hosts(qweather_host):
+                try:
+                    geo_resp = client.get(
+                        f"https://{geo_host}/geo/v2/city/lookup",
+                        params={"location": location, "key": qweather_key, "number": 1},
+                    )
+                    geo_data = geo_resp.json()
+                    if geo_data.get("code") == "200" and geo_data.get("location"):
+                        break
+                except Exception as e:
+                    logger.warning("QWeather geo lookup failed for %s on %s: %s", location, geo_host, e)
+                    continue
+            else:
+                logger.warning(
+                    "QWeather geo lookup returned no location for %s, code=%s",
+                    location,
+                    geo_data.get("code"),
+                )
+                return None
+
+            location_data = geo_data["location"][0]
+            location_id = location_data.get("id", "")
+            location_name = location_data.get("name", location)
+            if not location_id:
+                return None
+
+            weather_resp = client.get(
+                f"https://{qweather_host}/v7/weather/now",
+                params={"location": location_id, "key": qweather_key},
+            )
+            weather_data = weather_resp.json()
+            if weather_data.get("code") != "200" or not weather_data.get("now"):
+                logger.warning("QWeather realtime returned code %s", weather_data.get("code"))
+                return None
+
+            now = weather_data["now"]
+            return {
+                "city": location_name,
+                "temperature": _to_int_or_none(now.get("temp")),
+                "humidity": _to_int_or_none(now.get("humidity")),
+                "pressure": _to_int_or_none(now.get("pressure")),
+                "wind_speed": _to_int_or_none(now.get("windSpeed")),
+                "wind_direction": now.get("windDir") or "",
+                "condition": now.get("text") or "",
+                "observed_at": now.get("obsTime") or "",
+            }
+    except Exception as e:
+        logger.exception("QWeather realtime call failed: %s", e)
+        return None
+
+
 def _fetch_qweather_forecast(location: str, days: int) -> Optional[str]:
     qweather_key, qweather_host = _get_qweather_config()
     if not qweather_key or not location:
         return None
 
     try:
-        with httpx.Client(timeout=10.0) as client:
+        with httpx_compatible_proxy_env(), httpx.Client(timeout=10.0) as client:
             geo_data = {}
             for geo_host in _qweather_geo_hosts(qweather_host):
                 geo_resp = client.get(
@@ -252,6 +321,10 @@ class WeatherToolService:
             description="查询实时气象预警信号。参数：location（城市/地区名称，如北京、上海）、alert_type（可选，如暴雨、台风）。",
             func=_fetch_realtime_alerts,
         )
+
+    @staticmethod
+    def fetch_realtime_weather(location: str) -> Optional[dict]:
+        return _fetch_qweather_realtime(location)
 
     @staticmethod
     def format_tool_result(result) -> str:

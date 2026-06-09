@@ -1,4 +1,5 @@
 import re
+import httpx
 from typing import AsyncIterator
 from langchain_openai import ChatOpenAI
 from app.config import settings
@@ -6,6 +7,7 @@ from app.config import settings
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models.model_config import ModelConfig
+from app.services.httpx_compat import httpx_compatible_proxy_env
 
 def get_model_config(model_id: str, db: Session = None) -> dict:
     """Build a fresh model config from the database and current runtime settings."""
@@ -86,7 +88,15 @@ def get_model_config(model_id: str, db: Session = None) -> dict:
             db.close()
 
 
-def get_llm(model_id: str, temperature: float = 0.7, streaming: bool = True, db: Session = None) -> ChatOpenAI:
+def get_llm(
+    model_id: str,
+    temperature: float = 0.7,
+    streaming: bool = True,
+    db: Session = None,
+    timeout=None,
+    max_retries=None,
+    use_env_proxy: bool = True,
+) -> ChatOpenAI:
     config = get_model_config(model_id, db=db)
     kwargs = dict(
         model=config["model"],
@@ -96,7 +106,15 @@ def get_llm(model_id: str, temperature: float = 0.7, streaming: bool = True, db:
     )
     # 若模型配置中指定了 temperature，优先使用；否则用传入值
     kwargs["temperature"] = config.get("temperature") if config.get("temperature") is not None else temperature
-    return ChatOpenAI(**kwargs)
+    if timeout is not None:
+        kwargs["timeout"] = timeout
+    if max_retries is not None:
+        kwargs["max_retries"] = max_retries
+    if not use_env_proxy:
+        kwargs["http_client"] = httpx.Client(trust_env=False)
+        return ChatOpenAI(**kwargs)
+    with httpx_compatible_proxy_env():
+        return ChatOpenAI(**kwargs)
 
 def strip_thinking_tags(text: str) -> str:
     """去除 <think>...</think> 标签及其内容（非流式使用），支持过滤未闭合的思维链。"""

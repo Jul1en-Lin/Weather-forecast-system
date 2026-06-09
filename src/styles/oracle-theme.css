@@ -1,0 +1,155 @@
+:root {
+  --oracle-bg: #060b13;
+  --oracle-bg-deep: #03060a;
+  --oracle-panel: rgba(8, 16, 29, 0.85);
+  --oracle-panel-soft: rgba(14, 25, 43, 0.75);
+  --oracle-panel-solid: #08101d;
+  --oracle-border: rgba(215, 174, 105, 0.3);
+  --oracle-border-soft: rgba(246, 234, 216, 0.08);
+  --oracle-gold: #d7ae69;
+  --oracle-gold-strong: #f0ca82;
+  --oracle-gold-glow: rgba(215, 174, 105, 0.15);
+  --oracle-purple: #8e6ec2;
+  --oracle-purple-soft: rgba(142, 110, 194, 0.15);
+  --oracle-blue: #5b9bf5;
+  --oracle-text: #f5ebd9;
+  --oracle-muted: #af9f87;
+  --oracle-faint: rgba(245, 235, 217, 0.65);
+  --oracle-danger: #cf6e5b;
+  --oracle-success: #54bfa3;
+  --oracle-shadow: 0 15px 45px rgba(0, 0, 0, 0.45);
+  --oracle-sidebar-width: 248px;
+  --oracle-radius: 12px;
+  --oracle-radius-inner: 8px;
+  --oracle-font-serif: 'Marcellus', 'Playfair Display', Georgia, serif;
+  --oracle-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --oracle-font-display: 'Cinzel', serif;
+  --oracle-bg-pattern: url('/mystical_bg_dark.png');
+}
+
+[data-oracle-theme='light'] {
+  --oracle-bg: #fefcf8;
+  --oracle-bg-deep: #fefcf8;
+  --oracle-panel: rgba(253, 249, 243, 0.92);
+  --oracle-panel-soft: rgba(253, 249, 243, 0.80);
+  --oracle-panel-solid: #fdf9f3;
+  --oracle-border: rgba(180, 140, 85, 0.32);
+  --oracle-border-soft: rgba(74, 58, 37, 0.08);
+  --oracle-gold: #b28542;
+  --oracle-gold-strong: #8c6022;
+  --oracle-gold-glow: rgba(180, 140, 85, 0.08);
+  --oracle-purple: #7457a4;
+  --oracle-purple-soft: rgba(116, 87, 164, 0.08);
+  --oracle-blue: #3b6ba5;
+  --oracle-text: #3c3020;
+  --oracle-muted: #8c7b64;
+  --oracle-faint: rgba(60, 48, 32, 0.68);
+  --oracle-danger: #ad503f;
+  --oracle-success: #378a68;
+  --oracle-shadow: 0 15px 35px rgba(140, 110, 80, 0.08);
+  --oracle-bg-pattern: url('/mystical_bg_light.png');
+}
+
+/* Base resets in layout context */
+.oracle-layout {
+  font-family: var(--oracle-font-sans);
+}
+
+.oracle-surface {
+  border: 1px solid var(--oracle-border);
+  border-radius: var(--oracle-radius);
+  background:
+    linear-gradient(135deg, rgba(215, 174, 105, 0.04), transparent 50%),
+    var(--oracle-panel);
+  box-shadow: var(--oracle-shadow);
+  backdrop-filter: blur(16px);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.oracle-surface:hover {
+  border-color: var(--oracle-gold);
+  box-shadow: 0 15px 40px var(--oracle-gold-glow);
+}
+
+.oracle-eyebrow {
+  color: var(--oracle-gold);
+  font-family: var(--oracle-font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.oracle-muted {
+  color: var(--oracle-muted);
+}
+
+.oracle-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--oracle-border), transparent);
+}
+
+/* Mystical Details */
+.oracle-card-header {
+  border-bottom: 1px solid var(--oracle-border-soft);
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  font-family: var(--oracle-font-serif);
+}
+
+/* Animations */
+@keyframes float-mystical {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pulse-mystical {
+  0%, 100% {
+    opacity: 0.8;
+    box-shadow: 0 0 10px var(--oracle-gold-glow);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 20px var(--oracle-border);
+  }
+}
+
+.anim-float {
+  animation: float-mystical 4s ease-in-out infinite;
+}
+
+.anim-pulse {
+  animation: pulse-mystical 3s ease-in-out infinite;
+}
+
+/* Gold corner decorations for premium panels */
+.oracle-gold-corners::before,
+.oracle-gold-corners::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--oracle-gold);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.7;
+}
+
+.oracle-gold-corners::before {
+  top: 6px;
+  left: 6px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.oracle-gold-corners::after {
+  bottom: 6px;
+  right: 6px;
+  border-left: none;
+  border-top: none;
+}

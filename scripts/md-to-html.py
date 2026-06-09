@@ -1,9 +1,18 @@
-import markdown
-import os
+import argparse
+from pathlib import Path
 
-# Read markdown
-with open("项目汇报文档.md", "r", encoding="utf-8") as f:
-    md_text = f.read()
+import markdown
+
+
+parser = argparse.ArgumentParser(description="Convert a Markdown file to a styled HTML file.")
+parser.add_argument("input", help="Markdown input path")
+parser.add_argument("-o", "--output", help="HTML output path. Defaults to the input path with .html suffix.")
+args = parser.parse_args()
+
+input_path = Path(args.input)
+output_path = Path(args.output) if args.output else input_path.with_suffix(".html")
+
+md_text = input_path.read_text(encoding="utf-8")
 
 # Convert to HTML
 html_body = markdown.markdown(md_text, extensions=["tables", "fenced_code"])
@@ -43,7 +52,6 @@ hr {{ border: none; border-top: 1px solid #eee; margin: 24px 0; }}
 </body>
 </html>"""
 
-with open("项目汇报文档.html", "w", encoding="utf-8") as f:
-    f.write(html)
+output_path.write_text(html, encoding="utf-8")
 
-print("HTML generated: 项目汇报文档.html")
+print(f"HTML generated: {output_path}")

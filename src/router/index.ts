@@ -21,8 +21,12 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/home',
-    name: 'Home',
-    component: () => import('../views/Home.vue'),
+    redirect: '/oracle'
+  },
+  {
+    path: '/oracle',
+    name: 'WeatherOracle',
+    component: () => import('../views/WeatherOracle.vue'),
     meta: { requiresAuth: true }
   },
   {
@@ -36,6 +40,12 @@ const routes: RouteRecordRaw[] = [
     name: 'AdminUsers',
     component: () => import('../views/AdminUsers.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/knowledge-base',
+    name: 'KnowledgeBase',
+    component: () => import('../views/KnowledgeBase.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/settings',
@@ -60,15 +70,15 @@ router.beforeEach(async (to, _from, next) => {
     if (!isAuthenticated) {
       next('/login')
     } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
-      next('/home')
+      next('/oracle')
     } else {
       next()
     }
   } else {
     if (to.path === '/login' && isAuthenticated) {
-      next('/home')
+      next('/oracle')
     } else if (to.path === '/register' && isAuthenticated) {
-      next('/home')
+      next('/oracle')
     } else {
       next()
     }

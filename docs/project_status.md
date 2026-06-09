@@ -10,7 +10,7 @@ Status: Completed Task 1 (Modify Login Page Template and Styles).
 
 - Completed Task 1 (Modify Login Page Template and Styles):
   - Removed brand subtitle (`✦ 气象占卜台 ✦`) and welcome subtitle (`✦ 登录以继续你的天气占卜之旅 ✦`) from [Login.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Login.vue).
-  - Updated the welcome title to `✦ 欢迎回来 ✦` in [Login.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Login.vue).
+  - Updated the welcome title to wrap stars in a span with gold color (`<span class="star-gold">✦</span> 欢迎回来 <span class="star-gold">✦</span>`) and added the `.star-gold` scoped CSS style in [Login.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Login.vue).
   - Cleaned up unused scoped CSS classes `.brand-subtitle` and `.welcome-subtitle` in [Login.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Login.vue).
 - Verified successful Vite compilation of the frontend after changes.
 

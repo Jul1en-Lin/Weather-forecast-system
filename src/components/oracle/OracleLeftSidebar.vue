@@ -32,18 +32,30 @@
 
       <div class="moon-phase-display">
         <!-- SVG Weather Graphic -->
-        <svg viewBox="0 0 100 100" width="72" height="72" class="moon-svg">
+        <svg viewBox="0 0 100 100" width="80" height="80" class="oracle-weather-svg">
           <defs>
-            <radialGradient id="weatherGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#fff" stop-opacity="0.8" />
-              <stop offset="60%" stop-color="#fff8d6" stop-opacity="0.3" />
-              <stop offset="100%" stop-color="#d7ae69" stop-opacity="0" />
-            </radialGradient>
+            <linearGradient id="sunGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFF2A3" />
+              <stop offset="50%" stop-color="#FFD700" />
+              <stop offset="100%" stop-color="#FF8C00" />
+            </linearGradient>
           </defs>
-          <circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.03)" stroke="var(--oracle-border-soft)" stroke-width="1" />
-          <circle cx="50" cy="50" r="30" fill="url(#weatherGlow)" class="glow-circle" />
-          <circle cx="50" cy="50" r="20" fill="none" stroke="var(--oracle-gold)" stroke-width="1.5" stroke-dasharray="4 3" />
-          <path d="M 35 65 A 10 10 0 0 1 45 55 A 12 12 0 0 1 67 55 A 10 10 0 0 1 77 65 Z" fill="rgba(255,255,255,0.15)" stroke="var(--oracle-gold)" stroke-width="1" />
+          <!-- Celestial outer ring -->
+          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(215, 174, 105, 0.15)" stroke-width="1" />
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--oracle-gold)" stroke-width="1.2" stroke-dasharray="1 8" class="celestial-ticks" />
+          
+          <!-- Glowing celestial background -->
+          <circle cx="50" cy="50" r="30" fill="rgba(255, 248, 214, 0.02)" />
+          
+          <!-- The Sun -->
+          <circle cx="48" cy="42" r="15" fill="url(#sunGradient)" class="sun-body" />
+          
+          <!-- The Cloud with glassmorphic look -->
+          <path d="M 32 62 h 36 a 10 10 0 0 0 10 -10 a 10 10 0 0 0 -10 -10 a 14 14 0 0 0 -26 -6 a 12 12 0 0 0 -20 10 a 10 10 0 0 0 10 16 Z" fill="rgba(255, 255, 255, 0.08)" stroke="var(--oracle-gold)" stroke-width="1.5" stroke-linejoin="round" class="cloud-body" />
+          
+          <!-- Star Sparkles (celestial/oracle style) -->
+          <path d="M 75 30 L 77 35 L 82 37 L 77 39 L 75 44 L 73 39 L 68 37 L 73 35 Z" fill="var(--oracle-gold)" class="star-sparkle-1" />
+          <path d="M 23 23 L 24 26 L 27 27 L 24 28 L 23 31 L 22 28 L 19 27 L 22 26 Z" fill="var(--oracle-gold)" class="star-sparkle-2" />
         </svg>
       </div>
 
@@ -171,12 +183,49 @@ function handleSearchTrigger() {
   padding: 10px 0;
 }
 
-.moon-svg {
+.oracle-weather-svg {
   filter: drop-shadow(0 0 8px var(--oracle-gold-glow));
 }
 
-.glow-circle {
-  animation: pulse-mystical 4s ease-in-out infinite;
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.celestial-ticks {
+  transform-origin: 50px 50px;
+  animation: spin-slow 120s linear infinite;
+}
+
+@keyframes sun-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.3)); }
+  50% { transform: scale(1.06); filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6)); }
+}
+.sun-body {
+  transform-origin: 48px 42px;
+  animation: sun-pulse 6s ease-in-out infinite;
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2.5px); }
+}
+.cloud-body {
+  transform-origin: 50px 50px;
+  animation: float-gentle 5s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.star-sparkle-1 {
+  transform-origin: 75px 37px;
+  animation: shine 4s ease-in-out infinite;
+}
+.star-sparkle-2 {
+  transform-origin: 23px 27px;
+  animation: shine 3s ease-in-out infinite;
+  animation-delay: 1.5s;
 }
 
 .horoscope-info {

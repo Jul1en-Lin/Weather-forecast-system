@@ -1,9 +1,9 @@
 <template>
   <section class="weather-metric-grid-card oracle-surface oracle-gold-corners">
     <div class="metric-card-header">
-      <span class="oracle-eyebrow">Weather & Destiny Mapping</span>
-      <h3 class="metric-card-title">天气数据 · 命运映射</h3>
-      <p class="metric-card-subtitle">将物理天气要素转化为今日的心灵能量指引</p>
+      <span class="oracle-eyebrow">Real-time Weather Data</span>
+      <h3 class="metric-card-title">实时天气数据</h3>
+      <p class="metric-card-subtitle">当前城市气象要素综合分析</p>
     </div>
 
     <div class="metrics-row" :key="mappings.map(m => m.metric + m.value).join('-')">

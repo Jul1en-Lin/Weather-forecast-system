@@ -2,12 +2,22 @@
 
 ## Current goal
 
-Goal: Improve Weather Oracle tarot metadata used by model prompts.
+Goal: Demote fortune telling/divination elements in Weather Oracle frontend to focus on weather services.
 
-Status: Backend now sends a very compact selected-card tarot prompt to the model, disables environment proxy for Weather Oracle model calls, uses lower temperature, and allows 20 seconds for `mimo-v2.5` to respond.
+Status: Completed implementation of the Frontend Redesign Implementation Plan. All components updated to prioritize weather intelligence over divination.
 
 ## Done
 
+- Implemented the Frontend Redesign Implementation Plan to prioritize weather services over fortune-telling/divination:
+  - [OracleLayout.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/layouts/OracleLayout.vue): Changed "气象占卜台" to "智能气象助手", updated moon phases symbol decor to weather icons (☀ ⛅ 🌤 ⛈ ❄), updated dropdown subtitle user roles to "系统管理员" / "气象助手用户", and renamed footer description.
+  - [TarotCardDisplay.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/components/oracle/TarotCardDisplay.vue): Changed titles to "Weather Intelligence" and "今日天气概览", renamed label values like "幸运色" to "今日色彩", "幸运数字" to "今日数字", "宜" / "忌" to "适宜" / "注意", and updated fallback card text.
+  - [WeatherMetricGrid.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/components/oracle/WeatherMetricGrid.vue): Renamed eyebrow to "Real-time Weather Data" and updated mapping titles and descriptions.
+  - [OracleLeftSidebar.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/components/oracle/OracleLeftSidebar.vue): Replaced today's astrology card headers and zodiac signs array data with daily weather tips, renamed computations, and replaced the moon graphic with a weather graphic.
+  - [OracleBottomCards.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/components/oracle/OracleBottomCards.vue): Replaced daily ratings with Life Weather Index ("穿衣指数"/"运动指数"/"紫外线指数"), travel advisor content, and renamed recommended knowledge base articles to weather-related topics.
+  - [OracleChatPanel.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/components/oracle/OracleChatPanel.vue): Renamed "天气占卜师" to "天气助手", updated suggestions, input placeholders, welcome greetings, and createContextualPrompt chat context prompt formatting.
+  - [MoodGuidePanel.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/components/oracle/MoodGuidePanel.vue): Changed titles to "Weather Life Guide" and "今日天气生活指南".
+  - [WeatherOracle.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/WeatherOracle.vue): Changed page placeholder texts from tarot card summoning to weather report query.
+  - [index.html](file:///Users/lien/GitRepo/Weather-forecast-system/index.html): Updated title tag content to "Weather Oracle - 智能气象助手".
 - Redesigned the login page (`src/views/Login.vue`) using a fullscreen glassmorphic container, theme switcher, custom star logo, inputs with prefix icons, and direct redirection to `/oracle` route upon successful login. Removed GitHub login button.
 - Redirected `/home` to `/oracle` in `src/router/index.ts` and deleted the unused `src/views/Home.vue` page.
 - Polished IntelligentAssistant interactive elements: optimized transitions, focus states, active click scaling, and hover media query gating for new-chat-btn, chip, chat-input, and send-button in IntelligentAssistant.vue.

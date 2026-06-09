@@ -12,7 +12,7 @@
           </svg>
           <div class="oracle-header-brand-text">
             <strong>Weather Oracle</strong>
-            <span>气象占卜台</span>
+            <span>智能气象助手</span>
           </div>
         </div>
 
@@ -39,11 +39,11 @@
         <div class="oracle-header-right">
           <!-- Moon Phase Decoration -->
           <div class="oracle-header-moon-phases">
-            <span class="phase-symbol select-none">)</span>
-            <span class="phase-symbol select-none">☽</span>
-            <span class="phase-symbol select-none">◯</span>
-            <span class="phase-symbol select-none">☾</span>
-            <span class="phase-symbol select-none">(</span>
+            <span class="phase-symbol select-none">☀</span>
+            <span class="phase-symbol select-none">⛅</span>
+            <span class="phase-symbol select-none">🌤</span>
+            <span class="phase-symbol select-none">⛈</span>
+            <span class="phase-symbol select-none">❄</span>
           </div>
 
           <!-- User Profile Dropdown -->
@@ -61,7 +61,7 @@
               <div v-if="isDropdownOpen" class="oracle-header-dropdown-menu oracle-surface oracle-gold-corners">
                 <div class="dropdown-header">
                   <strong>{{ username }}</strong>
-                  <span class="dropdown-subtitle">{{ isAdmin ? '皇家大占卜师' : '占卜师学徒' }}</span>
+                  <span class="dropdown-subtitle">{{ isAdmin ? '系统管理员' : '气象助手用户' }}</span>
                 </div>
                 <div class="oracle-divider"></div>
                 <ul class="dropdown-list">
@@ -92,7 +92,7 @@
 
     <!-- Global Footer -->
     <footer class="oracle-layout-footer">
-      <p>© 2026 Weather Oracle 气象占卜台 | 以天象知人心</p>
+      <p>© 2026 Weather Oracle 智能气象助手 | 科学预报，智慧服务</p>
     </footer>
   </div>
 </template>
@@ -114,7 +114,7 @@ const userInitial = computed(() => username.value ? username.value.charAt(0).toU
 const isLightTheme = computed(() => theme.value === 'light')
 
 const userTitle = computed(() => {
-  return isAdmin.value ? 'Lv.5 皇家大占卜师' : 'Lv.3 占卜师学徒'
+  return isAdmin.value ? '管理员' : '用户'
 })
 
 const isDropdownOpen = ref(false)

@@ -57,7 +57,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{ draw: [city: string] }>()
 
-const cities = ['上海', '北京', '杭州', '广州', '深圳', '成都', '南京', '武汉']
+const cities = ['广州', '杭州', '上海', '南京']
 const searchQuery = ref('')
 const isDropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
@@ -103,6 +103,7 @@ onUnmounted(() => {
 .oracle-city-picker-wrapper {
   position: relative;
   display: inline-block;
+  z-index: 20;
 }
 
 /* Trigger Button */
@@ -154,9 +155,9 @@ onUnmounted(() => {
   position: absolute;
   top: calc(100% + 10px);
   left: 0;
-  width: 280px;
-  padding: 16px;
-  z-index: 50;
+  width: 300px;
+  padding: 14px;
+  z-index: 100;
   transform-origin: top left;
 }
 
@@ -164,7 +165,7 @@ onUnmounted(() => {
 .city-search-form {
   display: flex;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .city-search-input {
@@ -227,7 +228,7 @@ onUnmounted(() => {
 .quick-cities-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  gap: 8px;
 }
 
 .quick-city-btn {

@@ -41,9 +41,9 @@
           <!-- Placeholder when loading or no reading is loaded yet -->
           <div v-else class="tarot-placeholder-card oracle-surface oracle-gold-corners">
             <div class="placeholder-content">
-              <span class="placeholder-icon anim-pulse">🔮</span>
-              <h3>正在召唤今日天气牌</h3>
-              <p>读取气象要素与星相规律，正在生成你今天的能量映射...</p>
+              <span class="placeholder-icon anim-pulse">🌤️</span>
+              <h3>正在获取今日天气</h3>
+              <p>正在查询气象数据，为你生成今日天气报告...</p>
               <div class="placeholder-city-picker">
                 <QuickCityPicker
                   :loading="isLoading"
@@ -114,8 +114,8 @@ const cacheKey = computed(() => `weather_oracle:last_reading:${authStore.usernam
 onMounted(async () => {
   const restored = restoreCachedReading()
   if (!restored) {
-    // Dynamically query a default city so they see the gorgeous tarot right away!
-    await drawCity('杭州')
+    // Query a default city on the first visit so the page has useful weather data immediately.
+    await drawCity('广东江门')
   }
 })
 

@@ -3,9 +3,9 @@
     <!-- Left Column: Title & Selector -->
     <div class="tarot-left-col">
       <div class="tarot-card-title-wrap">
-        <span class="oracle-eyebrow">Tarot Weather Divination</span>
-        <h2>今日天气塔罗牌</h2>
-        <p class="tarot-subtitle">AI 为你抽取今日的天气指引</p>
+        <span class="oracle-eyebrow">Weather Intelligence</span>
+        <h2>今日天气概览</h2>
+        <p class="tarot-subtitle">AI 为你解读今日天气</p>
       </div>
 
       <div class="tarot-city-picker-wrap">
@@ -35,7 +35,7 @@
           />
           <div v-else class="tarot-card-fallback-frame" aria-hidden="true">
             <span class="fallback-char">{{ fallbackInitial }}</span>
-            <small class="fallback-copy">牌面待导出</small>
+            <small class="fallback-copy">天气卡片加载中</small>
           </div>
           <!-- Filigree gold border decorations -->
           <div class="frame-gold-border"></div>
@@ -47,13 +47,13 @@
     <div class="tarot-right-col">
       <div class="fortune-guidance-header">
         <span class="guidance-marker">✦</span>
-        <span class="guidance-title">今日指引</span>
+        <span class="guidance-title">今日提示</span>
         <span class="guidance-marker">✦</span>
       </div>
 
       <div class="fortune-main-details">
         <h3 class="fortune-title-mix">
-          {{ tarot.name_zh }} · {{ fortune.title }}
+          {{ fortune.title }}
         </h3>
 
         <div class="fortune-keywords-chips">
@@ -73,22 +73,22 @@
 
       <div class="fortune-dl-metrics">
         <div class="fortune-dl-row">
-          <span class="dl-label">幸运色</span>
+          <span class="dl-label">今日色彩</span>
           <span class="dl-value">
             <span class="color-indicator" :style="{ backgroundColor: getColorCode(fortune.lucky_color) }"></span>
             {{ fortune.lucky_color }}
           </span>
         </div>
         <div class="fortune-dl-row">
-          <span class="dl-label">幸运数字</span>
+          <span class="dl-label">今日数字</span>
           <span class="dl-value num-val">{{ fortune.lucky_number }}</span>
         </div>
         <div class="fortune-dl-row flex-top">
-          <span class="dl-label">宜</span>
+          <span class="dl-label">适宜</span>
           <span class="dl-value do-avoid-val positive">{{ fortune.good_for }}</span>
         </div>
         <div class="fortune-dl-row flex-top">
-          <span class="dl-label">忌</span>
+          <span class="dl-label">注意</span>
           <span class="dl-value do-avoid-val negative">{{ fortune.avoid }}</span>
         </div>
       </div>
@@ -181,6 +181,7 @@ function getColorCode(colorName: string): string {
   gap: 24px;
   padding: 30px 24px;
   align-items: stretch;
+  z-index: 3;
 }
 
 /* Left Column Styling */

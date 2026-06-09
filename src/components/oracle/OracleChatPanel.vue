@@ -9,8 +9,8 @@
           </svg>
         </div>
         <div class="diviner-meta">
-          <h4>天气占卜师</h4>
-          <span>你的专属天气与心灵向导</span>
+          <h4>天气助手</h4>
+          <span>你的智能气象服务助理</span>
         </div>
       </div>
       <div class="model-badge" v-if="modelName">
@@ -29,12 +29,12 @@
           <!-- Avatar inside bubble block -->
           <div class="bubble-avatar">
             <span v-if="message.role === 'user'">👤</span>
-            <span v-else>🔮</span>
+            <span v-else>🌤️</span>
           </div>
 
           <div class="bubble-content-wrap">
             <div class="bubble-sender-name">
-              {{ message.role === 'user' ? '你' : '天气占卜师' }}
+              {{ message.role === 'user' ? '你' : '天气助手' }}
             </div>
             <div class="bubble-text-box">
               <p v-if="message.content">{{ message.content }}</p>
@@ -72,7 +72,7 @@
         <input
           v-model.trim="draftMessage"
           type="text"
-          placeholder="继续追问今日天气牌..."
+          placeholder="输入天气相关问题..."
           class="chat-text-input"
           :disabled="isSending || !selectedModel"
         />
@@ -115,7 +115,7 @@ const props = defineProps<{
   reading?: WeatherOracleReading
 }>()
 
-const suggestions = ['今天天气如何影响我的状态？', '今日运势解析', '适合出行吗？', '给我一句天气签文。']
+const suggestions = ['今天需要带伞吗？', '本周天气预报', '适合户外运动吗？', '今天穿什么合适？']
 const models = ref<ModelInfo[]>([])
 const selectedModel = ref('')
 const isSending = ref(false)
@@ -125,7 +125,7 @@ const messagesBoxRef = ref<HTMLElement | null>(null)
 
 // Initialize messages with a default welcoming diviner message
 const messages = ref<ChatMessage[]>([
-  { role: 'assistant', content: '你好，我是你的天气占卜师。今天想了解什么呢？' }
+  { role: 'assistant', content: '你好，我是你的智能天气助手。有什么天气问题可以问我~' }
 ])
 
 const modelName = computed(() => {
@@ -181,18 +181,17 @@ function submitCustomMessage() {
 function createContextualPrompt(message: string) {
   if (!props.reading) {
     return [
-      '你是天气占卜师。目前用户尚未选择城市进行今日的天气占卜。请以占卜师的温柔口吻，提醒他们可以通过界面中的城市选择器输入或选择城市，抽取专属的天气塔罗牌。',
+      '你是智能天气助手。目前用户尚未选择城市。请友好地提醒用户可以通过界面中的城市选择器输入或选择城市，以查看今日天气分析报告。',
       `用户追问：${message}`
     ].join('\n')
   }
   const weather = props.reading.weather
   return [
-    '你是天气占卜师，请结合以下天气牌上下文回答用户追问。',
+    '你是智能天气助手，请结合以下天气上下文回答用户追问。',
     `城市：${props.city}`,
     `日期：${props.reading.date}`,
-    `塔罗牌：${props.reading.tarot.name_zh || props.reading.tarot.name_en}`,
     `天气：${weather.condition}，温度 ${weather.temperature ?? '未知'}°C，湿度 ${weather.humidity ?? '未知'}%，气压 ${weather.pressure ?? '未知'} hPa，风速 ${weather.wind_speed ?? '未知'} km/h，风向 ${weather.wind_direction || '未知'}`,
-    `今日运势：${props.reading.fortune.summary}`,
+    `今日天气提示：${props.reading.fortune.summary}`,
     '回答要短，直接给建议，不要复述全部上下文。',
     `用户追问：${message}`,
   ].join('\n')

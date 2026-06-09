@@ -27,29 +27,29 @@
 
     <!-- Horoscope Card -->
     <div class="horoscope-card oracle-surface oracle-gold-corners">
-      <span class="oracle-eyebrow">Astrology</span>
-      <h3 class="card-title">今日星象</h3>
+      <span class="oracle-eyebrow">Daily Tips</span>
+      <h3 class="card-title">每日气象贴士</h3>
 
       <div class="moon-phase-display">
-        <!-- SVG Moon Phase Graphic -->
+        <!-- SVG Weather Graphic -->
         <svg viewBox="0 0 100 100" width="72" height="72" class="moon-svg">
           <defs>
-            <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+            <radialGradient id="weatherGlow" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stop-color="#fff" stop-opacity="0.8" />
               <stop offset="60%" stop-color="#fff8d6" stop-opacity="0.3" />
               <stop offset="100%" stop-color="#d7ae69" stop-opacity="0" />
             </radialGradient>
           </defs>
           <circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.03)" stroke="var(--oracle-border-soft)" stroke-width="1" />
-          <circle cx="50" cy="50" r="30" fill="url(#moonGlow)" class="glow-circle" />
-          <!-- Draw dynamic crescent mask -->
-          <path :d="moonPath" fill="var(--oracle-bg)" opacity="0.8" />
+          <circle cx="50" cy="50" r="30" fill="url(#weatherGlow)" class="glow-circle" />
+          <circle cx="50" cy="50" r="20" fill="none" stroke="var(--oracle-gold)" stroke-width="1.5" stroke-dasharray="4 3" />
+          <path d="M 35 65 A 10 10 0 0 1 45 55 A 12 12 0 0 1 67 55 A 10 10 0 0 1 77 65 Z" fill="rgba(255,255,255,0.15)" stroke="var(--oracle-gold)" stroke-width="1" />
         </svg>
       </div>
 
       <div class="horoscope-info">
-        <strong class="moon-sign-title">月亮进入{{ currentZodiac.sign }}</strong>
-        <p class="moon-sign-copy">{{ currentZodiac.advice }}</p>
+        <strong class="moon-sign-title">{{ currentTip.title }}</strong>
+        <p class="moon-sign-copy">{{ currentTip.advice }}</p>
 
         <router-link to="/knowledge-base" class="view-detail-link">
           查看详情 →
@@ -66,42 +66,25 @@ import { useAuthStore } from '../../stores/auth'
 const authStore = useAuthStore()
 const isAdmin = computed(() => authStore.isAdmin)
 
-const zodiacSigns = [
-  { sign: '白羊座', advice: '激情重燃，宜开启全新挑战与计划' },
-  { sign: '金牛座', advice: '感官敏锐，宜享受美食、安稳身心' },
-  { sign: '双子座', advice: '灵思泉涌，宜头脑风暴与信息交流' },
-  { sign: '巨蟹座', advice: '情感丰盈，宜陪伴家人、整理情绪' },
-  { sign: '狮子座', advice: '自信倍增，宜展示才华、积极社交' },
-  { sign: '处女座', advice: '思维缜密，宜整理收纳、推敲细节' },
-  { sign: '天秤座', advice: '审美提升，宜寻觅美好、维持人际平衡' },
-  { sign: '天蝎座', advice: '直觉深邃，宜探寻隐秘、疗愈内心' },
-  { sign: '射手座', advice: '胸怀旷达，宜登高望远、学习新知' },
-  { sign: '摩羯座', advice: '沉稳务实，宜稳步推进、落实阶段目标' },
-  { sign: '水瓶座', advice: '特立独行，宜践行创意、打破旧有成见' },
-  { sign: '双鱼座', advice: '直觉增强，适合内容与分析创作' },
+const weatherTips = [
+  { title: '紫外线提示', advice: '夏季紫外线较强，外出建议涂抹防晒霜、佩戴遮阳帽' },
+  { title: '防暑降温', advice: '高温天气注意补充水分，避免长时间户外暴晒' },
+  { title: '雷雨天气', advice: '雷雨天气避免在空旷地带停留，远离金属物体' },
+  { title: '台风预防', advice: '台风来临前检查门窗，储备必要物资，关注预警信息' },
+  { title: '雾天出行', advice: '大雾天气能见度低，驾车请减速慢行、开启雾灯' },
+  { title: '寒潮提醒', advice: '寒潮来临注意添衣保暖，预防感冒和心血管疾病' },
+  { title: '空气质量', advice: '关注空气质量指数，污染天气减少户外活动' },
+  { title: '干燥天气', advice: '秋冬干燥季节注意补水保湿，预防静电和皮肤干裂' },
+  { title: '晨练建议', advice: '晴好天气适宜户外运动，但避开高温时段' },
+  { title: '梅雨季节', advice: '梅雨期间注意防潮除湿，衣物及时晾晒烘干' },
+  { title: '霜冻预警', advice: '霜冻天气注意农作物保护，行车注意路面结冰' },
+  { title: '气压变化', advice: '气压剧烈波动可能引起头痛不适，注意休息调节' },
 ]
 
-// Compute a dynamic zodiac sign based on the current date of the month
-const currentZodiac = computed(() => {
+// Compute a dynamic tip based on the current date of the month
+const currentTip = computed(() => {
   const day = new Date().getDate()
-  return zodiacSigns[day % zodiacSigns.length]
-})
-
-// Compute a dynamic moon path SVG string based on the day of the month
-const moonPath = computed(() => {
-  const day = new Date().getDate()
-  const phase = day % 30
-  if (phase === 0 || phase === 15) {
-    return '' // Full Moon or New Moon
-  }
-  // Draw simple crescent paths
-  if (phase < 15) {
-    // Waxing Crescent / Quarter
-    return 'M 50 20 A 30 30 0 0 1 50 80 A 15 30 0 0 1 50 20 Z'
-  } else {
-    // Waning Crescent / Quarter
-    return 'M 50 20 A 15 30 0 0 1 50 80 A 30 30 0 0 1 50 20 Z'
-  }
+  return weatherTips[day % weatherTips.length]
 })
 
 function handleSearchTrigger() {

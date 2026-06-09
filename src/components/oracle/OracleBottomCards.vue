@@ -2,21 +2,21 @@
   <div class="oracle-bottom-cards-row">
     <!-- Card 1: Daily ratings -->
     <div class="oracle-bottom-card oracle-surface oracle-gold-corners">
-      <span class="oracle-eyebrow">Fortune Ratings</span>
+      <span class="oracle-eyebrow">Life Weather Index</span>
       <h4 class="card-title">
-        <span class="card-icon">🧭</span> 每日运势
+        <span class="card-icon">🌡️</span> 生活气象指数
       </h4>
       <div class="ratings-list">
         <div class="rating-row">
-          <span class="rating-label">综合运势</span>
+          <span class="rating-label">穿衣指数</span>
           <span class="stars-wrap">{{ getStarsString(overallRating) }}</span>
         </div>
         <div class="rating-row">
-          <span class="rating-label">爱情运势</span>
+          <span class="rating-label">运动指数</span>
           <span class="stars-wrap">{{ getStarsString(loveRating) }}</span>
         </div>
         <div class="rating-row">
-          <span class="rating-label">财富运势</span>
+          <span class="rating-label">紫外线指数</span>
           <span class="stars-wrap">{{ getStarsString(wealthRating) }}</span>
         </div>
       </div>
@@ -39,14 +39,14 @@
       </div>
     </div>
 
-    <!-- Card 3: Inspiration Crystal Ball -->
+    <!-- Card 3: Travel Advisory -->
     <div class="oracle-bottom-card oracle-surface oracle-gold-corners">
-      <span class="oracle-eyebrow">Crystal Ball Tips</span>
+      <span class="oracle-eyebrow">Travel Advisory</span>
       <h4 class="card-title">
-        <span class="card-icon">🔮</span> 灵感建议
+        <span class="card-icon">☂️</span> 出行建议
       </h4>
       <p class="tip-content-text">
-        今日适合创作与记录，让灵感自由流动。尝试静坐 5 分钟，听听窗外风雨声。
+        晴天外出注意防晒与补水，雨天出行备好雨具并减速慢行。关注温差适度增减衣物。
       </p>
       <router-link to="/knowledge-base" class="card-link-footer">获取更多建议 →</router-link>
     </div>
@@ -59,13 +59,13 @@
       </h4>
       <ul class="rec-links-list">
         <li>
-          <router-link to="/knowledge-base" class="rec-link-item">📖 解读云的语言</router-link>
+          <router-link to="/knowledge-base" class="rec-link-item">📖 常见天气符号解读</router-link>
         </li>
         <li>
-          <router-link to="/knowledge-base" class="rec-link-item">📖 天气与情绪的关系</router-link>
+          <router-link to="/knowledge-base" class="rec-link-item">📖 气象灾害防御指南</router-link>
         </li>
         <li>
-          <router-link to="/knowledge-base" class="rec-link-item">📖 风的象征意义</router-link>
+          <router-link to="/knowledge-base" class="rec-link-item">📖 天气预报入门知识</router-link>
         </li>
       </ul>
       <router-link to="/knowledge-base" class="card-link-footer">进入知识库 →</router-link>

@@ -1,8 +1,8 @@
 <template>
   <section class="mood-guide-panel-card oracle-surface oracle-gold-corners">
     <div class="mood-card-header">
-      <span class="oracle-eyebrow">Mood & Activity Guide</span>
-      <h3 class="mood-card-title">今日情绪状态指南</h3>
+      <span class="oracle-eyebrow">Weather Life Guide</span>
+      <h3 class="mood-card-title">今日天气生活指南</h3>
     </div>
 
     <div class="mood-grid-layout">

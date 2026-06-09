@@ -2,18 +2,23 @@
 
 ## Current goal
 
-Goal: Demote fortune telling/divination elements in Weather Oracle frontend to focus on weather services.
+Goal: Fix the admin user management page failing to load users.
 
-Status: Redesigned the Intelligent Assistant page to match the glassmorphic theme and weather services identity.
+Status: Done. The user list now uses the backend route with the trailing slash and avoids the proxy redirect that caused `Failed to fetch`.
 
 ## Done
 
+- Fixed [AdminUsers.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/AdminUsers.vue) so `fetchUsers()` requests `/api/v1/users/` instead of `/api/v1/users`, avoiding FastAPI's 307 redirect from the Vite proxy origin to the backend origin.
 - Redesigned the UI template elements in [Settings.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Settings.vue) (Task 1):
   - Added `.oracle-surface` class to model and tools tab panel container forms.
   - Replaced `.model-badge` / `.local-badge` classes with `.badge-pill` / `.badge-pill-local`.
   - Replaced status emojis with the `.status-indicator` dot and text element.
   - Replaced system built-in status badge with `.badge-pill.badge-pill-builtin`.
   - Verified compilation of Vue templates via `npm run build`.
+- Redesigned the CSS Stylesheet block in [Settings.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Settings.vue) (Task 2):
+  - Replaced original scoped styles with gold-accented, glassmorphic layout rules.
+  - Custom styled tabs, loading animations, input fields, badges, forms, and layout grids.
+  - Verified compilation of Vue templates and styles via `npm run build`.
 - Redesigned the Intelligent Assistant page ([IntelligentAssistant.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/IntelligentAssistant.vue)):
   - Replaced cheap, cartoonish emojis (🤖, 🗑️, ✏️, 📋) with clean, professional SVG vector icons.
   - Aligned colors, backgrounds, borders, and input focus states with the gold-accented glassmorphic theme via CSS variables from `oracle-theme.css`.
@@ -117,6 +122,10 @@ Status: Redesigned the Intelligent Assistant page to match the glassmorphic them
 
 ## Checkpoints
 
+- Reproduced the failing path with `curl http://localhost:5174/api/v1/users`, which returned `307` and redirected to `http://localhost:8000/api/v1/users/`.
+- Verified `curl http://localhost:5174/api/v1/users/` returns directly without redirect (`401` when unauthenticated, as expected).
+- Ran `npm run build` successfully and removed the generated `dist/`.
+- Verified the existing Chrome page at `http://localhost:5174/admin/users` now shows the user list instead of `Failed to fetch`.
 - Ran setup-light initialization script.
 - Preserved archived local files instead of deleting them.
 - Confirmed the remaining root `index.html`, `package*.json`, and `tsconfig*.json` files are standard Vite/TypeScript project files.

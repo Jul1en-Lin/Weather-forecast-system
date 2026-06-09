@@ -78,7 +78,7 @@ const fetchUsers = async () => {
   loading.value = true
   error.value = ''
   try {
-    const res = await fetch('/api/v1/users', { credentials: 'include' })
+    const res = await fetch('/api/v1/users/', { credentials: 'include' })
     if (!res.ok) {
       const data = await res.json()
       throw new Error(data.detail || '获取用户列表失败')

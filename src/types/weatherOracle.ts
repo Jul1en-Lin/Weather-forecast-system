@@ -26,6 +26,7 @@ export interface WeatherOracleFortune {
   title: string
   summary: string
   lucky_color: string
+  lucky_color_hex?: string
   lucky_number: number
   good_for: string
   avoid: string

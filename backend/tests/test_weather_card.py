@@ -117,7 +117,8 @@ class WeatherCardHelperTests(unittest.TestCase):
         self.assertIn("The Lovers", prompt)
         self.assertIn("core_meaning", prompt)
         self.assertIn("weather_oracle_hint", prompt)
-        self.assertIn("fortune={title,summary,lucky_color,lucky_number,good_for,avoid}", prompt)
+        self.assertIn("lucky_color_hex", prompt)
+        self.assertIn("lucky_color", prompt)
 
 
 class WeatherCardEndpointTests(unittest.TestCase):

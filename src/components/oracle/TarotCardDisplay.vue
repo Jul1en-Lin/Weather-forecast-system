@@ -75,7 +75,7 @@
         <div class="fortune-dl-row">
           <span class="dl-label">今日色彩</span>
           <span class="dl-value">
-            <span class="color-indicator" :style="{ backgroundColor: getColorCode(fortune.lucky_color) }"></span>
+            <span class="color-indicator" :style="{ backgroundColor: fortune.lucky_color_hex || getColorCode(fortune.lucky_color) }"></span>
             {{ fortune.lucky_color }}
           </span>
         </div>

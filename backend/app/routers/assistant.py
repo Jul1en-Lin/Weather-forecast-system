@@ -239,6 +239,11 @@ def normalize_weather_oracle_model_data(card_data: dict, fallback: dict) -> dict
             raw_fortune.get("lucky_number"),
             fortune["lucky_number"],
         )
+        # Extract hex color - validate it looks like a hex code
+        raw_hex = non_empty_text(raw_fortune.get("lucky_color_hex"))
+        import re as _re
+        if raw_hex and _re.match(r'^#[0-9a-fA-F]{3,8}$', raw_hex.strip()):
+            fortune["lucky_color_hex"] = raw_hex.strip()
     else:
         summary = non_empty_text(raw_fortune)
         if summary:
@@ -344,7 +349,7 @@ def build_weather_oracle_prompt(weather: dict, date_key: str, tarot: dict) -> st
         "只输出 JSON，不要 markdown。"
         f"日期={date_key};天气={json.dumps(weather_payload, ensure_ascii=False)};"
         f"塔罗={json.dumps(card_payload, ensure_ascii=False)};"
-        "生成 fortune={title,summary,lucky_color,lucky_number,good_for,avoid}、"
+        "生成 fortune={title,summary,lucky_color,lucky_color_hex(对应lucky_color的标准CSS十六进制色值,如#3c6ea5),lucky_number,good_for,avoid}、"
         "mood_guide={title,analysis,suggestions} 和 weather_tip={title, advice} (建议字数不超过30字)。"
     )
 
@@ -764,6 +769,7 @@ def generate_weather_card(
             "title": "云隙微光",
             "summary": "今天适合先观察，再行动。把节奏放慢一点，很多事会自然变清楚。",
             "lucky_color": "雾紫色",
+            "lucky_color_hex": "#9d81ba",
             "lucky_number": 7,
             "good_for": "整理思路",
             "avoid": "冲动争执",

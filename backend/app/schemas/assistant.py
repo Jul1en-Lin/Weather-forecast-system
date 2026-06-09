@@ -59,6 +59,7 @@ class WeatherOracleFortune(BaseModel):
     title: str
     summary: str
     lucky_color: str
+    lucky_color_hex: Optional[str] = None  # LLM-provided hex e.g. "#3c6ea5"
     lucky_number: int
     good_for: str
     avoid: str

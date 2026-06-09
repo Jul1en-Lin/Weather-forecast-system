@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.dependencies import get_db_session, get_current_user, require_admin
 from app.models.user import User
-from app.schemas.user import UserResponse, UserUpdate
+from app.schemas.user import UserResponse, UserUpdate, BatchUpdateAdmin, BatchDelete
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
@@ -52,3 +52,36 @@ def delete_user(
     db.delete(user)
     db.commit()
     return {"detail": "User deleted"}
+
+@router.post("/batch/admin")
+def batch_update_admin(
+    batch: BatchUpdateAdmin,
+    current_user: dict = Depends(require_admin),
+    db: Session = Depends(get_db_session)
+):
+    users = db.query(User).filter(User.id.in_(batch.user_ids)).all()
+    updated_count = 0
+    for user in users:
+        if user.username == "admin":
+            continue
+        user.is_admin = batch.is_admin
+        updated_count += 1
+    db.commit()
+    return {"detail": f"Successfully updated {updated_count} users"}
+
+@router.post("/batch/delete")
+def batch_delete_users(
+    batch: BatchDelete,
+    current_user: dict = Depends(require_admin),
+    db: Session = Depends(get_db_session)
+):
+    users = db.query(User).filter(User.id.in_(batch.user_ids)).all()
+    deleted_count = 0
+    for user in users:
+        if user.username == "admin":
+            continue
+        db.delete(user)
+        deleted_count += 1
+    db.commit()
+    return {"detail": f"Successfully deleted {deleted_count} users"}
+

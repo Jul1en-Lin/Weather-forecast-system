@@ -4,9 +4,15 @@
 
 Goal: Redesign the User Management view (`src/views/AdminUsers.vue`) to align with the theme variables, replacing hardcoded RGBA colors with theme-aware RGB variables.
 
-Status: In Progress. Task 1 (Redesign CSS Stylesheet in AdminUsers.vue) is completed.
+Status: Completed. Batch processing features added.
 
 ## Done
+
+- Implemented Batch User Management features in both backend and frontend:
+  - **Backend**: Added batch admin status update (`POST /api/v1/users/batch/admin`) and batch deletion (`POST /api/v1/users/batch/delete`) endpoints, protected by the `require_admin` dependency. Written comprehensive unit tests in `backend/tests/test_batch_users.py`.
+  - **Frontend**: Added a custom styled "Select All" checkbox in the User Management header, checkboxes on individual user cards, and a glassmorphic floating action bar showing selected count with buttons for batch upgrade, batch downgrade, batch delete, and deselect.
+  - **Responsive Design**: Ensured the floating batch action bar folds into a neat vertical stack on screens below 768px.
+  - **Verification**: Verified that Vite frontend builds successfully and backend tests pass.
 
 - Fixed layout overflow in [AdminUsers.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/AdminUsers.vue):
   - Added `:title` tooltip on hover for user names.

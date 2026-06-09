@@ -83,6 +83,11 @@ class WeatherOracleMapping(BaseModel):
     score: int
 
 
+class WeatherOracleTip(BaseModel):
+    title: str
+    advice: str
+
+
 class WeatherCardResponse(BaseModel):
     city: str
     date: str
@@ -94,3 +99,4 @@ class WeatherCardResponse(BaseModel):
     mood_guide: WeatherOracleMoodGuide
     daily_advice: WeatherOracleDailyAdvice
     weather_mappings: List[WeatherOracleMapping]
+    weather_tip: Optional[WeatherOracleTip] = None

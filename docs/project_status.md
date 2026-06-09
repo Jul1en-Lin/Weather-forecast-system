@@ -2,11 +2,20 @@
 
 ## Current goal
 
-Goal: Update README with current screenshots, supported features, project structure, configuration, and startup guide.
+Goal: Expose model selector on Weather Oracle chat panel and default to preferred models.
 
-Status: README has been rewritten against the current frontend/backend code and screenshot assets.
+Status: Dynamic model selector dropdown has been added to the chat panel header, styled, and initialized with user preference in localStorage.
 
 ## Done
+
+- Completed Task 1 (Modify OracleChatPanel UI, Script Logic, and Styles):
+  - Replaced static model badge with a select dropdown for model selection on the home weather assistant chat panel.
+  - Added script initialization logic to persist user's chosen model in `localStorage` under `weather_oracle:chat_model`, defaulting to `mimo-v2.5`, `MiniMax-M2.5`, `kimi-k2.5`, or the first configured model.
+  - Added watcher to update `localStorage` when user changes selection.
+  - Removed `.model-badge` style block and added styles for `.model-picker` and `.model-select` to style the selector.
+  - Cleaned up unused computed property `modelName` and unused `computed` import from `vue` to ensure clean typechecking.
+  - Verified Vite compilation builds successfully via `npm run build` and cleaned up `dist/` build output.
+  - Verified backend tests run successfully via `pytest` in the backend directory.
 
 - Rewrote [README.md](file:///Users/lien/GitRepo/Weather-forecast-system/README.md) to document the current app:
   - Updated page screenshots to `docs/images/login.png`, `home-light.png`, `intelligent-assistant.png`, `setting1.png`, `setting2.png`, and `users.png`.

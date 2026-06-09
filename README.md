@@ -55,10 +55,31 @@
 │   ├── main.ts                    # 应用入口
 │   ├── App.vue                    # 根组件
 │   ├── style.css                  # 全局样式（Apple 风格 CSS 变量）
+│   ├── api/
+│   │   └── weatherOracle.ts       # 气象助手 API 请求
+│   ├── components/
+│   │   └── oracle/                # 气象助手面板组件
+│   │       ├── MoodGuidePanel.vue      # 生活指南面板
+│   │       ├── OracleBottomCards.vue   # 底部指标与建议卡片
+│   │       ├── OracleChatPanel.vue     # 右侧气象 AI 助理对话
+│   │       ├── OracleLeftSidebar.vue   # 快捷入口与每日气象贴士
+│   │       ├── QuickCityPicker.vue     # 城市选择器
+│   │       ├── TarotCardDisplay.vue    # 今日天气概览卡片
+│   │       └── WeatherMetricGrid.vue   # 实时天气数据网格
+│   ├── layouts/
+│   │   └── OracleLayout.vue       # 气象助手页面布局壳
+│   ├── data/
+│   │   └── tarotCards.ts          # 塔罗牌/天气卡片静态数据清单
 │   ├── router/
 │   │   └── index.ts               # 路由配置
 │   ├── stores/
 │   │   └── auth.ts                # 用户认证状态管理
+│   ├── styles/
+│   │   └── oracle-theme.css       # 气象助手专有 CSS 主题变量
+│   ├── types/
+│   │   └── weatherOracle.ts       # 气象助手相关 TypeScript 类型定义
+│   ├── utils/
+│   │   └── tarot.ts               # 塔罗牌辅助函数
 │   ├── views/
 │   │   ├── Login.vue              # 登录页
 │   │   ├── Register.vue           # 注册页
@@ -82,7 +103,8 @@
 │       ├── models/                # ORM 模型
 │       ├── routers/               # API 路由
 │       ├── schemas/               # Pydantic 数据模型
-│       ├── services/              # 业务服务（LLM、对话、知识库、天气工具）
+│       ├── services/              # 业务服务（LLM、对话、知识库、天气工具及 HTTPX 兼容处理）
+│       ├── data/                  # 静态元数据（塔罗牌与天气提示定义）
 │       └── core/                  # 工具模块（安全加密、SSE 封装）
 │
 ├── docs/                          # 项目文档

@@ -6,9 +6,7 @@ Goal: Demote fortune telling/divination elements in Weather Oracle frontend to f
 
 Status: Completed implementation of the Frontend Redesign Implementation Plan. All components updated to prioritize weather intelligence over divination.
 
-## Done
-
-- Generated and updated new page screenshot mockups matching the glassmorphic theme under `docs/images/` and updated `README.md` to reference the correct image names and directory tree structure.
+- Generated and updated new page screenshot mockups matching the glassmorphic theme under `docs/images/`, and updated `README.md` to reference the correct image names and show the updated frontend/backend directory tree structure.
 - Implemented the Frontend Redesign Implementation Plan to prioritize weather services over fortune-telling/divination:
   - [OracleLayout.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/layouts/OracleLayout.vue): Changed "气象占卜台" to "智能气象助手", updated moon phases symbol decor to weather icons (☀ ⛅ 🌤 ⛈ ❄), updated dropdown subtitle user roles to "系统管理员" / "气象助手用户", and renamed footer description.
   - [TarotCardDisplay.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/components/oracle/TarotCardDisplay.vue): Changed titles to "Weather Intelligence" and "今日天气概览", renamed label values like "幸运色" to "今日色彩", "幸运数字" to "今日数字", "宜" / "忌" to "适宜" / "注意", and updated fallback card text.

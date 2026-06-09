@@ -4,8 +4,8 @@
       <!-- Header Section -->
       <section class="kb-hero oracle-surface oracle-gold-corners anim-float">
         <span class="oracle-eyebrow">Weather Wisdom</span>
-        <h1>气象占卜知识库</h1>
-        <p>探索天气要素、气相星曜与人类情绪、命运脉络的隐秘联系。在这里，科学数据转化为心灵启示。</p>
+        <h1>气象科普知识库</h1>
+        <p>探索天气要素、气象规律与日常生活的紧密联系。在这里，科学数据转化为实用气象科普知识与服务指南。</p>
 
         <!-- Search bar -->
         <div class="kb-search-container">
@@ -13,7 +13,7 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="搜寻气压、温度、二十四节气或塔罗映射..."
+            placeholder="搜寻气压、温度、二十四节气或科普知识..."
             class="kb-search-input"
           />
         </div>
@@ -56,8 +56,8 @@
       </div>
 
       <div v-if="filteredArticles.length === 0" class="kb-empty">
-        <span class="empty-icon">🔮</span>
-        <p>未找到相关的星象学识，换个词试试看吧。</p>
+        <span class="empty-icon">🌤️</span>
+        <p>未找到相关的气象学识，换个词试试看吧。</p>
       </div>
     </div>
   </OracleLayout>
@@ -82,64 +82,64 @@ const activeCategory = ref<'all' | 'metric' | 'cycle' | 'theory'>('all')
 
 const categories: { label: string; value: 'all' | 'metric' | 'cycle' | 'theory' }[] = [
   { label: '全部知识', value: 'all' },
-  { label: '气象要素隐喻', value: 'metric' },
-  { label: '岁时节气能量', value: 'cycle' },
-  { label: '占卜基础理论', value: 'theory' },
+  { label: '气象要素科普', value: 'metric' },
+  { label: '岁时节气规律', value: 'cycle' },
+  { label: '气象科普理论', value: 'theory' },
 ]
 
 const articles: Article[] = [
   {
     id: 'temp-metaphor',
-    title: '气温的命运隐喻：生命的寒暑刻度',
+    title: '气温的科学规律：生命的寒暑刻度',
     category: 'metric',
     icon: '🌡️',
-    summary: '温度是外界环境对生命的包容度。在占卜中，它直接投射个人的热情、安全感与表达欲。',
-    content: '<ul><li><strong>极寒（&lt;0°C）</strong>：对应塔罗‘隐士’或‘死神’，代表能量收敛、深度自我反思与蛰伏。</li><li><strong>舒适（20°C-25°C）</strong>：对应‘星辰’或‘皇后’，暗示万物繁茂、情绪松弛与灵感涌现。</li><li><strong>酷暑（&gt;35°C）</strong>：对应‘战车’或‘塔’，表明意志力高度紧绷、情绪容易宣泄，属于爆发性相。</li></ul>',
+    summary: '温度是外界环境对生命的包容度。在气象学中，它直接反映了人体的热量平衡与舒适度状态。',
+    content: '<ul><li><strong>极寒（&lt;0°C）</strong>：代表能量收敛、防寒保暖与蛰伏，趣味映射塔罗‘隐士’。</li><li><strong>舒适（20°C-25°C）</strong>：代表万物繁茂、情绪松弛与户外活动适宜，趣味映射‘星辰’。</li><li><strong>酷暑（&gt;35°C）</strong>：代表热量积聚、防暑降温与防范强对流，趣味映射‘战车’。</li></ul>',
     tarot: '皇后 & 战车'
   },
   {
     id: 'humidity-emotion',
-    title: '湿度的情绪共鸣：潜意识的活跃程度',
+    title: '湿度的科学规律：环境对人体感官的影响',
     category: 'metric',
     icon: '💧',
-    summary: '水分是直觉与情感的载体。湿度的高低，决定了潜意识直觉的折射能力。',
-    content: '当湿度偏高（&gt;75%）时，空气充满感性因子，对应‘女祭司’与‘圣杯’牌组。此时人会更加敏感、富有同情心，适合进行艺术创作或心理疗愈。反之，干燥（&lt;35%）则带来理性、敏捷与利落（对应‘宝剑’），利于逻辑思考与边界建立。',
+    summary: '水分是影响环境体感的重要因素。湿度的高低直接影响人体汗液蒸发与舒适度。',
+    content: '当湿度偏高（&gt;75%）时，空气潮湿闷热，易感黏腻，趣味映射‘女祭司’。此时应注意室内通风防潮，预防呼吸道敏感。反之，干燥（&lt;35%）则带来干爽体感（趣味映射‘宝剑’），利于衣物晾晒，但需注意皮肤保湿与多喝水。',
     tarot: '女祭司 (The High Priestess)'
   },
   {
     id: 'pressure-will',
-    title: '气压与秩序张力：掌控感与外界阻力',
+    title: '气压与人体体感：气压对身体和情绪的影响',
     category: 'metric',
     icon: '🌀',
-    summary: '气压是无形物质投射在万物上的负荷，反映了个人承受现实压力与掌控周遭的能力。',
-    content: '高气压（&gt;1015 hPa）对应‘皇帝’或‘正义’。高压环境下，精神集中，秩序井然，人们容易拥有掌控全局的自信。低气压（&lt;1000 hPa）则对应‘吊人’或‘恶魔’。气压降低常带来思绪的沉重、惰性与被迫顺应，此时宜于放下掌控欲，随遇而安。',
+    summary: '气压是大气压强作用于人体的物理载荷，直接关系到血氧饱和度与心血管舒张。',
+    content: '高气压（&gt;1015 hPa）通常对应晴朗舒适天气，精神集中，趣味映射‘皇帝’。低气压（&lt;1000 hPa）则常伴随阴雨连绵，精神易惰性或胸闷，趣味映射‘吊人’。此时宜保持室内通风，进行舒缓运动。',
     tarot: '皇帝 (The Emperor)'
   },
   {
     id: 'wind-mind',
-    title: '风速与风向：思维的信使与情绪迁移',
+    title: '风速与风向：大气的流动与能量迁移',
     category: 'metric',
     icon: '💨',
-    summary: '风是空气流动的轨迹，象征思想在无形中的迁移与改变。',
-    content: '微风如细碎的灵感之雨，激发创作欲；强风（风速&gt;25 km/h）对应‘愚者’或‘命运之轮’，代表着变化与冲刷旧观念。在方向上，<strong>东风</strong>代表开启（创造力），<strong>南风</strong>代表热忱（行动），<strong>西风</strong>代表情感共鸣，<strong>北风</strong>代表收割与沉静（智慧）。',
+    summary: '风是空气流动的轨迹，体现了大气热量与湿度的循环和输送。',
+    content: '微风宜人，适合户外出行；强风（风速&gt;25 km/h，趣味映射‘愚者’）则代表天气变化，需注意加固门窗避风。在我国传统文化中，东风代表春季开启（润物无声），南风代表夏季热忱（雨水充足），西风代表秋季收敛，北风代表冬季严寒。',
     tarot: '愚者 (The Fool)'
   },
   {
     id: 'solstice-energy',
-    title: '二至二分：天球能量轴线的交替',
+    title: '二至二分：天体运行与节气交替',
     category: 'cycle',
     icon: '📅',
-    summary: '春分、秋分、夏至、冬至，是地球与太阳关系最显著的四个拐点，主导了地表能量的大循环。',
-    content: '<ul><li><strong>春分</strong>：日夜平分，万物复苏，象征平衡与初始，对应‘魔术师’。</li><li><strong>夏至</strong>：白昼最长，阳气鼎盛，象征极致的绽放与繁盛，对应‘太阳’。</li><li><strong>秋分</strong>：收获与均分，冷暖交叠，代表反思与收敛，对应‘正义’。</li><li><strong>冬至</strong>：黑夜最长，万物归藏，代表转化、沉思与重生的希望，对应‘世界’。</li></ul>',
+    summary: '春分、夏至、秋分、冬至是太阳直射点变化的重要分界线，主导了地表季节的自然大循环。',
+    content: '<ul><li><strong>春分</strong>：日夜平分，气温回暖，春耕开始，趣味映射‘魔术师’。</li><li><strong>夏至</strong>：白昼最长，阳气充沛，气温最高，趣味映射‘太阳’。</li><li><strong>秋分</strong>：昼夜平分，冷暖交替，作物成熟，趣味映射‘正义’。</li><li><strong>冬至</strong>：黑夜最长，天寒地冻，阴极阳生，趣味映射‘世界’。</li></ul>',
     tarot: '太阳 & 命运之轮'
   },
   {
     id: 'divination-base',
-    title: '气象占卜的核心原则：天人感应与符号学',
+    title: '气象科普的核心原则：天人感应与生活指南',
     category: 'theory',
     icon: '🔮',
-    summary: '气象占卜并非伪科学，而是一种基于大自然状态对个体意识影响的符号共鸣系统。',
-    content: '占卜的本质是‘共时性’（Synchronicity）。通过现代传感器获取实时的温度、湿度、气压、风速，我们将这些物理参量转化为塔罗符号的权重，再利用自然语言模型将这些权重重构为人类能够理解的心灵隐喻。以天象知人心，顺天时以达人谋。',
+    summary: '气象与人居环境密切相关，是通过大数据气象参数服务人类的智能共鸣系统。',
+    content: '气象服务的本质是‘天人感应’。通过现代传感器获取实时的温度、湿度、气压、风速，我们将这些物理参量转化为气象生活指数，并利用大语言模型将数据重构为人类更易理解的出行、穿衣、防灾等健康与生活隐喻。以科学预报天气，以智慧服务民生。',
     tarot: '命运之轮 (Wheel of Fortune)'
   }
 ]

@@ -8,6 +8,13 @@ Status: Dynamic model selector dropdown has been added to the chat panel header,
 
 ## Done
 
+- Implemented Task (Custom Card-style Dropdown Selector in OracleChatPanel):
+  - Replaced native `<select>` dropdown in the chat panel header with a custom transition-enhanced floating card dropdown selector (`.model-picker-wrapper`, `.model-select-trigger`, `.model-dropdown-panel`).
+  - Added click-outside listener to automatically close the dropdown when clicking elsewhere on the page.
+  - Implemented `modelName` computed property for displaying the active model.
+  - Cleaned up unused styles and updated CSS to match the custom dropdown design specifications.
+  - Verified compilation via `npm run build` and ran `pytest` regression checks successfully.
+
 - Completed Task 1 (Modify OracleChatPanel UI, Script Logic, and Styles):
   - Replaced static model badge with a select dropdown for model selection on the home weather assistant chat panel.
   - Added script initialization logic to persist user's chosen model in `localStorage` under `weather_oracle:chat_model`, defaulting to `mimo-v2.5`, `MiniMax-M2.5`, `kimi-k2.5`, or the first configured model.

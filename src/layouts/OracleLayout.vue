@@ -49,7 +49,7 @@
           </div>
 
           <!-- User Profile Dropdown -->
-          <div class="oracle-header-user-wrapper" ref="dropdownRef">
+          <div class="oracle-header-user-wrapper" ref="dropdownRef" @click.stop>
             <div class="oracle-header-profile-trigger" @click="toggleDropdown">
               <div class="oracle-header-avatar">{{ userInitial }}</div>
               <div class="oracle-header-user-info">
@@ -124,6 +124,8 @@ const dropdownRef = ref<HTMLElement | null>(null)
 
 watch(theme, value => {
   localStorage.setItem('weather_oracle:theme', value)
+  // Sync to <html> so the global [data-oracle-theme='light'] CSS selector applies everywhere
+  document.documentElement.dataset.oracleTheme = value
 })
 
 function toggleTheme() {
@@ -153,6 +155,8 @@ function handleClickOutside(event: MouseEvent) {
 }
 
 onMounted(() => {
+  // Apply the persisted theme to <html> on first mount
+  document.documentElement.dataset.oracleTheme = theme.value
   document.addEventListener('click', handleClickOutside)
 })
 
@@ -168,11 +172,12 @@ onUnmounted(() => {
   position: relative;
   isolation: isolate;
   background:
-    linear-gradient(115deg, rgba(215, 174, 105, 0.05), transparent 30%),
-    linear-gradient(245deg, rgba(142, 110, 194, 0.05), transparent 35%),
+    linear-gradient(115deg, var(--oracle-gold-glow), transparent 30%),
+    linear-gradient(245deg, var(--oracle-purple-soft), transparent 35%),
     linear-gradient(135deg, var(--oracle-bg-deep), var(--oracle-bg) 45%, var(--oracle-panel-solid));
   display: flex;
   flex-direction: column;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
 .oracle-layout::after {

@@ -388,6 +388,79 @@ class WeatherCardEndpointTests(unittest.TestCase):
         self.assertIn("正常出门", data["daily_advice"]["travel"])
         self.assertIn("薄外套", data["daily_advice"]["clothing"])
 
+    @patch("app.routers.assistant.get_llm")
+    @patch("app.services.weather_tool.WeatherToolService.fetch_realtime_weather")
+    def test_weather_tip_generation_and_fallback(self, fetch_weather, get_llm):
+        fetch_weather.return_value = {
+            "city": "北京",
+            "temperature": 25,
+            "humidity": 50,
+            "pressure": 1010,
+            "wind_speed": 10,
+            "wind_direction": "南风",
+            "condition": "晴",
+            "observed_at": "2026-06-06T09:00+08:00",
+        }
+
+        # First, test fallback behavior when LLM fails
+        class FakeLLMFail:
+            def invoke(self, prompt):
+                raise RuntimeError("llm fail")
+
+        get_llm.return_value = FakeLLMFail()
+
+        response = self.client.post(
+            "/api/v1/assistant/weather-card",
+            json={"city": "北京", "model_id": "kimi-k2.5"},
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("weather_tip", data)
+        self.assertIsNotNone(data["weather_tip"])
+        self.assertIn("title", data["weather_tip"])
+        self.assertIn("advice", data["weather_tip"])
+
+        # Second, test LLM prompt updates and parsed tip when LLM succeeds
+        class FakeLLMSuccess:
+            def invoke(self, prompt):
+                self.prompt = prompt
+                return SimpleNamespace(content=json.dumps({
+                    "fortune": {
+                        "title": "星辰希望",
+                        "summary": "今天适合把节奏放慢。",
+                        "lucky_color": "雾紫色",
+                        "lucky_number": 7,
+                        "good_for": "整理思路",
+                        "avoid": "冲动争执",
+                    },
+                    "mood_guide": {
+                        "title": "内收敏感",
+                        "analysis": "湿度偏高，给自己一点空隙。",
+                        "suggestions": ["留二十分钟独处"],
+                    },
+                    "weather_mappings": [
+                        {"metric": "temperature", "label": "温度", "value": "25°C", "reading": "平和舒适", "score": 70},
+                    ],
+                    "weather_tip": {
+                        "title": "测试贴士",
+                        "advice": "测试气象建议内容"
+                    }
+                }, ensure_ascii=False))
+
+        fake_llm = FakeLLMSuccess()
+        get_llm.return_value = fake_llm
+
+        response = self.client.post(
+            "/api/v1/assistant/weather-card",
+            json={"city": "北京", "model_id": "kimi-k2.5"},
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("weather_tip", data)
+        self.assertEqual(data["weather_tip"]["title"], "测试贴士")
+        self.assertEqual(data["weather_tip"]["advice"], "测试气象建议内容")
+
+
 
 if __name__ == "__main__":
     unittest.main()

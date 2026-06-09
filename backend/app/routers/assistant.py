@@ -179,6 +179,26 @@ def build_weather_daily_advice(weather: dict) -> dict:
     return {"travel": travel, "clothing": clothing}
 
 
+def build_fallback_weather_tip() -> dict:
+    from datetime import datetime
+    day = datetime.now().day
+    tips = [
+        {"title": "紫外线提示", "advice": "夏季紫外线较强，外出建议涂抹防晒霜、配戴遮阳帽"},
+        {"title": "防暑降温", "advice": "高温天气注意补充水分，避免长时间户外暴晒"},
+        {"title": "雷雨天气", "advice": "雷雨天气避免在空旷地带停留，远离金属物体"},
+        {"title": "台风预防", "advice": "台风来临前检查门窗，储备必要物资，关注预警信息"},
+        {"title": "雾天出行", "advice": "大雾天气能见度低，驾车请减速慢行、开启雾灯"},
+        {"title": "寒潮提醒", "advice": "寒潮来临注意添衣保暖，预防感冒和心血管疾病"},
+        {"title": "空气质量", "advice": "关注空气质量指数，污染天气减少户外活动"},
+        {"title": "干燥天气", "advice": "秋冬干燥季节注意补水保湿，预防静电和皮肤干裂"},
+        {"title": "晨练建议", "advice": "晴好天气适宜户外运动，但避开高温时段"},
+        {"title": "梅雨季节", "advice": "梅雨期间注意防潮除湿，衣物及时晾晒烘干"},
+        {"title": "霜冻预警", "advice": "霜冻天气注意农作物保护，行车注意路面结冰"},
+        {"title": "气压变化", "advice": "气压剧烈波动可能引起头痛不适，注意休息调节"},
+    ]
+    return tips[day % len(tips)]
+
+
 def normalize_daily_advice(raw_advice: Any, fallback: dict) -> dict:
     daily_advice = dict(fallback)
     if isinstance(raw_advice, dict):
@@ -287,11 +307,20 @@ def normalize_weather_oracle_model_data(card_data: dict, fallback: dict) -> dict
         fallback["daily_advice"],
     )
 
+    raw_tip = card_data.get("weather_tip") or card_data.get("weatherTip")
+    weather_tip = dict(fallback["weather_tip"])
+    if isinstance(raw_tip, dict):
+        for key in ("title", "advice"):
+            text = non_empty_text(raw_tip.get(key))
+            if text:
+                weather_tip[key] = text
+
     return {
         "fortune": fortune,
         "mood_guide": mood_guide,
         "daily_advice": daily_advice,
         "weather_mappings": weather_mappings,
+        "weather_tip": weather_tip,
     }
 
 
@@ -315,8 +344,8 @@ def build_weather_oracle_prompt(weather: dict, date_key: str, tarot: dict) -> st
         "只输出 JSON，不要 markdown。"
         f"日期={date_key};天气={json.dumps(weather_payload, ensure_ascii=False)};"
         f"塔罗={json.dumps(card_payload, ensure_ascii=False)};"
-        "生成 fortune={title,summary,lucky_color,lucky_number,good_for,avoid}"
-        " 和 mood_guide={title,analysis,suggestions}。"
+        "生成 fortune={title,summary,lucky_color,lucky_number,good_for,avoid}、"
+        "mood_guide={title,analysis,suggestions} 和 weather_tip={title, advice} (建议字数不超过30字)。"
     )
 
 # ---- 模型列表 ----
@@ -775,6 +804,7 @@ def generate_weather_card(
                 "score": 60,
             },
         ],
+        "weather_tip": build_fallback_weather_tip(),
     }
 
     response_payload = {
@@ -788,6 +818,7 @@ def generate_weather_card(
         "mood_guide": fallback["mood_guide"],
         "daily_advice": fallback["daily_advice"],
         "weather_mappings": fallback["weather_mappings"],
+        "weather_tip": fallback["weather_tip"],
     }
     try:
         llm = get_llm(
@@ -813,6 +844,7 @@ def generate_weather_card(
             "mood_guide": normalized_card_data["mood_guide"],
             "daily_advice": normalized_card_data["daily_advice"],
             "weather_mappings": normalized_card_data["weather_mappings"],
+            "weather_tip": normalized_card_data["weather_tip"],
         }
         return WeatherCardResponse.model_validate(model_payload, strict=True)
     except HTTPException:

@@ -10,7 +10,6 @@
         </div>
         <div class="diviner-meta">
           <h4>天气助手</h4>
-          <span>你的智能气象服务助理</span>
         </div>
       </div>
       <div class="model-picker" v-if="models.length > 0">
@@ -337,13 +336,6 @@ async function sendMessage(message: string) {
   margin: 0;
 }
 
-.diviner-meta span {
-  font-size: 11px;
-  color: var(--oracle-muted);
-  display: block;
-  margin-top: 1px;
-}
-
 .model-picker {
   position: relative;
   display: flex;
@@ -354,16 +346,17 @@ async function sendMessage(message: string) {
   appearance: none;
   -webkit-appearance: none;
   background: var(--oracle-panel-soft);
-  border: 1px solid var(--oracle-border-soft);
-  border-radius: 12px;
-  padding: 3px 22px 3px 10px;
-  font-size: 10.5px;
-  color: var(--oracle-gold);
-  font-weight: 600;
+  border: 1px solid var(--oracle-border);
+  border-radius: 20px;
+  padding: 6px 28px 6px 12px;
+  font-size: 11.5px;
+  color: var(--oracle-text);
+  font-weight: 700;
   cursor: pointer;
   outline: none;
   font-family: var(--oracle-font-sans);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), border-color 160ms ease-out, background-color 160ms ease-out, box-shadow 160ms ease-out;
 }
 
 .model-select option {
@@ -373,7 +366,7 @@ async function sendMessage(message: string) {
 
 .model-select:focus:not(:disabled) {
   border-color: var(--oracle-gold);
-  box-shadow: 0 0 8px var(--oracle-gold-glow);
+  box-shadow: 0 0 10px var(--oracle-gold-glow);
 }
 
 .model-select:disabled {
@@ -384,8 +377,8 @@ async function sendMessage(message: string) {
 .model-picker::after {
   content: '▾';
   position: absolute;
-  right: 8px;
-  font-size: 9px;
+  right: 12px;
+  font-size: 11px;
   color: var(--oracle-gold);
   pointer-events: none;
 }
@@ -393,8 +386,14 @@ async function sendMessage(message: string) {
 @media (hover: hover) and (pointer: fine) {
   .model-select:hover:not(:disabled) {
     border-color: var(--oracle-gold);
-    box-shadow: 0 0 6px var(--oracle-gold-glow);
+    background: var(--oracle-panel);
+    box-shadow: 0 0 10px var(--oracle-gold-glow);
+    transform: translateY(-1px);
   }
+}
+
+.model-select:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 /* Chat History Display */

@@ -29,7 +29,7 @@
                   <div class="user-title-desc">
                     <div class="user-avatar">{{ user.username.charAt(0).toUpperCase() }}</div>
                     <div class="user-name-role">
-                      <h4>{{ user.username }}</h4>
+                      <h4 :title="user.username">{{ user.username }}</h4>
                       <span class="badge-pill" :class="user.is_admin ? 'badge-pill-admin' : 'badge-pill-user'">
                         {{ user.is_admin ? '管理员' : '普通用户' }}
                       </span>
@@ -241,6 +241,7 @@ onMounted(fetchUsers)
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .user-avatar {
@@ -258,12 +259,21 @@ onMounted(fetchUsers)
   border: 1px solid var(--oracle-border-soft);
 }
 
+.user-name-role {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .user-name-role h4 {
   font-size: 16px;
   font-weight: 600;
   color: var(--oracle-text);
   margin: 0 0 4px 0;
   font-family: var(--oracle-font-serif);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Badges */
@@ -296,6 +306,7 @@ onMounted(fetchUsers)
 .user-card-actions {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .btn-card-action {

@@ -8,6 +8,12 @@ Status: In Progress. Task 1 (Redesign CSS Stylesheet in AdminUsers.vue) is compl
 
 ## Done
 
+- Fixed layout overflow in [AdminUsers.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/AdminUsers.vue):
+  - Added `:title` tooltip on hover for user names.
+  - Set `.user-title-desc` and `.user-name-role` to `min-width: 0` and enabled `text-overflow: ellipsis` to cleanly truncate long usernames.
+  - Configured `.user-card-actions` with `flex-shrink: 0` to prevent upgrade and delete action buttons from being squeezed or pushed out of view.
+  - Verified that it compiles cleanly with `npm run build`.
+
 - Redesigned the CSS Stylesheet block in [AdminUsers.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/AdminUsers.vue) (Task 1):
   - Replaced hardcoded RGBA colors in `.badge-pill-admin`, `.btn-card-action.edit-btn:hover`, `.btn-card-action.delete-btn`, `.success-message`, and `.error-message` with theme-aware RGB variables (`var(--oracle-gold-rgb)`, `var(--oracle-danger-rgb)`, and `var(--oracle-success-rgb)`).
   - Verified compilation of Vue templates and styles via `npm run build`.

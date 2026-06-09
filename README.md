@@ -5,20 +5,19 @@
 前端基于 Vue 3 提供智能气象问答对话界面，采用玻璃模糊设计风格；后端采用 Python + LangChain 技术，实现简单的天气检索功能，模型支持流式输出、知识库检索、调用天气工具等。
 
 ### 登录页
-![login](./docs/images/home.png)
+![login](./docs/images/login_page.png)
 
-### 首页
-![home](./docs/images/home2.png)
-![AI-page](./docs/images/picture1.png)
+### 气象助手主页
+![dashboard](./docs/images/dashboard_page.png)
 
-### 系统设置页（LLM 模型）
-![settings-llm](./docs/images/setting1.png)
+### 智能气象对话页
+![assistant](./docs/images/assistant_page.png)
 
-### 系统设置页（天气服务）
-![settings-weather](./docs/images/setting2.png)
+### 系统设置页
+![settings](./docs/images/settings_page.png)
 
 ### 用户管理页
-![admin-users](./docs/images/setting3.png)
+![admin-users](./docs/images/admin_users_page.png)
 
 
 ## 核心功能
@@ -63,7 +62,7 @@
 │   ├── views/
 │   │   ├── Login.vue              # 登录页
 │   │   ├── Register.vue           # 注册页
-│   │   ├── Home.vue               # 首页
+│   │   ├── WeatherOracle.vue      # 气象助手主页
 │   │   ├── Settings.vue           # 系统设置页
 │   │   ├── AdminUsers.vue         # 用户管理页（管理员）
 │   │   └── IntelligentAssistant.vue   # 智能助手核心页面

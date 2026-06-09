@@ -15,17 +15,16 @@ dist-ssr
 .superpowers/
 
 # Docs
-docs/
+docs/manuals/
 docs/**/*.pdf
 docs/archive/
 docs/generated/
 docs/images/*
-!docs/images/home.png
-!docs/images/home2.png
-!docs/images/picture1.png
-!docs/images/setting1.png
-!docs/images/setting2.png
-!docs/images/setting3.png
+!docs/images/login_page.png
+!docs/images/dashboard_page.png
+!docs/images/assistant_page.png
+!docs/images/settings_page.png
+!docs/images/admin_users_page.png
 
 # Editor directories and files
 .vscode/*

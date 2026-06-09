@@ -42,7 +42,6 @@
           </defs>
           <circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.03)" stroke="var(--oracle-border-soft)" stroke-width="1" />
           <circle cx="50" cy="50" r="30" fill="url(#weatherGlow)" class="glow-circle" />
-          <circle cx="50" cy="50" r="20" fill="none" stroke="var(--oracle-gold)" stroke-width="1.5" stroke-dasharray="4 3" />
           <path d="M 35 65 A 10 10 0 0 1 45 55 A 12 12 0 0 1 67 55 A 10 10 0 0 1 77 65 Z" fill="rgba(255,255,255,0.15)" stroke="var(--oracle-gold)" stroke-width="1" />
         </svg>
       </div>

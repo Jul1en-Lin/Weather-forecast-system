@@ -92,10 +92,6 @@
       </div>
     </main>
 
-    <!-- Global Footer -->
-    <footer class="oracle-layout-footer">
-      <p>© 2026 Weather Oracle 智能气象助手 | 科学预报，智慧服务</p>
-    </footer>
   </div>
 </template>
 

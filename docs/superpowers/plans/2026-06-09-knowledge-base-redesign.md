@@ -1,3 +1,55 @@
+# Knowledge Base Redesign Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Modify the Knowledge Base page to remove the search input box and floating card layout/effects, rendering a clean, text-based typography layout and adding copy emphasizing that these definitions serve as the model's built-in knowledge base context.
+
+**Architecture:** Remove search input, filter state, and template tags. Refactor the grid into a single-column typographic layout using CSS variables, removing the card panels, border shadows, and floating hover effects. Update the description/header to state its functional integration with the AI model.
+
+**Tech Stack:** Vue 3, CSS (oracle-theme.css variables)
+
+---
+
+### Task 1: Refactor Template & Script in KnowledgeBase.vue
+
+**Files:**
+- Modify: `src/views/KnowledgeBase.vue`
+
+- [ ] **Step 1: Remove the search query state and simplify filter logic in `<script setup>`**
+  - Delete `searchQuery` ref.
+  - Simplify `filteredArticles` computed property to only filter by `activeCategory`.
+
+```typescript
+const activeCategory = ref<'all' | 'metric' | 'cycle' | 'theory'>('all')
+
+const categories: { label: string; value: 'all' | 'metric' | 'cycle' | 'theory' }[] = [
+  { label: '全部知识', value: 'all' },
+  { label: '气象要素科普', value: 'metric' },
+  { label: '岁时节气规律', value: 'cycle' },
+  { label: '气象科普理论', value: 'theory' },
+]
+
+// ... (keep articles array as is)
+
+const filteredArticles = computed(() => {
+  return articles.filter(art => {
+    // Category filter
+    if (activeCategory.value !== 'all' && art.category !== activeCategory.value) {
+      return false
+    }
+    return true
+  })
+})
+```
+
+- [ ] **Step 2: Update HTML template structure**
+  - Remove `oracle-surface oracle-gold-corners anim-float` classes from the hero `<section class="kb-hero">`.
+  - Update hero description to emphasize the built-in model knowledge base.
+  - Remove the search container `<div class="kb-search-container">` completely.
+  - Replace `.kb-grid` and `.kb-article-card` with `.kb-list` and `.kb-article-item`. Remove the card design class `oracle-surface`.
+  - Add a sub-badge or explicit line stating `内置知识库` in the article layout.
+
+```html
 <template>
   <OracleLayout>
     <div class="knowledge-base-page">
@@ -6,7 +58,7 @@
         <span class="oracle-eyebrow">Model Built-in Knowledge Base</span>
         <h1>模型内置气象知识库</h1>
         <p class="kb-hero-desc">
-          以下气象常识作为系统内置知识库，直接用于大语言模型在天气助手与智能问答服务时的常识检索与推理依据。通过注入专业气象学背景，确保智能解答科学、准确。
+          以下气象科普常识作为模型内置知识库，直接嵌入大语言模型的系统提示词中，用作天气助手与智能问答的常识检索、推理参考及事实比对依据。
         </p>
       </section>
 
@@ -38,7 +90,7 @@
               </div>
               <div class="article-badges">
                 <span class="article-category-badge">{{ getCategoryLabel(article.category) }}</span>
-                <span class="article-builtin-badge">模型内置</span>
+                <span class="article-builtin-badge">内置常识</span>
               </div>
             </header>
             
@@ -46,7 +98,7 @@
             <div class="article-content" v-html="article.content"></div>
             
             <footer class="article-footer">
-              <span class="article-meta">模型关联参考：<strong>{{ article.tarot }}</strong></span>
+              <span class="article-meta">对应牌面：<strong>{{ article.tarot }}</strong></span>
             </footer>
           </article>
         </transition-group>
@@ -59,102 +111,21 @@
     </div>
   </OracleLayout>
 </template>
+```
 
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import OracleLayout from '../layouts/OracleLayout.vue'
+---
 
-interface Article {
-  id: string
-  title: string
-  category: 'metric' | 'cycle' | 'theory'
-  icon: string
-  summary: string
-  content: string
-  tarot: string
-}
+### Task 2: Refactor Scoped CSS Styles in KnowledgeBase.vue
 
-const activeCategory = ref<'all' | 'metric' | 'cycle' | 'theory'>('all')
+**Files:**
+- Modify: `src/views/KnowledgeBase.vue`
 
-const categories: { label: string; value: 'all' | 'metric' | 'cycle' | 'theory' }[] = [
-  { label: '全部知识', value: 'all' },
-  { label: '气象要素科普', value: 'metric' },
-  { label: '岁时节气规律', value: 'cycle' },
-  { label: '气象科普理论', value: 'theory' },
-]
+- [ ] **Step 1: Replace styles in `<style scoped>`**
+  - Replace search styles and grid styles with the clean text list styling.
+  - Remove any hover scale or translate effects, shadows, card borders.
+  - Simplify category active button styling to avoid floating card/shadow effects.
 
-const articles: Article[] = [
-  {
-    id: 'temp-metaphor',
-    title: '气温的科学规律：生命的寒暑刻度',
-    category: 'metric',
-    icon: '🌡️',
-    summary: '温度是外界环境对生命的包容度。在气象学中，它直接反映了人体的热量平衡与舒适度状态。',
-    content: '<ul><li><strong>极寒（&lt;0°C）</strong>：代表能量收敛、防寒保暖与蛰伏，趣味映射塔罗‘隐士’。</li><li><strong>舒适（20°C-25°C）</strong>：代表万物繁茂、情绪松弛与户外活动适宜，趣味映射‘星辰’。</li><li><strong>酷暑（&gt;35°C）</strong>：代表热量积聚、防暑降温与防范强对流，趣味映射‘战车’。</li></ul>',
-    tarot: '皇后 & 战车'
-  },
-  {
-    id: 'humidity-emotion',
-    title: '湿度的科学规律：环境对人体感官的影响',
-    category: 'metric',
-    icon: '💧',
-    summary: '水分是影响环境体感的重要因素。湿度的高低直接影响人体汗液蒸发与舒适度。',
-    content: '当湿度偏高（&gt;75%）时，空气潮湿闷热，易感黏腻，趣味映射‘女祭司’。此时应注意室内通风防潮，预防呼吸道敏感。反之，干燥（&lt;35%）则带来干爽体感（趣味映射‘宝剑’），利于衣物晾晒，但需注意皮肤保湿与多喝水。',
-    tarot: '女祭司 (The High Priestess)'
-  },
-  {
-    id: 'pressure-will',
-    title: '气压与人体体感：气压对身体和情绪的影响',
-    category: 'metric',
-    icon: '🌀',
-    summary: '气压是大气压强作用于人体的物理载荷，直接关系到血氧饱和度与心血管舒张。',
-    content: '高气压（&gt;1015 hPa）通常对应晴朗舒适天气，精神集中，趣味映射‘皇帝’。低气压（&lt;1000 hPa）则常伴随阴雨连绵，精神易惰性或胸闷，趣味映射‘吊人’。此时宜保持室内通风，进行舒缓运动。',
-    tarot: '皇帝 (The Emperor)'
-  },
-  {
-    id: 'wind-mind',
-    title: '风速与风向：大气的流动与能量迁移',
-    category: 'metric',
-    icon: '💨',
-    summary: '风是空气流动的轨迹，体现了大气热量与湿度的循环和输送。',
-    content: '微风宜人，适合户外出行；强风（风速&gt;25 km/h，趣味映射‘愚者’）则代表天气变化，需注意加固门窗避风。在我国传统文化中，东风代表春季开启（润物无声），南风代表夏季热忱（雨水充足），西风代表秋季收敛，北风代表冬季严寒。',
-    tarot: '愚者 (The Fool)'
-  },
-  {
-    id: 'solstice-energy',
-    title: '二至二分：天体运行与节气交替',
-    category: 'cycle',
-    icon: '📅',
-    summary: '春分、夏至、秋分、冬至是太阳直射点变化的重要分界线，主导了地表季节的自然大循环。',
-    content: '<ul><li><strong>春分</strong>：日夜平分，气温回暖，春耕开始，趣味映射‘魔术师’。</li><li><strong>夏至</strong>：白昼最长，阳气充沛，气温最高，趣味映射‘太阳’。</li><li><strong>秋分</strong>：昼夜平分，冷暖交替，作物成熟，趣味映射‘正义’。</li><li><strong>冬至</strong>：黑夜最长，天寒地冻，阴极阳生，趣味映射‘世界’。</li></ul>',
-    tarot: '太阳 & 命运之轮'
-  },
-  {
-    id: 'divination-base',
-    title: '气象科普的核心原则：天人感应与生活指南',
-    category: 'theory',
-    icon: '💡',
-    summary: '气象与人居环境密切相关，是通过大数据气象参数服务人类的智能共鸣系统。',
-    content: '气象服务的本质是‘天人感应’。通过现代传感器获取实时的温度、湿度、气压、风速，我们将这些物理参量转化为气象生活指数，并利用大语言模型将数据重构为人类更易理解的出行、穿衣、防灾等健康与生活隐喻。以科学预报天气，以智慧服务民生。',
-    tarot: '命运之轮 (Wheel of Fortune)'
-  }
-]
-
-function getCategoryLabel(val: string) {
-  return categories.find(c => c.value === val)?.label || val
-}
-
-const filteredArticles = computed(() => {
-  return articles.filter(art => {
-    // Category filter
-    if (activeCategory.value !== 'all' && art.category !== activeCategory.value) {
-      return false
-    }
-    return true
-  })
-})
-</script>
-
+```css
 <style scoped>
 .knowledge-base-page {
   padding: 12px 0;
@@ -371,3 +342,23 @@ const filteredArticles = computed(() => {
   }
 }
 </style>
+```
+
+---
+
+### Task 3: Verify the Changes & Compilation
+
+- [ ] **Step 1: Check Vite Compilation**
+  - Run: `npm run build`
+  - Expected: Clean compilation with zero type errors.
+
+- [ ] **Step 2: Check Backend Tests**
+  - Run: `venv/bin/python -m pytest tests -q` (or `python -m pytest` inside `backend/` directory)
+  - Expected: All backend tests pass successfully.
+
+- [ ] **Step 3: Commit Changes**
+  - Run:
+  ```bash
+  git add src/views/KnowledgeBase.vue docs/project_status.md
+  git commit -m "style: remove search and card design from knowledge base view, styling as model built-in text list"
+  ```

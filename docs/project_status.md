@@ -2,11 +2,20 @@
 
 ## Current goal
 
-Goal: Expose model selector on Weather Oracle chat panel and default to preferred models.
+Goal: Redesign Knowledge Base page to simplify visual styling and emphasize built-in nature.
 
-Status: Dynamic model selector dropdown has been added to the chat panel header, styled, and initialized with user preference in localStorage.
+Status: Redesign completed. Removed search input, card styling, and hover/shadow animations. Formatted knowledge base items as a clean, text-based typography list highlighting that they are model-internal datasets.
 
 ## Done
+
+- Redesigned Knowledge Base page (KnowledgeBase.vue):
+  - Removed search box container and query/filtering script state.
+  - Replaced the category buttons active hover/shadow effects with simpler flat colors to align with theme aesthetics.
+  - Replaced the `.kb-grid` and `.kb-article-card` style layouts with a text-only vertical list layout (`.kb-list` and `.kb-article-item`).
+  - Removed all card effects, shadows, floating animations (`anim-float`, `oracle-surface`, `oracle-gold-corners`) from both the header and articles.
+  - Added copy explicitly highlighting the knowledge base content as "模型内置" (model built-in) used for AI context/retrieval.
+  - Verified Vite compile and pytest backend test passes.
+
 
 - Implemented Task (Custom Card-style Dropdown Selector in OracleChatPanel):
   - Replaced native `<select>` dropdown in the chat panel header with a custom transition-enhanced floating card dropdown selector (`.model-picker-wrapper`, `.model-select-trigger`, `.model-dropdown-panel`).

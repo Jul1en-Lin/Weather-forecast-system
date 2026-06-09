@@ -12,17 +12,35 @@
           <h4>天气助手</h4>
         </div>
       </div>
-      <div class="model-picker" v-if="models.length > 0">
-        <select
-          v-model="selectedModel"
-          class="model-select"
+      <div class="model-picker-wrapper" ref="dropdownRef">
+        <button
+          type="button"
+          class="model-select-trigger"
           :disabled="isSending"
-          aria-label="选择模型"
+          @click="toggleDropdown"
         >
-          <option v-for="model in models" :key="model.id" :value="model.id">
-            {{ model.name }}
-          </option>
-        </select>
+          <span class="trigger-icon">🤖</span>
+          <span class="trigger-text">{{ modelName || '选择模型' }}</span>
+          <span class="trigger-arrow">▾</span>
+        </button>
+
+        <transition name="fade-scale">
+          <div v-if="isDropdownOpen" class="model-dropdown-panel oracle-surface oracle-gold-corners">
+            <div class="model-options-list">
+              <button
+                v-for="model in models"
+                :key="model.id"
+                type="button"
+                class="model-option-btn"
+                :class="{ active: model.id === selectedModel }"
+                @click="selectModel(model.id)"
+              >
+                <div class="model-option-name">{{ model.name }}</div>
+                <div class="model-option-desc" v-if="model.description">{{ model.description }}</div>
+              </button>
+            </div>
+          </div>
+        </transition>
       </div>
     </header>
 
@@ -104,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, nextTick, watch } from 'vue'
+import { computed, onMounted, ref, nextTick, watch, onUnmounted } from 'vue'
 import type { WeatherOracleReading } from '../../types/weatherOracle'
 
 const STORAGE_KEY = 'weather_oracle:chat_model'
@@ -138,10 +156,35 @@ const messages = ref<ChatMessage[]>([
   { role: 'assistant', content: '你好，我是你的智能天气助手。有什么天气问题可以问我~' }
 ])
 
+const isDropdownOpen = ref(false)
+const dropdownRef = ref<HTMLElement | null>(null)
 
+const modelName = computed(() => {
+  return models.value.find(model => model.id === selectedModel.value)?.name || ''
+})
+
+function toggleDropdown() {
+  isDropdownOpen.value = !isDropdownOpen.value
+}
+
+function selectModel(modelId: string) {
+  selectedModel.value = modelId
+  isDropdownOpen.value = false
+}
+
+function handleClickOutside(event: MouseEvent) {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+    isDropdownOpen.value = false
+  }
+}
 
 onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
   loadModels()
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 
 // Scroll chat log to bottom whenever messages list grows
@@ -336,55 +379,30 @@ async function sendMessage(message: string) {
   margin: 0;
 }
 
-.model-picker {
+.model-picker-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
+  display: inline-block;
+  z-index: 20;
 }
 
-.model-select {
-  appearance: none;
-  -webkit-appearance: none;
-  background: var(--oracle-panel-soft);
+.model-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
   border: 1px solid var(--oracle-border);
   border-radius: 20px;
-  padding: 6px 28px 6px 12px;
-  font-size: 11.5px;
+  background: var(--oracle-panel-soft);
   color: var(--oracle-text);
+  font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
-  outline: none;
-  font-family: var(--oracle-font-sans);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), border-color 160ms ease-out, background-color 160ms ease-out, box-shadow 160ms ease-out;
-}
-
-.model-select option {
-  background-color: var(--oracle-panel-solid);
-  color: var(--oracle-text);
-}
-
-.model-select:focus:not(:disabled) {
-  border-color: var(--oracle-gold);
-  box-shadow: 0 0 10px var(--oracle-gold-glow);
-}
-
-.model-select:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.model-picker::after {
-  content: '▾';
-  position: absolute;
-  right: 12px;
-  font-size: 11px;
-  color: var(--oracle-gold);
-  pointer-events: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .model-select:hover:not(:disabled) {
+  .model-select-trigger:hover:not(:disabled) {
     border-color: var(--oracle-gold);
     background: var(--oracle-panel);
     box-shadow: 0 0 10px var(--oracle-gold-glow);
@@ -392,8 +410,93 @@ async function sendMessage(message: string) {
   }
 }
 
-.model-select:active:not(:disabled) {
+.model-select-trigger:active:not(:disabled) {
   transform: scale(0.97);
+}
+
+.model-select-trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.trigger-icon {
+  font-size: 11px;
+}
+
+.trigger-arrow {
+  color: var(--oracle-gold);
+  font-size: 10px;
+}
+
+.model-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 240px;
+  padding: 10px;
+  z-index: 100;
+  transform-origin: top right;
+}
+
+.model-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.model-option-btn {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--oracle-border-soft);
+  border-radius: 8px;
+  background: var(--oracle-panel-soft);
+  color: var(--oracle-faint);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), border-color 160ms ease-out, color 160ms ease-out, background-color 160ms ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .model-option-btn:hover {
+    border-color: var(--oracle-gold);
+    color: var(--oracle-gold-strong);
+    background: var(--oracle-panel);
+  }
+}
+
+.model-option-btn:active {
+  transform: scale(0.98);
+}
+
+.model-option-btn.active {
+  border-color: var(--oracle-gold);
+  color: var(--oracle-gold-strong);
+  background: var(--oracle-purple-soft);
+  box-shadow: 0 0 8px var(--oracle-gold-glow);
+}
+
+.model-option-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.model-option-desc {
+  font-size: 10.5px;
+  color: var(--oracle-muted);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.fade-scale-enter-active,
+.fade-scale-leave-active {
+  transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1), transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.fade-scale-enter-from,
+.fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.96) translateY(-4px);
 }
 
 /* Chat History Display */

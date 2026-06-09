@@ -2,11 +2,15 @@
 
 ## Current goal
 
-Goal: Fix the admin user management page failing to load users.
+Goal: Resolve issues identified in the code quality review of `src/views/Settings.vue`.
 
-Status: Done. The user list now uses the backend route with the trailing slash and avoids the proxy redirect that caused `Failed to fetch`.
+Status: Done. Dead CSS styles have been pruned, and light theme overrides have been added.
 
 ## Done
+
+- Pruned dead CSS styles from [Settings.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Settings.vue), deleting unused selectors `.config-section`, `.config-grid`, and `.config-card` (along with all nested/theme rules).
+- Added light mode adaptability CSS overrides using the `[data-oracle-theme='light']` class selector in [Settings.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Settings.vue).
+- Verified successful Vite compilation via `npm run build`.
 
 - Fixed [AdminUsers.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/AdminUsers.vue) so `fetchUsers()` requests `/api/v1/users/` instead of `/api/v1/users`, avoiding FastAPI's 307 redirect from the Vite proxy origin to the backend origin.
 - Redesigned the UI template elements in [Settings.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Settings.vue) (Task 1):

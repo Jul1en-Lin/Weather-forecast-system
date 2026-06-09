@@ -668,9 +668,6 @@ onMounted(fetchConfig)
   padding: 40px;
 }
 
-.config-section {
-  margin-bottom: 40px;
-}
 
 .section-header {
   display: flex;
@@ -693,58 +690,6 @@ onMounted(fetchConfig)
   gap: 12px;
 }
 
-.config-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-}
-
-.config-card {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid var(--oracle-border-soft);
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-[data-oracle-theme='light'] .config-card {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.config-card:hover {
-  border-color: var(--oracle-gold);
-  box-shadow: 0 0 10px var(--oracle-gold-glow);
-}
-
-.config-card label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--oracle-text);
-  margin-bottom: 10px;
-}
-
-.config-card input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid var(--oracle-border);
-  border-radius: 10px;
-  font-size: 15px;
-  color: var(--oracle-text);
-  background: rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-}
-
-[data-oracle-theme='light'] .config-card input {
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.config-card input:focus {
-  outline: none;
-  border-color: var(--oracle-gold);
-  box-shadow: 0 0 8px var(--oracle-gold-glow);
-}
 
 .current-value {
   display: block;
@@ -1220,5 +1165,58 @@ code.meta-value {
   .settings-form {
     padding: 20px;
   }
+}
+
+/* Light theme specific overrides */
+[data-oracle-theme='light'] .tab-btn:hover {
+  background: rgba(178, 133, 66, 0.05);
+}
+
+[data-oracle-theme='light'] .tab-btn.active {
+  background: rgba(178, 133, 66, 0.08);
+}
+
+[data-oracle-theme='light'] .badge-pill {
+  border-color: rgba(178, 133, 66, 0.25);
+  background: rgba(178, 133, 66, 0.08);
+}
+
+[data-oracle-theme='light'] .badge-pill-local {
+  border-color: rgba(55, 138, 104, 0.25);
+  background: rgba(55, 138, 104, 0.08);
+}
+
+[data-oracle-theme='light'] .badge-pill-builtin {
+  border-color: rgba(116, 87, 164, 0.25);
+  background: rgba(116, 87, 164, 0.08);
+}
+
+[data-oracle-theme='light'] .btn-card-action.edit-btn:hover {
+  background: rgba(178, 133, 66, 0.08);
+}
+
+[data-oracle-theme='light'] .btn-card-action.delete-btn {
+  border-color: rgba(173, 80, 63, 0.25);
+  background: rgba(173, 80, 63, 0.05);
+}
+
+[data-oracle-theme='light'] .btn-card-action.delete-btn:hover {
+  background: rgba(173, 80, 63, 0.15);
+}
+
+[data-oracle-theme='light'] .btn-add-model,
+[data-oracle-theme='light'] .btn-save {
+  background: linear-gradient(135deg, var(--oracle-gold) 0%, #8c6022 100%);
+  color: #fdf9f3;
+}
+
+[data-oracle-theme='light'] .success-message {
+  background: rgba(55, 138, 104, 0.12);
+  border-color: rgba(55, 138, 104, 0.2);
+}
+
+[data-oracle-theme='light'] .error-message {
+  background: rgba(173, 80, 63, 0.12);
+  border-color: rgba(173, 80, 63, 0.2);
 }
 </style>

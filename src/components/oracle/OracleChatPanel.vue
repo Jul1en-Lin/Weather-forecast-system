@@ -13,8 +13,17 @@
           <span>你的智能气象服务助理</span>
         </div>
       </div>
-      <div class="model-badge" v-if="modelName">
-        <span>{{ modelName }}</span>
+      <div class="model-picker" v-if="models.length > 0">
+        <select
+          v-model="selectedModel"
+          class="model-select"
+          :disabled="isSending"
+          aria-label="选择模型"
+        >
+          <option v-for="model in models" :key="model.id" :value="model.id">
+            {{ model.name }}
+          </option>
+        </select>
       </div>
     </header>
 
@@ -96,8 +105,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, nextTick, watch } from 'vue'
+import { onMounted, ref, nextTick, watch } from 'vue'
 import type { WeatherOracleReading } from '../../types/weatherOracle'
+
+const STORAGE_KEY = 'weather_oracle:chat_model'
 
 interface ModelInfo {
   id: string
@@ -128,9 +139,7 @@ const messages = ref<ChatMessage[]>([
   { role: 'assistant', content: '你好，我是你的智能天气助手。有什么天气问题可以问我~' }
 ])
 
-const modelName = computed(() => {
-  return models.value.find(model => model.id === selectedModel.value)?.name || ''
-})
+
 
 onMounted(() => {
   loadModels()
@@ -143,6 +152,12 @@ watch(
     scrollToBottom()
   }
 )
+
+watch(selectedModel, (newVal) => {
+  if (newVal) {
+    localStorage.setItem(STORAGE_KEY, newVal)
+  }
+})
 
 function scrollToBottom() {
   nextTick(() => {
@@ -162,7 +177,18 @@ async function loadModels() {
     if (!res.ok) throw new Error(res.status === 401 ? '登录已过期' : '模型列表读取失败')
     const data = await res.json() as { models?: ModelInfo[] }
     models.value = data.models || []
-    selectedModel.value = models.value[0]?.id || ''
+    const stored = localStorage.getItem(STORAGE_KEY)
+    const ids = models.value.map(m => m.id)
+    if (stored && ids.includes(stored)) {
+      selectedModel.value = stored
+    } else {
+      // Find preferred model: mimo-v2.5, MiniMax-M2.5, kimi-k2.5
+      const preferred = models.value.find(m => m.id === 'mimo-v2.5' || m.id === 'mimo')
+        || models.value.find(m => m.id === 'MiniMax-M2.5')
+        || models.value.find(m => m.id === 'kimi-k2.5')
+        || models.value[0]
+      selectedModel.value = preferred ? preferred.id : ''
+    }
     if (!selectedModel.value) {
       errorMessage.value = '暂无可用模型，请先到系统设置里配置。'
     }
@@ -318,17 +344,57 @@ async function sendMessage(message: string) {
   margin-top: 1px;
 }
 
-.model-badge {
+.model-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.model-select {
+  appearance: none;
+  -webkit-appearance: none;
   background: var(--oracle-panel-soft);
   border: 1px solid var(--oracle-border-soft);
   border-radius: 12px;
-  padding: 3px 10px;
-}
-
-.model-badge span {
+  padding: 3px 22px 3px 10px;
   font-size: 10.5px;
   color: var(--oracle-gold);
   font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  font-family: var(--oracle-font-sans);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.model-select option {
+  background-color: var(--oracle-panel-solid);
+  color: var(--oracle-text);
+}
+
+.model-select:focus:not(:disabled) {
+  border-color: var(--oracle-gold);
+  box-shadow: 0 0 8px var(--oracle-gold-glow);
+}
+
+.model-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.model-picker::after {
+  content: '▾';
+  position: absolute;
+  right: 8px;
+  font-size: 9px;
+  color: var(--oracle-gold);
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .model-select:hover:not(:disabled) {
+    border-color: var(--oracle-gold);
+    box-shadow: 0 0 6px var(--oracle-gold-glow);
+  }
 }
 
 /* Chat History Display */

@@ -1,13 +1,13 @@
-# Weather Assistant Model Selector Design
+# Weather Assistant Model Selector Design - Cards Dropdown Rev
 
-Design specification for adding a model selector to the homepage right-side weather assistant panel and setting the default model to `mimo-v2.5`.
+Design specification for creating a floating card-style dropdown selector for the weather assistant model selection, matching the city picker's style.
 
 ## Requirements
 
-1. **Model Selector**: Add a dropdown select element to the Weather Assistant panel on the homepage.
-2. **Default Model**: Change the default model to `mimo-v2.5` (if configured), falling back to `MiniMax-M2.5`, `kimi-k2.5`, or the first available model.
-3. **Selection Persistence**: Save the selected model in `localStorage` so the user's choice is remembered across page refreshes.
-4. **Theme Adaptation**: Ensure the dropdown matches the gold-accented, glassmorphic layout of the Weather Oracle page.
+1. **Card-Style Dropdown selector**: Instead of a native HTML `<select>` element, implement a button trigger that opens a floating panel (`.model-dropdown-panel`) styled as an `.oracle-surface` with `.oracle-gold-corners`.
+2. **Model Option Cards**: Inside the dropdown panel, list the available models vertically as clickable buttons, showing their names and descriptions (if available).
+3. **No Header Subtitle**: Remove the subtitle text `<span>你的智能气象服务助理</span>` from the panel header to avoid any layout crowding.
+4. **Clean Interactive Transitions**: Implement the `fade-scale` transition for the dropdown toggle, click-outside auto-close listener, hover-translate, and active-scale micro-animations on buttons.
 
 ## Proposed Changes
 
@@ -15,32 +15,52 @@ Design specification for adding a model selector to the homepage right-side weat
 
 #### [OracleChatPanel.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/components/oracle/OracleChatPanel.vue)
 
-1. **Header Template**: Replace the static model badge with a select dropdown:
-   ```html
-   <div class="model-picker" v-if="models.length > 0">
-     <select
-       v-model="selectedModel"
-       class="model-select"
-       :disabled="isSending"
-       aria-label="选择模型"
-     >
-       <option v-for="model in models" :key="model.id" :value="model.id">
-         {{ model.name }}
-       </option>
-     </select>
-   </div>
-   ```
+1. **Template**:
+   - Clean up subtitle span inside `.diviner-meta`.
+   - Replace `<div class="model-picker">` with the new structure:
+     ```html
+     <div class="model-picker-wrapper" ref="dropdownRef">
+       <button
+         type="button"
+         class="model-select-trigger"
+         :disabled="isSending"
+         @click="toggleDropdown"
+       >
+         <span class="trigger-icon">🤖</span>
+         <span class="trigger-text">{{ modelName || '选择模型' }}</span>
+         <span class="trigger-arrow">▾</span>
+       </button>
 
-2. **Initialization and Persistence Logic**:
-   - Save the selected model using a watcher on `selectedModel` to `localStorage` under key `weather_oracle:chat_model`.
-   - Restore the model in `loadModels()` from `localStorage`. If not present, default to `mimo-v2.5` (or fallback models in preference order).
+       <transition name="fade-scale">
+         <div v-if="isDropdownOpen" class="model-dropdown-panel oracle-surface oracle-gold-corners">
+           <div class="model-options-list">
+             <button
+               v-for="model in models"
+               :key="model.id"
+               type="button"
+               class="model-option-btn"
+               :class="{ active: model.id === selectedModel }"
+               @click="selectModel(model.id)"
+             >
+               <div class="model-option-name">{{ model.name }}</div>
+               <div class="model-option-desc" v-if="model.description">{{ model.description }}</div>
+             </button>
+           </div>
+         </div>
+       </transition>
+     </div>
+     ```
 
-3. **Styling**:
-   - Style `.model-picker` and `.model-select` using variables from `oracle-theme.css`.
-   - Implement custom arrow indicator and glassmorphic inputs.
+2. **Script Setup**:
+   - Re-introduce `modelName` computed property.
+   - Add `isDropdownOpen` and `dropdownRef` template references.
+   - Implement `toggleDropdown()`, `selectModel()`, and `handleClickOutside()` logic.
+   - Register the click listener on `onMounted` and clean up on `onUnmounted`.
+
+3. **CSS**:
+   - Add `.model-picker-wrapper`, `.model-select-trigger`, `.model-dropdown-panel`, `.model-options-list`, `.model-option-btn`, `.model-option-name`, `.model-option-desc`, and the `.fade-scale` transition styles.
 
 ## Verification Plan
 
-1. **Vite Build**: Run `npm run build` to confirm compilation.
-2. **Browser Verification**: Inspect the Weather Assistant header and verify that the dropdown works and updates the active model for stream chat calls.
-3. **Persistence Verification**: Refresh the page to confirm that the selected model is remembered.
+1. **Vite Build**: Verify zero compilation/type errors via `npm run build`.
+2. **Unit Tests**: Confirm that no backend tests are affected.

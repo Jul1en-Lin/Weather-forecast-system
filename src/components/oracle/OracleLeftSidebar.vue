@@ -32,17 +32,9 @@
 
       <div class="moon-phase-display">
         <!-- SVG Weather Graphic -->
-        <svg viewBox="0 0 100 100" width="72" height="72" class="moon-svg">
-          <defs>
-            <radialGradient id="weatherGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#fff" stop-opacity="0.8" />
-              <stop offset="60%" stop-color="#fff8d6" stop-opacity="0.3" />
-              <stop offset="100%" stop-color="#d7ae69" stop-opacity="0" />
-            </radialGradient>
-          </defs>
-          <circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.03)" stroke="var(--oracle-border-soft)" stroke-width="1" />
-          <circle cx="50" cy="50" r="30" fill="url(#weatherGlow)" class="glow-circle" />
-          <path d="M 35 65 A 10 10 0 0 1 45 55 A 12 12 0 0 1 67 55 A 10 10 0 0 1 77 65 Z" fill="rgba(255,255,255,0.15)" stroke="var(--oracle-gold)" stroke-width="1" />
+        <svg viewBox="0 0 24 24" width="72" height="72" class="moon-svg" style="color: var(--oracle-gold);">
+          <circle cx="12" cy="8" r="4" fill="currentColor" />
+          <path fill="currentColor" opacity="0.85" d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z" />
         </svg>
       </div>
 

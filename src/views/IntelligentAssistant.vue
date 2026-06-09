@@ -97,7 +97,7 @@
           <div class="chat-messages" ref="messagesContainer">
             <div v-if="currentMessages.length === 0" class="empty-state">
               <div class="empty-icon">
-                <svg viewBox="0 0 24 24" width="72" height="72" style="color: var(--oracle-gold);">
+                <svg viewBox="0 0 24 24" width="72" height="72" style="color: var(--oracle-blue);">
                   <circle cx="12" cy="8" r="4" fill="currentColor" />
                   <path fill="currentColor" opacity="0.85" d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z" />
                 </svg>
@@ -876,9 +876,9 @@ onMounted(async () => {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--oracle-purple-soft), rgba(215, 174, 105, 0.2));
-  border: 1px solid var(--oracle-border);
-  color: var(--oracle-gold);
+  background: linear-gradient(135deg, var(--oracle-purple-soft), rgba(91, 155, 245, 0.2));
+  border: 1px solid rgba(91, 155, 245, 0.3);
+  color: var(--oracle-blue);
   display: flex;
   align-items: center;
   justify-content: center;

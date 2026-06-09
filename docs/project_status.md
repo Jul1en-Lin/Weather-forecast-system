@@ -4,9 +4,15 @@
 
 Goal: Remove divination-related text from Login and Register pages.
 
-Status: Completed Task 1 (Modify Login Page Template and Styles).
+Status: Completed Task 1 (Modify Login Page Template and Styles) and Task 2 (Modify Register Page Template and Styles).
 
 ## Done
+
+- Completed Task 2 (Modify Register Page Template and Styles):
+  - Removed brand subtitle (`✦ 气象占卜台 ✦`) and welcome subtitle (`✦ 开启你的天气占卜之旅 ✦`) from [Register.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Register.vue).
+  - Updated the welcome title to wrap stars in a span with gold color (`<span class="star-gold">✦</span> 创建您的账户 <span class="star-gold">✦</span>`) and added the `.star-gold` scoped CSS style in [Register.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Register.vue).
+  - Cleaned up unused scoped CSS classes `.brand-subtitle` and `.welcome-subtitle` in [Register.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Register.vue).
+  - Verified successful Vite compilation of the frontend after changes.
 
 - Completed Task 1 (Modify Login Page Template and Styles):
   - Removed brand subtitle (`✦ 气象占卜台 ✦`) and welcome subtitle (`✦ 登录以继续你的天气占卜之旅 ✦`) from [Login.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Login.vue).

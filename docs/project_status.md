@@ -2,19 +2,28 @@
 
 ## Current goal
 
-Goal: Redesign Knowledge Base page to simplify visual styling and emphasize built-in nature.
+Goal: Clean up and format Knowledge Base content to align with text-based built-in data representation.
 
-Status: Redesign completed. Removed search input, card styling, and hover/shadow animations. Formatted knowledge base items as a clean, text-based typography list highlighting that they are model-internal datasets.
+Status: Completed. Removed tarot mappings, footer reference sections, and model-builtin badge elements. Structured all science articles (humidity, pressure, wind, solstices, and principles) into list format matching the temperature layout.
 
 ## Done
 
-- Redesigned Knowledge Base page (KnowledgeBase.vue):
+- Refactored Knowledge Base content and template (KnowledgeBase.vue):
+  - Removed all "趣味映射" (tarot references) from article descriptions.
+  - Removed `tarot` property from the `Article` interface and articles list.
+  - Removed `<footer class="article-footer">` displaying model references.
+  - Removed the `<span class="article-builtin-badge">模型内置</span>` tag from headers.
+  - Formatted humidity, pressure, wind speed, solstice, and weather science principles into clean list elements (`<ul><li><strong>...</strong>：...</li></ul>`) mirroring the temperature layout.
+  - Verified Vite compilation builds cleanly and all backend tests pass.
+
+- Redesigned Knowledge Base page layout (KnowledgeBase.vue):
   - Removed search box container and query/filtering script state.
   - Replaced the category buttons active hover/shadow effects with simpler flat colors to align with theme aesthetics.
   - Replaced the `.kb-grid` and `.kb-article-card` style layouts with a text-only vertical list layout (`.kb-list` and `.kb-article-item`).
   - Removed all card effects, shadows, floating animations (`anim-float`, `oracle-surface`, `oracle-gold-corners`) from both the header and articles.
   - Added copy explicitly highlighting the knowledge base content as "模型内置" (model built-in) used for AI context/retrieval.
   - Verified Vite compile and pytest backend test passes.
+
 
 
 - Implemented Task (Custom Card-style Dropdown Selector in OracleChatPanel):

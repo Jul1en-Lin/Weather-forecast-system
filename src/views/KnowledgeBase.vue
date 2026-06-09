@@ -38,16 +38,11 @@
               </div>
               <div class="article-badges">
                 <span class="article-category-badge">{{ getCategoryLabel(article.category) }}</span>
-                <span class="article-builtin-badge">模型内置</span>
               </div>
             </header>
             
             <p class="article-summary">{{ article.summary }}</p>
             <div class="article-content" v-html="article.content"></div>
-            
-            <footer class="article-footer">
-              <span class="article-meta">模型关联参考：<strong>{{ article.tarot }}</strong></span>
-            </footer>
           </article>
         </transition-group>
       </div>
@@ -71,7 +66,6 @@ interface Article {
   icon: string
   summary: string
   content: string
-  tarot: string
 }
 
 const activeCategory = ref<'all' | 'metric' | 'cycle' | 'theory'>('all')
@@ -90,8 +84,7 @@ const articles: Article[] = [
     category: 'metric',
     icon: '🌡️',
     summary: '温度是外界环境对生命的包容度。在气象学中，它直接反映了人体的热量平衡与舒适度状态。',
-    content: '<ul><li><strong>极寒（&lt;0°C）</strong>：代表能量收敛、防寒保暖与蛰伏，趣味映射塔罗‘隐士’。</li><li><strong>舒适（20°C-25°C）</strong>：代表万物繁茂、情绪松弛与户外活动适宜，趣味映射‘星辰’。</li><li><strong>酷暑（&gt;35°C）</strong>：代表热量积聚、防暑降温与防范强对流，趣味映射‘战车’。</li></ul>',
-    tarot: '皇后 & 战车'
+    content: '<ul><li><strong>极寒（&lt;0°C）</strong>：代表能量收敛、防寒保暖与蛰伏，适宜防寒保暖与减少户外活动。</li><li><strong>舒适（20°C-25°C）</strong>：代表万物繁茂、情绪松弛与户外活动，是人体最适宜的温区。</li><li><strong>酷暑（&gt;35°C）</strong>：代表热量积聚，需注意防暑降温与防范强对流天气。</li></ul>'
   },
   {
     id: 'humidity-emotion',
@@ -99,8 +92,7 @@ const articles: Article[] = [
     category: 'metric',
     icon: '💧',
     summary: '水分是影响环境体感的重要因素。湿度的高低直接影响人体汗液蒸发与舒适度。',
-    content: '当湿度偏高（&gt;75%）时，空气潮湿闷热，易感黏腻，趣味映射‘女祭司’。此时应注意室内通风防潮，预防呼吸道敏感。反之，干燥（&lt;35%）则带来干爽体感（趣味映射‘宝剑’），利于衣物晾晒，但需注意皮肤保湿与多喝水。',
-    tarot: '女祭司 (The High Priestess)'
+    content: '<ul><li><strong>潮湿（&gt;70%）</strong>：代表空气水分充沛、体感闷热黏腻，需注意室内防潮通风，防范霉菌与呼吸道敏感。</li><li><strong>适宜（40%-60%）</strong>：代表温润舒适、体感最适宜，利于呼吸道健康与日常活动。</li><li><strong>干燥（&lt;30%）</strong>：代表水分蒸发迅速、体感干爽，利于衣物晾晒，但需注意补水防晒及皮肤保湿。</li></ul>'
   },
   {
     id: 'pressure-will',
@@ -108,8 +100,7 @@ const articles: Article[] = [
     category: 'metric',
     icon: '🌀',
     summary: '气压是大气压强作用于人体的物理载荷，直接关系到血氧饱和度与心血管舒张。',
-    content: '高气压（&gt;1015 hPa）通常对应晴朗舒适天气，精神集中，趣味映射‘皇帝’。低气压（&lt;1000 hPa）则常伴随阴雨连绵，精神易惰性或胸闷，趣味映射‘吊人’。此时宜保持室内通风，进行舒缓运动。',
-    tarot: '皇帝 (The Emperor)'
+    content: '<ul><li><strong>高气压（&gt;1015 hPa）</strong>：通常伴随晴空与稳定气流，人体血氧充足、精力集中，适宜户外出行。</li><li><strong>常压（1000 hPa - 1015 hPa）</strong>：气压处于平和状态，人体体感舒适，生理指标处于常态。</li><li><strong>低气压（&lt;1000 hPa）</strong>：通常伴随阴雨连绵或风暴，易导致胸闷、惰性与心血管负荷增加，需保持室内通风。</li></ul>'
   },
   {
     id: 'wind-mind',
@@ -117,8 +108,7 @@ const articles: Article[] = [
     category: 'metric',
     icon: '💨',
     summary: '风是空气流动的轨迹，体现了大气热量与湿度的循环和输送。',
-    content: '微风宜人，适合户外出行；强风（风速&gt;25 km/h，趣味映射‘愚者’）则代表天气变化，需注意加固门窗避风。在我国传统文化中，东风代表春季开启（润物无声），南风代表夏季热忱（雨水充足），西风代表秋季收敛，北风代表冬季严寒。',
-    tarot: '愚者 (The Fool)'
+    content: '<ul><li><strong>微风（&lt;12 km/h）</strong>：空气轻盈流动，体感舒适，能有效散热，是最适宜户外活动的风速。</li><li><strong>和风（12-24 km/h）</strong>：代表大气适度对流，能加速湿热扩散，但需防范局部天气转变。</li><li><strong>大风（&gt;25 km/h）</strong>：风力强劲，可能带来气温骤降，需注意加固门窗，出行时避免在临时广告牌或高大建筑物下逗留。</li></ul>'
   },
   {
     id: 'solstice-energy',
@@ -126,8 +116,7 @@ const articles: Article[] = [
     category: 'cycle',
     icon: '📅',
     summary: '春分、夏至、秋分、冬至是太阳直射点变化的重要分界线，主导了地表季节的自然大循环。',
-    content: '<ul><li><strong>春分</strong>：日夜平分，气温回暖，春耕开始，趣味映射‘魔术师’。</li><li><strong>夏至</strong>：白昼最长，阳气充沛，气温最高，趣味映射‘太阳’。</li><li><strong>秋分</strong>：昼夜平分，冷暖交替，作物成熟，趣味映射‘正义’。</li><li><strong>冬至</strong>：黑夜最长，天寒地冻，阴极阳生，趣味映射‘世界’。</li></ul>',
-    tarot: '太阳 & 命运之轮'
+    content: '<ul><li><strong>春分 / 秋分</strong>：太阳直射赤道，全球昼夜平分。春分时气候回暖，万物复苏；秋分时天高气爽，冷暖交替，迎来秋收。</li><li><strong>夏至</strong>：太阳直射北回归线，北半球白昼最长，代表阳气达到顶点，气温最高，需注意防暑避烈日。</li><li><strong>冬至</strong>：太阳直射南回归线，北半球黑夜最长，气温降至全年低位，代表寒冬来临，需强化御寒保暖。</li></ul>'
   },
   {
     id: 'divination-base',
@@ -135,8 +124,7 @@ const articles: Article[] = [
     category: 'theory',
     icon: '💡',
     summary: '气象与人居环境密切相关，是通过大数据气象参数服务人类的智能共鸣系统。',
-    content: '气象服务的本质是‘天人感应’。通过现代传感器获取实时的温度、湿度、气压、风速，我们将这些物理参量转化为气象生活指数，并利用大语言模型将数据重构为人类更易理解的出行、穿衣、防灾等健康与生活隐喻。以科学预报天气，以智慧服务民生。',
-    tarot: '命运之轮 (Wheel of Fortune)'
+    content: '<ul><li><strong>物理观测</strong>：通过气象雷达、传感器和气象卫星，精准获取温度、湿度、气压和风速等核心大气物理参数。</li><li><strong>指数转化</strong>：将基础观测数据转化为与人体感官、出行安全直接关联的舒适度指数、紫外线指数和穿衣指南。</li><li><strong>决策辅助</strong>：利用智能预测模型和历史气象大数据，为农业生产、防灾减灾以及日常出行提供科学的决策支持。</li></ul>'
   }
 ]
 
@@ -286,16 +274,6 @@ const filteredArticles = computed(() => {
   font-weight: 600;
 }
 
-.article-builtin-badge {
-  font-size: 10px;
-  border: 1px solid rgba(215, 174, 105, 0.2);
-  padding: 2px 8px;
-  border-radius: 10px;
-  color: var(--oracle-text);
-  background: rgba(215, 174, 105, 0.05);
-  font-weight: 600;
-}
-
 .article-summary {
   color: var(--oracle-muted);
   font-size: 13.5px;
@@ -318,15 +296,6 @@ const filteredArticles = computed(() => {
 
 .article-content :deep(li) {
   margin-bottom: 6px;
-}
-
-.article-footer {
-  font-size: 12px;
-  color: var(--oracle-muted);
-}
-
-.article-footer strong {
-  color: var(--oracle-gold);
 }
 
 /* Empty State */
@@ -365,9 +334,6 @@ const filteredArticles = computed(() => {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-  }
-  .article-badges {
-    align-self: flex-start;
   }
 }
 </style>

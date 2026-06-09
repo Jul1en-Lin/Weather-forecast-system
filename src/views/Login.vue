@@ -15,7 +15,7 @@
 
       <!-- Welcome Banner -->
       <div class="welcome-banner">
-        <h2 class="welcome-title">✦ 欢迎回来 ✦</h2>
+        <h2 class="welcome-title"><span class="star-gold">✦</span> 欢迎回来 <span class="star-gold">✦</span></h2>
       </div>
       
       <form @submit.prevent="handleLogin" class="login-form">
@@ -303,6 +303,10 @@ const handleForgotPassword = () => {
   font-weight: 600;
   margin: 0;
   letter-spacing: 0.05em;
+}
+
+.star-gold {
+  color: var(--gold-color);
 }
 
 .login-form {

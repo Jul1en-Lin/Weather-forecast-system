@@ -48,8 +48,8 @@
       </div>
 
       <div class="horoscope-info">
-        <strong class="moon-sign-title">{{ currentTip.title }}</strong>
-        <p class="moon-sign-copy">{{ currentTip.advice }}</p>
+        <strong class="moon-sign-title">{{ displayTip.title }}</strong>
+        <p class="moon-sign-copy">{{ displayTip.advice }}</p>
 
         <router-link to="/knowledge-base" class="view-detail-link">
           查看详情 →
@@ -61,7 +61,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { WeatherOracleTip } from '../../types/weatherOracle'
 import { useAuthStore } from '../../stores/auth'
+
+const props = defineProps<{
+  weatherTip?: WeatherOracleTip
+}>()
 
 const authStore = useAuthStore()
 const isAdmin = computed(() => authStore.isAdmin)
@@ -82,7 +87,10 @@ const weatherTips = [
 ]
 
 // Compute a dynamic tip based on the current date of the month
-const currentTip = computed(() => {
+const displayTip = computed(() => {
+  if (props.weatherTip && props.weatherTip.title && props.weatherTip.advice) {
+    return props.weatherTip
+  }
   const day = new Date().getDate()
   return weatherTips[day % weatherTips.length]
 })

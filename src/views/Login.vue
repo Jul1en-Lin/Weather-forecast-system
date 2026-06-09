@@ -11,13 +11,11 @@
           </svg>
         </div>
         <h1 class="brand-title">Weather Oracle</h1>
-        <p class="brand-subtitle">✦ 气象占卜台 ✦</p>
       </div>
 
       <!-- Welcome Banner -->
       <div class="welcome-banner">
         <h2 class="welcome-title">欢迎回来</h2>
-        <p class="welcome-subtitle">✦ 登录以继续你的天气占卜之旅 ✦</p>
       </div>
       
       <form @submit.prevent="handleLogin" class="login-form">

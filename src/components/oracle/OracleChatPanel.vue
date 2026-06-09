@@ -19,7 +19,6 @@
           :disabled="isSending"
           @click="toggleDropdown"
         >
-          <span class="trigger-icon">🤖</span>
           <span class="trigger-text">{{ modelName || '选择模型' }}</span>
           <span class="trigger-arrow">▾</span>
         </button>
@@ -36,7 +35,6 @@
                 @click="selectModel(model.id)"
               >
                 <div class="model-option-name">{{ model.name }}</div>
-                <div class="model-option-desc" v-if="model.description">{{ model.description }}</div>
               </button>
             </div>
           </div>
@@ -419,10 +417,6 @@ async function sendMessage(message: string) {
   cursor: not-allowed;
 }
 
-.trigger-icon {
-  font-size: 11px;
-}
-
 .trigger-arrow {
   color: var(--oracle-gold);
   font-size: 10px;
@@ -432,8 +426,8 @@ async function sendMessage(message: string) {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  width: 240px;
-  padding: 10px;
+  width: 160px;
+  padding: 8px;
   z-index: 100;
   transform-origin: top right;
 }
@@ -441,12 +435,12 @@ async function sendMessage(message: string) {
 .model-options-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .model-option-btn {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 12px;
   border: 1px solid var(--oracle-border-soft);
   border-radius: 8px;
   background: var(--oracle-panel-soft);
@@ -476,16 +470,9 @@ async function sendMessage(message: string) {
 }
 
 .model-option-name {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
-  margin-bottom: 2px;
-}
-
-.model-option-desc {
-  font-size: 10.5px;
-  color: var(--oracle-muted);
-  font-weight: 400;
-  line-height: 1.4;
+  margin-bottom: 0;
 }
 
 .fade-scale-enter-active,

@@ -2,11 +2,15 @@
 
 ## Current goal
 
-Goal: Resolve issues identified in the code quality review of `src/views/Settings.vue`.
+Goal: Redesign the User Management view (`src/views/AdminUsers.vue`) to align with the theme variables, replacing hardcoded RGBA colors with theme-aware RGB variables.
 
-Status: Done. Dead CSS styles have been pruned, and light theme overrides have been added.
+Status: In Progress. Task 1 (Redesign CSS Stylesheet in AdminUsers.vue) is completed.
 
 ## Done
+
+- Redesigned the CSS Stylesheet block in [AdminUsers.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/AdminUsers.vue) (Task 1):
+  - Replaced hardcoded RGBA colors in `.badge-pill-admin`, `.btn-card-action.edit-btn:hover`, `.btn-card-action.delete-btn`, `.success-message`, and `.error-message` with theme-aware RGB variables (`var(--oracle-gold-rgb)`, `var(--oracle-danger-rgb)`, and `var(--oracle-success-rgb)`).
+  - Verified compilation of Vue templates and styles via `npm run build`.
 
 - Pruned dead CSS styles from [Settings.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Settings.vue), deleting unused selectors `.config-section`, `.config-grid`, and `.config-card` (along with all nested/theme rules).
 - Added light mode adaptability CSS overrides using the `[data-oracle-theme='light']` class selector in [Settings.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/Settings.vue).

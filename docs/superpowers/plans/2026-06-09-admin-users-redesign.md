@@ -16,7 +16,7 @@
 - Modify: `src/views/AdminUsers.vue`
 - Verify: `npm run build`
 
-- [ ] **Step 1: Replace hardcoded RGBA colors in scoped styles**
+- [x] **Step 1: Replace hardcoded RGBA colors in scoped styles**
 
   In `src/views/AdminUsers.vue` starting around line 269:
   - Replace `rgba(215, 174, 105, ...)` with `rgba(var(--oracle-gold-rgb), ...)`.
@@ -307,7 +307,7 @@
   }
   ```
 
-- [ ] **Step 2: Verify Vite build compilation**
+- [x] **Step 2: Verify Vite build compilation**
 
   Run: `npm run build`
   Expected: Command succeeds with zero compiler/Vite bundle errors.

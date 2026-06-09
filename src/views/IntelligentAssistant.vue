@@ -3,7 +3,7 @@
     <div class="assistant-page">
       <div class="chat-layout">
         <!-- 历史对话侧边栏 -->
-        <aside class="history-sidebar">
+        <aside class="history-sidebar oracle-gold-corners">
           <div v-if="isBatchMode" class="batch-actions-container">
             <button class="batch-action-btn select-all-btn" @click="selectAllConversations">
               {{ isAllSelected ? '取消全选' : '全选' }}
@@ -13,13 +13,26 @@
               :disabled="selectedConvIds.length === 0"
               @click="batchDeleteConversations"
             >
-              🗑️ 删除 ({{ selectedConvIds.length }})
+              <svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" style="fill: currentColor; margin-right: 4px; vertical-align: middle;">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
+              删除 ({{ selectedConvIds.length }})
             </button>
           </div>
-          <div v-else class="new-chat-btn" @click="createNewChat">✨ 新建对话</div>
+          <div v-else class="new-chat-btn" @click="createNewChat">
+            <svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" style="fill: currentColor; margin-right: 4px; vertical-align: middle;">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            新建对话
+          </div>
           
           <div class="history-sidebar-header">
-            <span class="history-title">📋 历史对话</span>
+            <span class="history-title">
+              <svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" style="fill: currentColor; margin-right: 6px; color: var(--oracle-gold); vertical-align: middle;">
+                <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+              </svg>
+              历史对话
+            </span>
             <button class="batch-toggle-btn" @click="toggleBatchMode">
               {{ isBatchMode ? '取消' : '批量操作' }}
             </button>
@@ -44,19 +57,30 @@
               ></div>
               <span class="conv-title">{{ conv.title || '未命名' }}</span>
               <div v-if="!isBatchMode" class="conv-actions">
-                <button class="action-btn rename-btn" @click.stop="renameConversationPrompt(conv.id, conv.title)">✏️</button>
-                <button class="action-btn delete-btn" @click.stop="deleteConversation(conv.id)">🗑️</button>
+                <button class="action-btn rename-btn" @click.stop="renameConversationPrompt(conv.id, conv.title)" title="重命名">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                  </svg>
+                </button>
+                <button class="action-btn delete-btn" @click.stop="deleteConversation(conv.id)" title="删除">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
         </aside>
 
         <!-- 聊天主区域 -->
-        <div class="chat-wrapper">
+        <div class="chat-wrapper oracle-gold-corners">
           <div class="chat-header">
             <div class="header-content">
               <div class="assistant-avatar">
-                🤖
+                <svg class="assistant-avatar-svg" viewBox="0 0 24 24" width="24" height="24">
+                  <circle cx="12" cy="8" r="4" fill="currentColor" />
+                  <path fill="currentColor" opacity="0.85" d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z" />
+                </svg>
               </div>
               <div class="header-info">
                 <h1>气象智能助手</h1>
@@ -72,7 +96,12 @@
           
           <div class="chat-messages" ref="messagesContainer">
             <div v-if="currentMessages.length === 0" class="empty-state">
-              <div class="empty-icon">🤖</div>
+              <div class="empty-icon">
+                <svg viewBox="0 0 24 24" width="72" height="72" style="color: var(--oracle-gold);">
+                  <circle cx="12" cy="8" r="4" fill="currentColor" />
+                  <path fill="currentColor" opacity="0.85" d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z" />
+                </svg>
+              </div>
               <h2>开始对话</h2>
               <p>我是气象智能助手，可以帮助您解答气象相关问题</p>
               <div class="suggestion-chips">
@@ -92,7 +121,11 @@
                  class="message" 
                  :class="{ 'user-message': msg.role === 'user', 'assistant-message': msg.role === 'assistant' }">
               <div class="message-avatar">
-                {{ msg.role === 'user' ? userInitial : '🤖' }}
+                <span v-if="msg.role === 'user'">{{ userInitial }}</span>
+                <svg v-else class="assistant-avatar-svg" viewBox="0 0 24 24" width="20" height="20">
+                  <circle cx="12" cy="8" r="4" fill="currentColor" />
+                  <path fill="currentColor" opacity="0.85" d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z" />
+                </svg>
               </div>
               <div class="message-content">
                 <div class="message-text" v-html="msg.role === 'assistant' ? renderMarkdown(msg.content) : msg.content"></div>
@@ -102,7 +135,10 @@
             
             <div v-if="isTyping" class="message assistant-message">
               <div class="message-avatar">
-                🤖
+                <svg class="assistant-avatar-svg" viewBox="0 0 24 24" width="20" height="20">
+                  <circle cx="12" cy="8" r="4" fill="currentColor" />
+                  <path fill="currentColor" opacity="0.85" d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z" />
+                </svg>
               </div>
               <div class="message-content">
                 <div class="message-text typing">
@@ -571,52 +607,60 @@ onMounted(async () => {
 
 <style scoped>
 .assistant-page {
-  padding: 20px;
-  min-height: 100vh;
-  position: relative;
+  padding: 24px;
+  min-height: calc(100vh - var(--oracle-header-height, 64px));
+  box-sizing: border-box;
 }
 
 .chat-layout {
   display: flex;
   gap: 20px;
-  height: calc(100vh - 40px);
+  height: calc(100vh - 120px);
 }
 
 /* 历史对话侧边栏 */
 .history-sidebar {
   width: 260px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
+  background: var(--oracle-panel-soft);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--oracle-border);
+  border-radius: var(--oracle-radius);
   display: flex;
   flex-direction: column;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--oracle-shadow);
   overflow-y: auto;
+  position: relative;
 }
 
 .new-chat-btn {
-  background: #10a37f;
-  color: white;
+  background: linear-gradient(135deg, var(--oracle-purple-soft), rgba(215, 174, 105, 0.15));
+  border: 1px solid var(--oracle-border);
+  color: var(--oracle-gold-strong);
   text-align: center;
   padding: 12px;
   border-radius: 12px;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   margin-bottom: 20px;
-  transition: background-color 150ms ease-out, transform 150ms ease-out;
+  box-shadow: 0 4px 12px var(--oracle-gold-glow);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .new-chat-btn:hover {
-    background: #0e8e6e;
-  }
+.new-chat-btn:hover {
+  border-color: var(--oracle-gold);
+  color: var(--oracle-text);
+  background: var(--oracle-panel);
+  box-shadow: 0 6px 16px var(--oracle-gold-glow);
+  transform: translateY(-1px);
 }
 
 .new-chat-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.98) translateY(0);
 }
 
 .history-sidebar-header {
@@ -624,28 +668,33 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  border-bottom: 1px solid var(--oracle-border-soft);
+  padding-bottom: 8px;
 }
 
 .history-title {
-  font-size: 14px;
-  color: #6e6e6e;
-  margin: 0;
-  font-weight: 500;
+  font-size: 13.5px;
+  color: var(--oracle-muted);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
 }
 
 .batch-toggle-btn {
   background: none;
   border: none;
   font-size: 12px;
-  color: #007aff;
+  color: var(--oracle-gold);
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .batch-toggle-btn:hover {
-  background-color: rgba(0, 122, 255, 0.1);
+  background-color: var(--oracle-purple-soft);
+  color: var(--oracle-gold-strong);
 }
 
 .batch-actions-container {
@@ -658,9 +707,9 @@ onMounted(async () => {
   flex: 1;
   padding: 10px;
   border-radius: 12px;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
+  border: 1px solid var(--oracle-border);
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   display: inline-flex;
@@ -670,21 +719,24 @@ onMounted(async () => {
 }
 
 .select-all-btn {
-  background: rgba(0, 0, 0, 0.05);
-  color: #1d1d1f;
+  background: var(--oracle-panel-soft);
+  color: var(--oracle-text);
 }
 
 .select-all-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--oracle-panel);
+  border-color: var(--oracle-gold);
 }
 
 .batch-delete-btn {
-  background: #ff3b30;
+  background: var(--oracle-danger);
+  border-color: rgba(207, 110, 91, 0.4);
   color: white;
 }
 
 .batch-delete-btn:hover:not(:disabled) {
-  background: #d63027;
+  background: #bd523e;
+  box-shadow: 0 0 10px rgba(207, 110, 91, 0.2);
 }
 
 .batch-delete-btn:disabled {
@@ -693,33 +745,33 @@ onMounted(async () => {
 }
 
 .conversation-item.selected {
-  background: rgba(16, 163, 127, 0.1);
-  border-color: rgba(16, 163, 127, 0.4);
+  background: var(--oracle-purple-soft);
+  border-color: var(--oracle-gold);
 }
 
 .custom-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  border: 1.5px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--oracle-border);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-right: 8px;
   flex-shrink: 0;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--oracle-bg-deep);
 }
 
 .custom-checkbox.checked {
-  background: #10a37f;
-  border-color: #10a37f;
+  background: var(--oracle-gold);
+  border-color: var(--oracle-gold);
 }
 
 .custom-checkbox.checked::after {
   content: '✓';
-  color: white;
-  font-size: 11px;
+  color: var(--oracle-bg-deep);
+  font-size: 10px;
   font-weight: bold;
 }
 
@@ -733,16 +785,26 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding: 10px 12px;
-  margin-bottom: 6px;
-  border-radius: 10px;
+  margin-bottom: 8px;
+  border-radius: var(--oracle-radius-inner);
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(215, 174, 105, 0.03);
+  border: 1px solid var(--oracle-border-soft);
+  color: var(--oracle-faint);
+  transition: all 0.2s ease;
+}
+
+.conversation-item:hover {
+  border-color: var(--oracle-border);
+  background: rgba(215, 174, 105, 0.06);
+  color: var(--oracle-text);
 }
 
 .conversation-item.active {
-  background: #e2f0e6;
-  border-color: #10a37f;
+  background: var(--oracle-purple-soft);
+  border-color: var(--oracle-gold);
+  color: var(--oracle-text);
+  box-shadow: inset 0 0 10px rgba(215, 174, 105, 0.05);
 }
 
 .conv-title {
@@ -750,7 +812,7 @@ onMounted(async () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 13.5px;
 }
 
 .conv-actions {
@@ -762,83 +824,102 @@ onMounted(async () => {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 14px;
-  color: #aaa;
-  transition: color 0.2s ease;
-  padding: 2px;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--oracle-muted);
+  transition: all 0.2s ease;
 }
 
 .rename-btn:hover {
-  color: #007aff;
+  color: var(--oracle-gold);
+  background: rgba(215, 174, 105, 0.1);
 }
 
 .delete-btn:hover {
-  color: #e5484d;
+  color: var(--oracle-danger);
+  background: rgba(207, 110, 91, 0.15);
 }
 
 /* 聊天主区域 */
 .chat-wrapper {
   flex: 1;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
+  background: var(--oracle-panel);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--oracle-border);
+  border-radius: var(--oracle-radius);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--oracle-shadow);
+  position: relative;
 }
 
 .chat-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--oracle-border-soft);
   background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .header-content {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 12px;
 }
 
 .assistant-avatar {
-  width: 50px;
-  height: 50px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--oracle-purple-soft), rgba(215, 174, 105, 0.2));
+  border: 1px solid var(--oracle-border);
+  color: var(--oracle-gold);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 20px;
 }
 
 .header-info h1 {
-  font-size: 20px;
+  font-family: var(--oracle-font-serif);
+  font-size: 18px;
   font-weight: 600;
-  color: #1d1d1f;
-  margin: 0 0 4px 0;
+  color: var(--oracle-text);
+  margin: 0 0 2px 0;
+  letter-spacing: 0.05em;
 }
 
 .header-info p {
-  font-size: 13px;
-  color: #86868b;
+  font-size: 12px;
+  color: var(--oracle-muted);
   margin: 0;
 }
 
 .toolbar {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 8px;
+  align-items: center;
 }
 
 .toolbar select {
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--oracle-border);
+  font-size: 13.5px;
+  background: var(--oracle-panel-soft);
+  color: var(--oracle-text);
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toolbar select:hover {
+  border-color: var(--oracle-gold);
 }
 
 .chat-messages {
@@ -862,27 +943,23 @@ onMounted(async () => {
 }
 
 .empty-icon {
-  font-size: 80px;
-  margin-bottom: 24px;
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  margin-bottom: 20px;
+  animation: float-mystical 4s ease-in-out infinite;
 }
 
 .empty-state h2 {
-  font-size: 24px;
+  font-family: var(--oracle-font-serif);
+  font-size: 22px;
   font-weight: 600;
-  color: #1d1d1f;
-  margin: 0 0 12px 0;
+  color: var(--oracle-text);
+  margin: 0 0 10px 0;
+  letter-spacing: 0.05em;
 }
 
 .empty-state p {
-  font-size: 15px;
-  color: #86868b;
-  margin: 0 0 30px 0;
+  font-size: 14px;
+  color: var(--oracle-muted);
+  margin: 0 0 24px 0;
 }
 
 .suggestion-chips {
@@ -893,33 +970,31 @@ onMounted(async () => {
 }
 
 .chip {
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 18px;
+  background: var(--oracle-purple-soft);
+  border: 1px solid var(--oracle-border-soft);
   border-radius: 20px;
-  color: #1d1d1f;
-  font-size: 14px;
+  color: var(--oracle-text);
+  font-size: 13.5px;
   cursor: pointer;
-  transition: background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out, box-shadow 150ms ease-out;
+  transition: all 0.2s ease;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .chip:hover {
-    background: #007aff;
-    color: white;
-    border-color: #007aff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-  }
+.chip:hover {
+  background: var(--oracle-panel);
+  color: var(--oracle-gold-strong);
+  border-color: var(--oracle-gold);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--oracle-gold-glow);
 }
 
 .chip:active {
-  transform: translateY(-1px) scale(0.96);
+  transform: scale(0.97);
 }
 
 .message {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   animation: slideIn 0.3s ease-out;
 }
 
@@ -939,25 +1014,28 @@ onMounted(async () => {
 }
 
 .message-avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--oracle-purple-soft), rgba(215, 174, 105, 0.2));
+  color: var(--oracle-gold);
+  border: 1px solid var(--oracle-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   flex-shrink: 0;
 }
 
 .assistant-message .message-avatar {
-  background: linear-gradient(135deg, #007aff 0%, #0056cc 100%);
+  background: linear-gradient(135deg, var(--oracle-purple-soft), rgba(91, 155, 245, 0.2));
+  color: var(--oracle-blue);
+  border-color: rgba(91, 155, 245, 0.3);
 }
 
 .message-content {
-  max-width: 70%;
+  max-width: 75%;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -968,33 +1046,38 @@ onMounted(async () => {
 }
 
 .message-text {
-  padding: 14px 18px;
-  border-radius: 18px;
-  font-size: 15px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 14px;
   line-height: 1.6;
   word-break: break-word;
+  box-sizing: border-box;
 }
 
 .user-message .message-text {
-  background: #007aff;
-  color: white;
-  border-bottom-right-radius: 6px;
+  background: var(--oracle-purple-soft);
+  border: 1px solid var(--oracle-border);
+  color: var(--oracle-text);
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .assistant-message .message-text {
-  background: rgba(255, 255, 255, 0.7);
-  color: #1d1d1f;
-  border-bottom-left-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: var(--oracle-panel-soft);
+  border: 1px solid var(--oracle-border-soft);
+  color: var(--oracle-text);
+  border-bottom-left-radius: 4px;
+  box-shadow: var(--oracle-shadow);
 }
 
 .assistant-message .message-text :deep(strong) {
+  color: var(--oracle-gold);
   font-weight: 600;
 }
 
 .assistant-message .message-text :deep(ul),
 .assistant-message .message-text :deep(ol) {
-  margin: 8px 0;
+  margin: 6px 0;
   padding-left: 20px;
 }
 
@@ -1003,15 +1086,17 @@ onMounted(async () => {
 }
 
 .assistant-message .message-text :deep(code) {
-  background: #f5f5f7;
+  background: rgba(255, 255, 255, 0.05);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'SF Mono', Monaco, monospace;
-  font-size: 13px;
+  font-size: 12.5px;
+  color: var(--oracle-gold-strong);
 }
 
 .assistant-message .message-text :deep(pre) {
-  background: #f5f5f7;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--oracle-border-soft);
   padding: 12px;
   border-radius: 8px;
   overflow-x: auto;
@@ -1021,13 +1106,14 @@ onMounted(async () => {
 .assistant-message .message-text :deep(pre code) {
   background: transparent;
   padding: 0;
+  color: var(--oracle-text);
 }
 
 .assistant-message .message-text :deep(blockquote) {
-  border-left: 3px solid #d1d1d6;
+  border-left: 3px solid var(--oracle-gold);
   margin: 8px 0;
   padding-left: 12px;
-  color: #6e6e73;
+  color: var(--oracle-muted);
 }
 
 .assistant-message .message-text :deep(p) {
@@ -1043,22 +1129,23 @@ onMounted(async () => {
 }
 
 .message-time {
-  font-size: 12px;
-  color: #86868b;
+  font-size: 11px;
+  color: var(--oracle-muted);
+  margin-top: 2px;
 }
 
 .typing {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 14px 18px;
+  padding: 12px 16px;
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #86868b;
+  background: var(--oracle-muted);
   animation: bounce 1.4s ease-in-out infinite;
 }
 
@@ -1068,13 +1155,13 @@ onMounted(async () => {
 
 @keyframes bounce {
   0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-6px); }
+  30% { transform: translateY(-4px); }
 }
 
 .chat-input-container {
-  padding: 20px 24px 24px;
+  padding: 16px 24px 20px;
   background: transparent;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid var(--oracle-border-soft);
 }
 
 .input-wrapper {
@@ -1085,46 +1172,51 @@ onMounted(async () => {
 
 .chat-input {
   flex: 1;
-  padding: 14px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 18px;
+  border: 1px solid var(--oracle-border);
   border-radius: 24px;
-  font-size: 15px;
+  font-size: 14px;
   outline: none;
-  transition: border-color 180ms ease-out, background-color 180ms ease-out, box-shadow 180ms ease-out;
-  background: rgba(255, 255, 255, 0.6);
+  transition: all 0.2s ease;
+  background: var(--oracle-panel-soft);
+  color: var(--oracle-text);
+}
+
+.chat-input::placeholder {
+  color: var(--oracle-muted);
+  opacity: 0.7;
 }
 
 .chat-input:focus {
-  border-color: #007aff;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  border-color: var(--oracle-gold);
+  background: var(--oracle-panel);
+  box-shadow: 0 0 0 3px var(--oracle-gold-glow);
 }
 
 .send-button {
-  padding: 14px 28px;
-  background: linear-gradient(135deg, #007aff 0%, #0056cc 100%);
-  color: white;
+  padding: 12px 24px;
+  background: var(--oracle-gold);
+  color: var(--oracle-bg-deep);
   border: none;
   border-radius: 24px;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14.5px;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 160ms ease-out, opacity 160ms ease-out;
+  transition: all 0.2s ease;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .send-button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
-  }
+.send-button:hover:not(:disabled) {
+  background: var(--oracle-gold-strong);
+  box-shadow: 0 4px 12px var(--oracle-gold-glow);
+  transform: translateY(-1px);
 }
 
 .send-button:active:not(:disabled) {
-  transform: translateY(0) scale(0.96);
+  transform: scale(0.97) translateY(0);
 }
 
 .send-button:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 

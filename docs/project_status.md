@@ -4,8 +4,14 @@
 
 Goal: Demote fortune telling/divination elements in Weather Oracle frontend to focus on weather services.
 
-Status: Completed implementation of the Frontend Redesign Implementation Plan. All components updated to prioritize weather intelligence over divination.
+Status: Redesigned the Intelligent Assistant page to match the glassmorphic theme and weather services identity.
 
+## Done
+
+- Redesigned the Intelligent Assistant page ([IntelligentAssistant.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/views/IntelligentAssistant.vue)):
+  - Replaced cheap, cartoonish emojis (🤖, 🗑️, ✏️, 📋) with clean, professional SVG vector icons.
+  - Aligned colors, backgrounds, borders, and input focus states with the gold-accented glassmorphic theme via CSS variables from `oracle-theme.css`.
+  - Updated assistant name to "气象智能助手" and headings typography to match the serif styles.
 - Generated and updated new page screenshot mockups matching the glassmorphic theme under `docs/images/`, and updated `README.md` to reference the correct image names and show the updated frontend/backend directory tree structure.
 - Implemented the Frontend Redesign Implementation Plan to prioritize weather services over fortune-telling/divination:
   - [OracleLayout.vue](file:///Users/lien/GitRepo/Weather-forecast-system/src/layouts/OracleLayout.vue): Changed "气象占卜台" to "智能气象助手", updated moon phases symbol decor to weather icons (☀ ⛅ 🌤 ⛈ ❄), updated dropdown subtitle user roles to "系统管理员" / "气象助手用户", and renamed footer description.

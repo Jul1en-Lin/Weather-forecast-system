@@ -5,7 +5,7 @@
       <div class="oracle-header-inner">
         <!-- Logo Brand -->
         <div class="oracle-header-brand" @click="router.push('/oracle')">
-          <svg class="oracle-header-logo-svg" viewBox="0 0 24 24" width="28" height="28">
+          <svg class="oracle-header-logo-svg" viewBox="0 0 24 24" width="28" height="28" fill="none">
             <!-- Sun (Backdrop) -->
             <circle cx="8" cy="9" r="4" fill="currentColor" opacity="0.4" />
             <!-- Sun rays -->

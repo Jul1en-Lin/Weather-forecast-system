@@ -4,15 +4,8 @@
     <header class="chat-panel-header">
       <div class="diviner-profile">
         <div class="diviner-avatar-wrap">
-          <svg class="diviner-avatar-svg" viewBox="0 0 24 24" width="20" height="20" fill="none">
-            <!-- Sun (Backdrop) -->
-            <circle cx="8" cy="9" r="4" fill="currentColor" opacity="0.4" />
-            <!-- Sun rays -->
-            <path d="M8 3v2M4.46 5.46l1.42 1.42M2 9h2M4.46 12.54l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-            <!-- Cloud (Foreground) -->
-            <path d="M17.5 12.5a2.5 2.5 0 0 0-2.5-2.5c-.32 0-.62.06-.9.17a3.5 3.5 0 0 0-6.6 1.83 2.5 2.5 0 0 0 .5 4.5h9a2.5 2.5 0 0 0 .5-4z" fill="currentColor" />
-            <!-- AI Sparkle (Top-Right Accent) -->
-            <path d="M19 2l.75 1.75L21.5 4.5 19.75 5.25 19 7l-.75-1.75L16.5 4.5l1.75-.75L19 2z" fill="var(--oracle-gold)" />
+          <svg class="diviner-avatar-svg" viewBox="0 0 24 24" width="20" height="20">
+            <path fill="currentColor" d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zm1-17.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm-2.5 12h-1v-1h1v1zm3-3.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-3.5 1.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
           </svg>
         </div>
         <div class="diviner-meta">
@@ -60,11 +53,8 @@
           <!-- Avatar inside bubble block -->
           <div class="bubble-avatar">
             <span v-if="message.role === 'user'">👤</span>
-            <svg v-else viewBox="0 0 24 24" width="16" height="16" fill="none" style="color: var(--oracle-gold);">
-              <circle cx="8" cy="9" r="4" fill="currentColor" opacity="0.5" />
-              <path d="M8 3v2M4.46 5.46l1.42 1.42M2 9h2M4.46 12.54l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-              <path d="M17.5 12.5a2.5 2.5 0 0 0-2.5-2.5c-.32 0-.62.06-.9.17a3.5 3.5 0 0 0-6.6 1.83 2.5 2.5 0 0 0 .5 4.5h9a2.5 2.5 0 0 0 .5-4z" fill="currentColor" />
-              <path d="M19 2l.75 1.75L21.5 4.5 19.75 5.25 19 7l-.75-1.75L16.5 4.5l1.75-.75L19 2z" fill="currentColor" />
+            <svg v-else class="bubble-avatar-svg" viewBox="0 0 24 24" width="16" height="16">
+              <path fill="currentColor" d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zm1-17.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm-2.5 12h-1v-1h1v1zm3-3.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-3.5 1.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
             </svg>
           </div>
 
@@ -533,6 +523,11 @@ async function sendMessage(message: string) {
   font-size: 12px;
   flex-shrink: 0;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  color: var(--oracle-gold);
+}
+
+.bubble-avatar-svg {
+  filter: drop-shadow(0 0 2px var(--oracle-gold-glow));
 }
 
 .bubble-content-wrap {

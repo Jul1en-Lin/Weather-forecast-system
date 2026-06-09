@@ -621,12 +621,12 @@ onMounted(fetchConfig)
 .tab-btn:hover {
   color: var(--oracle-text);
   border-color: var(--oracle-border);
-  background: rgba(215, 174, 105, 0.05);
+  background: rgba(var(--oracle-gold-rgb), 0.05);
   transform: translateY(-2px);
 }
 
 .tab-btn.active {
-  background: rgba(215, 174, 105, 0.08);
+  background: rgba(var(--oracle-gold-rgb), 0.08);
   border-color: var(--oracle-gold);
   color: var(--oracle-gold);
   box-shadow: 0 0 12px var(--oracle-gold-glow);
@@ -668,7 +668,6 @@ onMounted(fetchConfig)
   padding: 40px;
 }
 
-
 .section-header {
   display: flex;
   align-items: center;
@@ -690,7 +689,6 @@ onMounted(fetchConfig)
   gap: 12px;
 }
 
-
 .current-value {
   display: block;
   margin-top: 10px;
@@ -709,25 +707,43 @@ onMounted(fetchConfig)
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* Add model button */
-.btn-add-model {
-  background: linear-gradient(135deg, var(--oracle-gold) 0%, #a47631 100%);
+/* Add model & Save buttons with shared gradient styles */
+.btn-add-model,
+.btn-save {
+  background: linear-gradient(135deg, var(--oracle-gold) 0%, var(--oracle-gold-dark) 100%);
   border: none;
-  color: var(--oracle-text);
+  color: #fdf9f3;
   border-radius: 10px;
-  padding: 10px 20px;
-  font-size: 15px;
-  font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   transition: all 0.3s ease;
 }
 
-.btn-add-model:hover {
+.btn-add-model:hover:not(:disabled),
+.btn-save:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 15px var(--oracle-gold-glow);
   filter: brightness(1.1);
+}
+
+.btn-add-model:disabled,
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-add-model {
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.btn-save {
+  padding: 12px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  gap: 8px;
 }
 
 /* Models Grid / Cards */
@@ -791,20 +807,20 @@ onMounted(fetchConfig)
   border-radius: 99px;
   font-size: 11px;
   font-weight: 600;
-  border: 1px solid rgba(215, 174, 105, 0.25);
-  background: rgba(215, 174, 105, 0.08);
+  border: 1px solid rgba(var(--oracle-gold-rgb), 0.25);
+  background: rgba(var(--oracle-gold-rgb), 0.08);
   color: var(--oracle-gold);
 }
 
 .badge-pill-local {
-  border-color: rgba(84, 191, 163, 0.25);
-  background: rgba(84, 191, 163, 0.08);
+  border-color: rgba(var(--oracle-success-rgb), 0.25);
+  background: rgba(var(--oracle-success-rgb), 0.08);
   color: var(--oracle-success);
 }
 
 .badge-pill-builtin {
-  border-color: rgba(142, 110, 194, 0.25);
-  background: rgba(142, 110, 194, 0.08);
+  border-color: rgba(var(--oracle-purple-rgb), 0.25);
+  background: rgba(var(--oracle-purple-rgb), 0.08);
   color: var(--oracle-purple);
 }
 
@@ -828,18 +844,18 @@ onMounted(fetchConfig)
 
 .btn-card-action.edit-btn:hover {
   border-color: var(--oracle-gold);
-  background: rgba(215, 174, 105, 0.08);
+  background: rgba(var(--oracle-gold-rgb), 0.08);
   color: var(--oracle-gold);
 }
 
 .btn-card-action.delete-btn {
-  border-color: rgba(207, 110, 91, 0.25);
-  background: rgba(207, 110, 91, 0.05);
+  border-color: rgba(var(--oracle-danger-rgb), 0.25);
+  background: rgba(var(--oracle-danger-rgb), 0.05);
   color: var(--oracle-danger);
 }
 
 .btn-card-action.delete-btn:hover {
-  background: rgba(207, 110, 91, 0.15);
+  background: rgba(var(--oracle-danger-rgb), 0.15);
   border-color: var(--oracle-danger);
 }
 
@@ -1061,32 +1077,6 @@ code.meta-value {
   border-color: var(--oracle-border);
 }
 
-.btn-save {
-  padding: 12px 32px;
-  background: linear-gradient(135deg, var(--oracle-gold) 0%, #a47631 100%);
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--oracle-text);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-save:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px var(--oracle-gold-glow);
-  filter: brightness(1.1);
-}
-
-.btn-save:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .btn-spinner {
   width: 18px;
   height: 18px;
@@ -1100,25 +1090,25 @@ code.meta-value {
 .success-message {
   margin: 24px 0 0 0;
   padding: 14px 20px;
-  background: rgba(84, 191, 163, 0.15);
+  background: rgba(var(--oracle-success-rgb), 0.12);
   color: var(--oracle-success);
   border-radius: 10px;
   font-size: 14px;
   text-align: center;
   font-weight: 500;
-  border: 1px solid rgba(84, 191, 163, 0.2);
+  border: 1px solid rgba(var(--oracle-success-rgb), 0.2);
 }
 
 .error-message {
   margin: 24px 0 0 0;
   padding: 14px 20px;
-  background: rgba(207, 110, 91, 0.15);
+  background: rgba(var(--oracle-danger-rgb), 0.12);
   color: var(--oracle-danger);
   border-radius: 10px;
   font-size: 14px;
   text-align: center;
   font-weight: 500;
-  border: 1px solid rgba(207, 110, 91, 0.2);
+  border: 1px solid rgba(var(--oracle-danger-rgb), 0.2);
 }
 
 .fade-enter-active,
@@ -1165,58 +1155,5 @@ code.meta-value {
   .settings-form {
     padding: 20px;
   }
-}
-
-/* Light theme specific overrides */
-[data-oracle-theme='light'] .tab-btn:hover {
-  background: rgba(178, 133, 66, 0.05);
-}
-
-[data-oracle-theme='light'] .tab-btn.active {
-  background: rgba(178, 133, 66, 0.08);
-}
-
-[data-oracle-theme='light'] .badge-pill {
-  border-color: rgba(178, 133, 66, 0.25);
-  background: rgba(178, 133, 66, 0.08);
-}
-
-[data-oracle-theme='light'] .badge-pill-local {
-  border-color: rgba(55, 138, 104, 0.25);
-  background: rgba(55, 138, 104, 0.08);
-}
-
-[data-oracle-theme='light'] .badge-pill-builtin {
-  border-color: rgba(116, 87, 164, 0.25);
-  background: rgba(116, 87, 164, 0.08);
-}
-
-[data-oracle-theme='light'] .btn-card-action.edit-btn:hover {
-  background: rgba(178, 133, 66, 0.08);
-}
-
-[data-oracle-theme='light'] .btn-card-action.delete-btn {
-  border-color: rgba(173, 80, 63, 0.25);
-  background: rgba(173, 80, 63, 0.05);
-}
-
-[data-oracle-theme='light'] .btn-card-action.delete-btn:hover {
-  background: rgba(173, 80, 63, 0.15);
-}
-
-[data-oracle-theme='light'] .btn-add-model,
-[data-oracle-theme='light'] .btn-save {
-  background: linear-gradient(135deg, var(--oracle-gold) 0%, #8c6022 100%);
-  color: #fdf9f3;
-}
-
-[data-oracle-theme='light'] .success-message {
-  background: rgba(55, 138, 104, 0.12);
-  border-color: rgba(55, 138, 104, 0.2);
-}
-
-[data-oracle-theme='light'] .error-message {
-  background: rgba(173, 80, 63, 0.12);
-  border-color: rgba(173, 80, 63, 0.2);
 }
 </style>

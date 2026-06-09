@@ -25,6 +25,12 @@
   --oracle-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --oracle-font-display: 'Cinzel', serif;
   --oracle-bg-pattern: url('/mystical_bg_dark.png');
+  /* RGB components for theme-aware alpha transparency */
+  --oracle-gold-rgb: 215, 174, 105;
+  --oracle-success-rgb: 84, 191, 163;
+  --oracle-purple-rgb: 142, 110, 194;
+  --oracle-danger-rgb: 207, 110, 91;
+  --oracle-gold-dark: #a47631;
 }
 
 [data-oracle-theme='light'] {
@@ -48,6 +54,12 @@
   --oracle-success: #378a68;
   --oracle-shadow: 0 15px 35px rgba(140, 110, 80, 0.08);
   --oracle-bg-pattern: url('/mystical_bg_light.png');
+  /* RGB components for theme-aware alpha transparency */
+  --oracle-gold-rgb: 178, 133, 66;
+  --oracle-success-rgb: 55, 138, 104;
+  --oracle-purple-rgb: 116, 87, 164;
+  --oracle-danger-rgb: 173, 80, 63;
+  --oracle-gold-dark: #8c6022;
 }
 
 /* Base resets in layout context */

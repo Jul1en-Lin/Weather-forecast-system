@@ -2,11 +2,16 @@
 
 ## Current goal
 
-Goal: Verify and polish layout branding aesthetics under light and dark modes.
+Goal: Complete final visual and layout adjustments on bottom cards.
 
-Status: Completed. Fixed SVG logo border glow box issue by replacing DOM box-shadow animation with path-based drop-shadow animation in OracleLayout.vue.
+Status: Completed. Removed redirection links to the knowledge base from the life weather index and travel advisory cards, and swapped the positions of the weather verse card and travel advisory card in OracleBottomCards.vue.
 
 ## Done
+
+- Adjusted bottom cards layout and links (OracleBottomCards.vue):
+  - Removed `<router-link>` footer elements from "生活气象指数" and "出行建议" cards.
+  - Swapped the positions of the "出行建议" card and "天气签文" card, placing "出行建议" as Card 2 and "天气签文" as Card 3.
+  - Verified Vite compile and pytest backend test passes.
 
 - Fixed logo border glow box issue (OracleLayout.vue):
   - Created a scoped keyframe animation `pulse-logo-glow` that uses SVG `filter: drop-shadow` and `opacity` modulation.

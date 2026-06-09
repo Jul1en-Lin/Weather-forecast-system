@@ -20,10 +20,20 @@
           <span class="stars-wrap">{{ getStarsString(wealthRating) }}</span>
         </div>
       </div>
-      <router-link to="/knowledge-base" class="card-link-footer">查看详情 →</router-link>
     </div>
 
-    <!-- Card 2: Weather Verse Scroll -->
+    <!-- Card 2: Travel Advisory -->
+    <div class="oracle-bottom-card oracle-surface oracle-gold-corners">
+      <span class="oracle-eyebrow">Travel Advisory</span>
+      <h4 class="card-title">
+        <span class="card-icon">☂️</span> 出行建议
+      </h4>
+      <p class="tip-content-text">
+        晴天外出注意防晒与补水，雨天出行备好雨具并减速慢行。关注温差适度增减衣物。
+      </p>
+    </div>
+
+    <!-- Card 3: Weather Verse Scroll -->
     <div class="oracle-bottom-card oracle-surface oracle-gold-corners">
       <span class="oracle-eyebrow">Weather Verse</span>
       <h4 class="card-title">
@@ -37,18 +47,6 @@
           换一签 🔄
         </button>
       </div>
-    </div>
-
-    <!-- Card 3: Travel Advisory -->
-    <div class="oracle-bottom-card oracle-surface oracle-gold-corners">
-      <span class="oracle-eyebrow">Travel Advisory</span>
-      <h4 class="card-title">
-        <span class="card-icon">☂️</span> 出行建议
-      </h4>
-      <p class="tip-content-text">
-        晴天外出注意防晒与补水，雨天出行备好雨具并减速慢行。关注温差适度增减衣物。
-      </p>
-      <router-link to="/knowledge-base" class="card-link-footer">获取更多建议 →</router-link>
     </div>
 
     <!-- Card 4: Knowledge Base Recommend -->

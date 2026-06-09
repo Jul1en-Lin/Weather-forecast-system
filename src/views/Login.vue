@@ -15,7 +15,7 @@
 
       <!-- Welcome Banner -->
       <div class="welcome-banner">
-        <h2 class="welcome-title">欢迎回来</h2>
+        <h2 class="welcome-title">✦ 欢迎回来 ✦</h2>
       </div>
       
       <form @submit.prevent="handleLogin" class="login-form">
@@ -291,15 +291,6 @@ const handleForgotPassword = () => {
   color: var(--text-color);
 }
 
-.brand-subtitle {
-  font-family: 'Marcellus', Georgia, serif;
-  font-size: 12px;
-  color: var(--gold-color);
-  letter-spacing: 0.25em;
-  margin: 4px 0 0 0;
-  text-transform: uppercase;
-}
-
 .welcome-banner {
   text-align: center;
   margin-bottom: 24px;
@@ -312,12 +303,6 @@ const handleForgotPassword = () => {
   font-weight: 600;
   margin: 0;
   letter-spacing: 0.05em;
-}
-
-.welcome-subtitle {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin: 4px 0 0 0;
 }
 
 .login-form {

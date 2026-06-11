@@ -13,8 +13,12 @@ dist-ssr
 *.local
 .local/
 .superpowers/
+scripts/generate-practice-report.cjs
 
 # Docs
+docs/agent_workflow.md
+docs/project_status.md
+docs/superpowers
 docs/manuals/
 docs/**/*.pdf
 docs/archive/
@@ -31,6 +35,7 @@ docs/images/*
 !docs/images/setting1.png
 !docs/images/setting2.png
 !docs/images/users.png
+docs/reports
 
 # Editor directories and files
 .vscode/*

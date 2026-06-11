@@ -56,7 +56,7 @@
 - 支持历史对话列表、新建对话、切换对话、删除对话、批量删除。
 - 支持 AI 自动总结对话标题。
 - 可结合气象术语库、预警信号库和天气/预警工具回答。
-- 对支持工具调用的模型，可绑定天气查询和预警查询工具；不支持工具调用的模型会用提示词方式补充工具说明。
+- 对支持工具调用的模型，绑定天气查询和预警查询工具。
 
 ### 知识库
 
@@ -101,7 +101,7 @@
 | 数据库 | SQLite、SQLAlchemy |
 | 认证 | bcrypt、Cookie Session |
 | HTTP 客户端 | httpx |
-| 外部服务 | Kimi、MiniMax、DeepSeek、Ollama 兼容接口、Tavily、QWeather |
+| 外部服务 | Ollama 兼容接口、Tavily、QWeather |
 
 ## 文件结构
 
@@ -234,20 +234,6 @@
 cp backend/.env.example backend/.env
 ```
 
-可用配置：
-
-| 变量 | 说明 | 默认值 |
-| --- | --- | --- |
-| `DATABASE_URL` | SQLite 连接地址 | `sqlite:///./database.sqlite` |
-| `KIMI_API_KEY` | Kimi API Key | 空 |
-| `DEEPSEEK_API_KEY` | DeepSeek API Key | 空 |
-| `MINIMAX_API_KEY` | MiniMax API Key | 空 |
-| `TAVILY_API_KEY` | Tavily Search API Key | 空 |
-| `QWEATHER_API_KEY` | 和风天气 API Key | 空 |
-| `QWEATHER_API_HOST` | 和风天气 API Host | `devapi.qweather.com` |
-| `OLLAMA_BASE_URL` | Ollama 兼容接口地址 | `http://localhost:11434/v1` |
-| `APP_SECRET_KEY` | 应用密钥预留项 | `change-me` |
-| `ALLOWED_ORIGINS` | 后端 CORS 来源 | `http://localhost:5173` |
 
 前端默认不需要单独配置。`vite.config.ts` 会把 `/api/*` 转发到 `http://localhost:8000`。
 
@@ -268,11 +254,10 @@ cp backend/.env.example backend/.env
 | `model_configs` | LLM 模型配置 |
 | `tool_configs` | 天气工具配置 |
 
-默认种子数据包含：
+默认数据包含：
 
 - 管理员：`admin / admin123`
-- 模型：Kimi K2.5、MiniMax M2.5、DeepSeek-V4-Flash、DeepSeek R1 14B 本地模型
-- 工具：天气查询、预警查询
+- 工具：天气查询、预警查询（需配置 API）
 - 气象术语与预警信号示例数据
 
 ### 模型配置
